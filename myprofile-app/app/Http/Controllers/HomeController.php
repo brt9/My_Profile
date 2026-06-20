@@ -4,87 +4,110 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Services\GitHub\GitHubClient;
+use App\Services\Steam\SteamClient;
+use App\Services\Telemetry\IntegrationHealthMonitor;
+use App\Services\Weather\WeatherClient;
 use Illuminate\Support\Arr;
 use Throwable;
-use App\Services\Steam\SteamClient;
-use App\Services\Weather\WeatherClient;
 
 final class HomeController extends Controller
 {
-    public function __invoke(Request $request)
+    public function __invoke(IntegrationHealthMonitor $health)
     {
-        // ---------- STEAM ----------
-        $steam          = SteamClient::fromConfig();
-        $recent         = [];
-        $summary        = [];
-        $achv           = [];
-        $currentGame    = null; // <- usado pelo Blade para “Jogando agora”
+        $portfolio = config('portfolio');
+        $github = null;
+        $externalCallsEnabled = ! app()->environment('testing')
+            || (bool) ($portfolio['integrations']['allow_in_tests'] ?? false);
+
+        if ($externalCallsEnabled && ($portfolio['integrations']['github'] ?? true)) {
+            $githubClient = GitHubClient::fromConfig();
+            $github = $githubClient->cachedDashboard();
+
+            defer(function () use ($githubClient, $health): void {
+                $startedAt = microtime(true);
+                try {
+                    $githubClient->dashboard();
+                    $health->success('github', $startedAt);
+                } catch (Throwable) {
+                    $health->failure('github', $startedAt);
+                }
+            });
+        }
+
+        $recent = [];
+        $summary = ['game_count' => 0, 'total_minutes' => 0, 'top' => []];
+        $achievements = [];
+        $currentGame = null;
         $featuredGameId = null;
+        $steamEnabled = filled(config('services.steam.key')) && filled(config('services.steam.id'));
 
-        try {
-            // Se seu client tiver outro nome, troque currentGame() por nowPlaying() ou getCurrentGame()
-            $currentGame = $steam->currentGame(); // deve retornar ['appid'=>int,'name'=>string,'image'=>url,'capsule'=>url] ou null
-        } catch (Throwable $e) {
-            // evita quebrar a home se a Steam rate-limitou
-            $currentGame = null;
+        if ($steamEnabled && $externalCallsEnabled) {
+            $steam = SteamClient::fromConfig();
+            $currentGame = $steam->cachedCurrentGame();
+            $recent = $steam->cachedRecentGames();
+            $summary = $steam->cachedLibrarySummary();
+
+            $featuredGameId = Arr::get($currentGame, 'appid')
+                ?? Arr::get($recent, '0.appid')
+                ?? Arr::get($summary, 'top.0.appid');
+
+            $achievements = $featuredGameId
+                ? $steam->cachedAchievements((int) $featuredGameId)
+                : [];
+
+            defer(function () use ($steam, $health): void {
+                $startedAt = microtime(true);
+                try {
+                    $current = $steam->currentGame();
+                    $recentGames = $steam->recentGames(6);
+                    $library = $steam->librarySummary(6);
+                    $featuredId = Arr::get($current, 'appid')
+                        ?? Arr::get($recentGames, '0.appid')
+                        ?? Arr::get($library, 'top.0.appid');
+
+                    if ($featuredId) {
+                        $steam->achievements((int) $featuredId, 8);
+                    }
+                    $health->success('steam', $startedAt);
+                } catch (Throwable) {
+                    $health->failure('steam', $startedAt);
+                }
+            });
         }
 
-        try {
-            $recent  = $steam->recentGames(6);       // array de jogos recentes (até 6)
-        } catch (Throwable $e) {
-            $recent = [];
+        $weatherNatal = null;
+        $weatherVisitor = null;
+
+        if (($portfolio['integrations']['weather'] ?? false) && $externalCallsEnabled) {
+            $weather = new WeatherClient;
+            $weatherNatal = $weather->cachedByCoords(-5.795, -35.209);
+
+            defer(function () use ($weather, $health): void {
+                $startedAt = microtime(true);
+                try {
+                    $weather->byCoords(-5.795, -35.209, 'Natal, RN');
+                    $health->success('weather', $startedAt);
+                } catch (Throwable) {
+                    $health->failure('weather', $startedAt);
+                }
+            });
         }
 
-        try {
-            $summary = $steam->librarySummary(6);    // ['game_count'=>int,'total_minutes'=>int,'top'=>[...]]
-        } catch (Throwable $e) {
-            $summary = ['game_count' => 0, 'total_minutes' => 0, 'top' => []];
-        }
-
-        // Escolhe um app para destacar conquistas:
-        // 1) o que está jogando agora; 2) primeiro dos recentes; 3) primeiro do top.
-        $featuredGameId =
-            Arr::get($currentGame, 'appid')
-            ?? Arr::get($recent, '0.appid')
-            ?? Arr::get($summary, 'top.0.appid');
-
-        try {
-            $achv = $featuredGameId ? $steam->achievements((int) $featuredGameId, 8) : [];
-        } catch (Throwable $e) {
-            $achv = [];
-        }
-
-        // ---------- CLIMA ----------
-        $wx = new WeatherClient();
-
-        try {
-            // Natal/RN (coords aproximadas)
-            $weatherNatal = $wx->byCoords(-5.795, -35.209, 'Natal, RN');
-        } catch (Throwable $e) {
-            $weatherNatal = null;
-        }
-
-        try {
-            // Visitante (por IP)
-            $weatherVisitor = $wx->byRequest($request);
-        } catch (Throwable $e) {
-            $weatherVisitor = null;
-        }
-
-        // ---------- VIEW ----------
         return view('home', [
-            // Steam
-            'steamProfile'         => 'https://steamcommunity.com/profiles/' . (config('services.steam.id') ?? config('services.steam.steamid')),
-            'currentGame'          => $currentGame,        // <- necessário para o bloco “Jogando agora” no Blade
-            'recentGames'          => $recent,
-            'steamSummary'         => $summary,
-            'featuredGameId'       => $featuredGameId,
-            'featuredAchievements' => $achv,
-
-            // Clima
-            'weatherNatal'         => $weatherNatal,
-            'weatherVisitor'       => $weatherVisitor,
+            'portfolio' => $portfolio,
+            'github' => $github,
+            'steamEnabled' => $steamEnabled,
+            'steamProfile' => $steamEnabled
+                ? 'https://steamcommunity.com/profiles/'.config('services.steam.id')
+                : null,
+            'currentGame' => $currentGame,
+            'recentGames' => $recent,
+            'steamSummary' => $summary,
+            'featuredGameId' => $featuredGameId,
+            'featuredAchievements' => $achievements,
+            'weatherNatal' => $weatherNatal,
+            'weatherVisitor' => $weatherVisitor,
         ]);
     }
 }

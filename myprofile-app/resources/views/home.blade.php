@@ -1,45 +1,95 @@
-{{-- resources/views/home.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
-    {{-- HERO --}}
-    <section id="home" class="max-w-7xl mx-auto px-4 pb-4">
-        <section id="inicio" class="max-w-7xl mx-auto px-4 py-16">
-            <div class="grid items-center gap-10 md:grid-cols-2">
-                <div>
-                    <p class="text-sm uppercase tracking-wider text-slate-500">PT-BR</p>
-                    <h1 class="mt-2 text-4xl sm:text-5xl font-extrabold leading-tight">
-                        Olá, eu sou <span class="text-slate-900">{{ $name ?? 'Pedro Felipe' }}</span>
-                    </h1>
-                    <p class="mt-4 text-slate-600">
-                        {{ $headline ?? 'Desenvolvedor Full Stack e nas horas vagas gamer.' }}
-                    </p>
+    <header id="inicio" class="hero">
+        <div class="container-shell">
+            <div class="hero-grid">
+                <div class="hero-copy">
+                    <span class="eyebrow">{{ $portfolio['role'] }}</span>
+                    <h1>Pedro Felipe,<br><span class="gradient-text">código que resolve.</span></h1>
+                    <p class="hero-lead">{{ $portfolio['headline'] }}</p>
 
-                    <div class="mt-6 flex flex-wrap gap-3">
-                        <a href="#sobre"
-                            class="inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 text-white hover:opacity-90">
-                            Sobre mim
-                        </a>
-                        <a href="#portfolio"
-                            class="inline-flex items-center rounded-lg border border-slate-300 px-4 py-2 hover:bg-slate-50">
-                            Ver projetos
-                        </a>
+                    <div class="badge-list" aria-label="Tecnologias principais">
+                        <span class="badge">🐘 PHP & Laravel</span>
+                        <span class="badge">⚡ JavaScript</span>
+                        <span class="badge">🧩 APIs & integrações</span>
+                        <span class="badge">📍 {{ $portfolio['location'] }}</span>
+                    </div>
+
+                    <div class="hero-actions">
+                        <a href="#projetos" class="button button-primary">Explorar projetos <span aria-hidden="true">↓</span></a>
+                        <a href="#contato" class="button button-secondary">Entrar em contato</a>
                     </div>
                 </div>
 
-                <div class="relative">
-                    <div
-                        class="flex aspect-[4/3] items-center justify-center rounded-2xl border bg-gradient-to-br from-slate-50 to-slate-100">
-                        <span class="text-sm text-slate-500">Sua foto / ilustração</span>
+                <div class="hero-visual" aria-label="Identidade visual de Pedro Felipe">
+                    <div class="hero-orbit" aria-hidden="true"></div>
+                    <div class="avatar-card">
+                        @if (!empty($portfolio['photo']))
+                            <img src="{{ asset($portfolio['photo']) }}" alt="Foto de {{ $portfolio['name'] }}" class="avatar-image" width="512" height="512" fetchpriority="high">
+                        @else
+                            <span class="avatar-monogram">PF</span>
+                        @endif
                     </div>
+                    <span class="floating-label top">&lt;full-stack /&gt;</span>
+                    <span class="floating-label bottom">laravel · php · js</span>
                 </div>
             </div>
-        </section>
 
+            <div class="stats-grid" aria-label="Resumo profissional">
+                @foreach ($portfolio['stats'] as $stat)
+                    <div class="stat">
+                        <strong>{{ $stat['value'] }}</strong>
+                        <span>{{ $stat['label'] }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </header>
 
-        @include('sections.pc')
-        @include('sections.about')
-        @include('sections.weather')
-        @include('sections.steam')
+    @include('sections.about')
+    @include('sections.pc')
+
+    <section id="integracoes" class="section section-alt">
+        <div class="container-shell">
+            <div class="section-header">
+                <div>
+                    <span class="section-kicker">Integrações</span>
+                    <h2>Dados reais, não só cards.</h2>
+                </div>
+                <p>Recursos do projeto consumindo serviços externos com cache, tolerância a falhas e apresentação responsiva.</p>
+            </div>
+
+            <div class="integration-grid">
+                @include('sections.weather')
+                @include('sections.steam')
+                @include('sections.github')
+            </div>
+        </div>
+    </section>
+
+    <section id="contato" class="section">
+        <div class="container-shell">
+            <div class="contact-panel">
+                <span class="section-kicker">Contato</span>
+                <h2>Tem um problema interessante<br>para resolver?</h2>
+                <p>Estou aberto a conversas sobre desenvolvimento web, Laravel, integrações e produtos digitais. Veja o código no GitHub ou fale comigo pelo LinkedIn.</p>
+
+                <div class="contact-actions">
+                    @if ($portfolio['email'])
+                        <a href="mailto:{{ $portfolio['email'] }}" class="button button-primary">Enviar e-mail</a>
+                    @endif
+                    @if ($portfolio['social']['linkedin'])
+                        <a href="{{ $portfolio['social']['linkedin'] }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">LinkedIn ↗</a>
+                    @endif
+                    @if ($portfolio['social']['github'])
+                        <a href="{{ $portfolio['social']['github'] }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">GitHub ↗</a>
+                    @endif
+                    @unless ($portfolio['email'] || $portfolio['social']['linkedin'] || $portfolio['social']['github'])
+                        <a href="#inicio" class="button button-primary">Conhecer meu trabalho ↑</a>
+                    @endunless
+                </div>
+            </div>
+        </div>
     </section>
 @endsection

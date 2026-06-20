@@ -1,75 +1,114 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Carbon;
+use App\Services\Telemetry\TelemetryHistory;
+use App\Services\Telemetry\TelemetryIngestor;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 
-class TelemetryController extends Controller
+final class TelemetryController extends Controller
 {
-    private const CACHE_KEY = 'telemetry:latest';
-    private const TTL_SEC   = 120;   // mantém último pacote por até 2 min
-    private const STALE_SEC = 30;    // após 30s sem push, marcar "stale"
-
-    public function store(Request $req): JsonResponse
+    public function store(Request $request, TelemetryIngestor $ingestor): JsonResponse
     {
-        // Token simples (opcional)
-        $auth  = $req->header('Authorization', '');
-        $token = config('services.telemetry.token', env('TELEMETRY_TOKEN'));
-        if (!$token || $auth !== 'Bearer ' . $token) {
+        $expectedToken = (string) config('telemetry.token');
+        $providedToken = (string) $request->bearerToken();
+
+        if ($expectedToken === '' || ! hash_equals($expectedToken, $providedToken)) {
             return response()->json(['message' => 'unauthorized'], 401);
         }
 
-        // Campos aceitos (inclui gpu_load)
-        $fields = ['cpu_temp', 'gpu_temp', 'cpu_load', 'gpu_load', 'pump_rpm', 'coolant_temp'];
-        $in     = $req->only($fields);
-
-        // Normalização / limites simples
-        $num = static fn($v) => is_null($v) ? null : (is_numeric($v) ? (float)$v : null);
-        $clamp = static function ($v, $lo, $hi) {
-            if ($v === null) return null;
-            if ($v < $lo) return $lo;
-            if ($v > $hi) return $hi;
-            return $v;
-        };
-
-        $cpu_temp     = $clamp($num($in['cpu_temp'] ?? null), 0, 120);
-        $gpu_temp     = $clamp($num($in['gpu_temp'] ?? null), 0, 120);
-        $cpu_load     = $clamp($num($in['cpu_load'] ?? null), 0, 100);
-        $gpu_load     = $clamp($num($in['gpu_load'] ?? null), 0, 100);
-        $pump_rpm     = $num($in['pump_rpm'] ?? null);       // se um dia existir
-        $coolant_temp = $clamp($num($in['coolant_temp'] ?? null), 0, 120);
-
-        // Arredonda onde faz sentido (1 casa p/ temp e carga)
-        $round1 = static fn($v) => is_null($v) ? null : round($v, 1);
-
-        $payload = [
-            'cpu_temp'      => $round1($cpu_temp),
-            'gpu_temp'      => $round1($gpu_temp),
-            'cpu_load'      => $round1($cpu_load),
-            'gpu_load'      => $round1($gpu_load),
-            'pump_rpm'      => $pump_rpm,            // inteiro opcional (se vier)
-            'coolant_temp'  => $round1($coolant_temp),
-            'updated_at'    => Carbon::now()->toIso8601String(),
-        ];
-
-        Cache::put(self::CACHE_KEY, $payload, self::TTL_SEC);
-
-        return response()->json(['ok' => true]);
-    }
-
-    public function show(): JsonResponse
-    {
-        $d = Cache::get(self::CACHE_KEY);
-        if (!$d) {
-            return response()->json(['stale' => true]);
+        if (strlen($request->getContent()) > (int) config('telemetry.max_payload_bytes', 16384)) {
+            return response()->json(['message' => 'payload_too_large'], 413);
         }
 
-        $stale = Carbon::parse($d['updated_at'])->diffInSeconds(now()) > self::STALE_SEC;
+        $validated = $request->validate([
+            'agent_id' => ['required', 'string', 'max:64', 'regex:/^[A-Za-z0-9._-]+$/'],
+            'collected_at' => ['required', 'date'],
+            'cpu_temp' => ['nullable', 'numeric', 'between:0,120'],
+            'gpu_temp' => ['nullable', 'numeric', 'between:0,120'],
+            'cpu_load' => ['nullable', 'numeric', 'between:0,100'],
+            'gpu_load' => ['nullable', 'numeric', 'between:0,100'],
+            'memory_usage' => ['nullable', 'numeric', 'between:0,100'],
+            'disk_usage' => ['nullable', 'numeric', 'between:0,100'],
+            'pump_rpm' => ['nullable', 'numeric', 'between:0,10000'],
+            'coolant_temp' => ['nullable', 'numeric', 'between:0,120'],
+            'uptime_seconds' => ['nullable', 'integer', 'between:0,315360000'],
+            'agent_version' => ['required', 'string', 'max:30'],
+        ]);
 
-        // retorna exatamente o que temos + flag 'stale'
-        return response()->json($d + ['stale' => $stale]);
+        $collectedAt = Carbon::parse((string) $validated['collected_at'])->utc();
+        if ($collectedAt->isAfter(now()->utc()->addMinutes(5)) || $collectedAt->isBefore(now()->utc()->subDays(2))) {
+            throw ValidationException::withMessages([
+                'collected_at' => 'O instante de coleta está fora da janela aceita.',
+            ]);
+        }
+
+        $inserted = $ingestor->ingest($validated);
+
+        return response()->json([
+            'ok' => true,
+            'duplicate' => ! $inserted,
+        ]);
+    }
+
+    public function show(TelemetryIngestor $ingestor): JsonResponse
+    {
+        $payload = $ingestor->latestPayload();
+
+        if ($payload === []) {
+            return response()->json([
+                'status' => 'unavailable',
+                'data' => null,
+                'meta' => [
+                    'source' => 'telemetry-agent',
+                    'collected_at' => null,
+                    'stale' => true,
+                    'machine_status' => 'offline',
+                ],
+                'error' => null,
+            ]);
+        }
+
+        $age = Carbon::parse($payload['collected_at'])->diffInSeconds(now()->utc(), true);
+        $stale = $age > (int) config('telemetry.stale_after', 30);
+        $offline = $age > (int) config('telemetry.offline_after', 180);
+
+        return response()->json([
+            'status' => $stale ? 'stale' : 'available',
+            'data' => collect($payload)->except(['agent_id', 'agent_version', 'collected_at'])->all(),
+            'meta' => [
+                'source' => 'telemetry-agent',
+                'collected_at' => $payload['collected_at'],
+                'stale' => $stale,
+                'machine_status' => $offline ? 'offline' : ($stale ? 'stale' : 'online'),
+                'agent_version' => $payload['agent_version'] ?? null,
+            ],
+            'error' => null,
+        ]);
+    }
+
+    public function history(Request $request, TelemetryHistory $history): JsonResponse
+    {
+        $validated = $request->validate([
+            'metric' => ['required', 'string', 'max:40'],
+            'range' => ['sometimes', 'string', 'max:4'],
+            'resolution' => ['sometimes', 'string', 'max:4'],
+        ]);
+
+        try {
+            return response()->json($history->get(
+                $validated['metric'],
+                $validated['range'] ?? '6h',
+                $validated['resolution'] ?? null,
+            ));
+        } catch (InvalidArgumentException $exception) {
+            throw ValidationException::withMessages(['metric' => $exception->getMessage()]);
+        }
     }
 }

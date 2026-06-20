@@ -37,6 +37,11 @@ return [
 
     'steam' => [
         'key' => env('STEAM_API_KEY'),
-        'id'  => env('STEAM_ID'),
+        'id' => env('STEAM_ID'),
+    ],
+
+    'github' => [
+        'username' => env('GITHUB_USERNAME', 'brt9'),
+        'token' => env('GITHUB_TOKEN'),
     ],
 ];

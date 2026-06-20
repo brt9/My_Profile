@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 import laravel from 'laravel-vite-plugin'
 
 export default defineConfig({
@@ -7,18 +8,18 @@ export default defineConfig({
       input: [
         'resources/css/app.css',
         'resources/js/app.js',
-        // remova a linha abaixo se o arquivo não existir
-        'resources/js/axios.js',
+        'resources/js/app.jsx',
       ],
       refresh: true,
     }),
+    react(),
   ],
   server: {
-    host: true,                 // 0.0.0.0
+    host: true,
     port: 5137,
     strictPort: true,
     cors: true,
-    origin: 'http://127.0.0.1:5137',   // evita problemas de "localhost" no Windows
+    origin: 'http://127.0.0.1:5137',
     watch: {
       usePolling: true,
       interval: 100,

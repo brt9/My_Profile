@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services\Weather;
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 final class WeatherClient
 {
@@ -17,15 +18,15 @@ final class WeatherClient
      * Busca clima atual por latitude/longitude.
      * Retorna dados prontos pra mostrar na view.
      */
-    public function byCoords(float $lat, float $lon, ?string $label = null): array
+    public function byCoords(float $lat, float $lon, ?string $label = null, string $source = 'fixed'): array
     {
-        $cacheKey = sprintf('wx:%s:%s', round($lat, 3), round($lon, 3));
+        $cacheKey = $this->coordsCacheKey($lat, $lon, $source);
 
-        return Cache::remember($cacheKey, now()->addMinutes(10), function () use ($lat, $lon, $label) {
+        return Cache::remember($cacheKey, now()->addMinutes(10), function () use ($lat, $lon, $label, $source) {
             $params = [
-                'latitude'  => $lat,
+                'latitude' => $lat,
                 'longitude' => $lon,
-                'current'   => implode(',', [
+                'current' => implode(',', [
                     'temperature_2m',
                     'apparent_temperature',
                     'weather_code',
@@ -36,30 +37,50 @@ final class WeatherClient
                     'uv_index',
                     'cloud_cover',
                 ]),
-                'timezone'  => 'auto',
+                'timezone' => 'auto',
             ];
 
-            $json = Http::timeout(8)->get(self::OPEN_METEO, $params)->json();
+            $json = Http::acceptJson()
+                ->timeout(8)
+                ->retry(1, 250)
+                ->get(self::OPEN_METEO, $params)
+                ->throw()
+                ->json();
             $c = $json['current'] ?? [];
 
             $code = (int) ($c['weather_code'] ?? 0);
 
             return [
-                'label'      => $label ?: '—',
-                'temp'       => $c['temperature_2m'] ?? null,
+                'label' => $label ?: '—',
+                'temp' => $c['temperature_2m'] ?? null,
                 'feels_like' => $c['apparent_temperature'] ?? null,
-                'wind_kmh'   => isset($c['wind_speed_10m']) ? round((float) $c['wind_speed_10m']) : null,
-                'wind_dir'   => $c['wind_direction_10m'] ?? null,
-                'humidity'   => $c['relative_humidity_2m'] ?? null,
-                'pressure'   => $c['pressure_msl'] ?? null,
-                'uv'         => $c['uv_index'] ?? null,
-                'clouds'     => $c['cloud_cover'] ?? null,
+                'wind_kmh' => isset($c['wind_speed_10m']) ? round((float) $c['wind_speed_10m']) : null,
+                'wind_dir' => $c['wind_direction_10m'] ?? null,
+                'humidity' => $c['relative_humidity_2m'] ?? null,
+                'pressure' => $c['pressure_msl'] ?? null,
+                'uv' => $c['uv_index'] ?? null,
+                'clouds' => $c['cloud_cover'] ?? null,
                 'updated_at' => $c['time'] ?? null,
-                'code'       => $code,
-                'condition'  => self::describe($code),
-                'emoji'      => self::emoji($code),
+                'code' => $code,
+                'condition' => self::describe($code),
+                'emoji' => self::emoji($code),
+                'source' => $source,
+                'origin' => match ($source) {
+                    'browser' => 'Localização autorizada no navegador',
+                    'ip' => 'Localização aproximada por IP',
+                    'fallback' => 'Localização padrão: Natal/RN',
+                    default => 'Localização fixa: Natal/RN',
+                },
             ];
         });
+    }
+
+    /** @return array<string, mixed>|null */
+    public function cachedByCoords(float $lat, float $lon, string $source = 'fixed'): ?array
+    {
+        $weather = Cache::get($this->coordsCacheKey($lat, $lon, $source));
+
+        return is_array($weather) ? $weather : null;
     }
 
     /**
@@ -77,7 +98,7 @@ final class WeatherClient
 
         // se só temos IP privado (ex.: 172.20.0.1), evita geolocalizar
         if (self::isPrivateIp($ip)) {
-            return $this->byCoords(-23.5505, -46.6333, 'Sua localização');
+            return $this->byCoords(-5.795, -35.209, 'Natal, RN', 'fallback');
         }
 
         // 1) tenta ipapi.co
@@ -86,8 +107,12 @@ final class WeatherClient
             $geo = Http::timeout(5)->retry(1, 200)
                 ->get("https://ipapi.co/{$ip}/json/")
                 ->json();
-        } catch (\Throwable $e) {
-            Log::warning('ipapi.co indisponível', ['err' => $e->getMessage()]);
+        } catch (Throwable) {
+            Log::warning('Weather geolocation provider unavailable', [
+                'integration' => 'weather',
+                'provider' => 'ipapi',
+                'status' => 'error',
+            ]);
         }
 
         // 2) fallback: ipwho.is (sem key, Cloudflare)
@@ -97,28 +122,35 @@ final class WeatherClient
                     ->get("https://ipwho.is/{$ip}")
                     ->json();
 
-                if (!empty($alt) && !($alt['bogon'] ?? false) && ($alt['success'] ?? true)) {
+                if (! empty($alt) && ! ($alt['bogon'] ?? false) && ($alt['success'] ?? true)) {
                     $geo = [
-                        'latitude'     => $alt['latitude']  ?? null,
-                        'longitude'    => $alt['longitude'] ?? null,
-                        'city'         => $alt['city']      ?? null,
-                        'region'       => $alt['region']    ?? null,
-                        'region_code'  => $alt['region_code'] ?? null,
+                        'latitude' => $alt['latitude'] ?? null,
+                        'longitude' => $alt['longitude'] ?? null,
+                        'city' => $alt['city'] ?? null,
+                        'region' => $alt['region'] ?? null,
+                        'region_code' => $alt['region_code'] ?? null,
                     ];
                 }
-            } catch (\Throwable $e) {
-                Log::warning('ipwho.is indisponível', ['err' => $e->getMessage()]);
+            } catch (Throwable) {
+                Log::warning('Weather geolocation provider unavailable', [
+                    'integration' => 'weather',
+                    'provider' => 'ipwho',
+                    'status' => 'error',
+                ]);
             }
         }
 
-        // monta resposta mesmo se não vier nada
-        $lat  = isset($geo['latitude'])  ? (float) $geo['latitude']  : -23.5505;
-        $lon  = isset($geo['longitude']) ? (float) $geo['longitude'] : -46.6333;
-        $city = trim(($geo['city'] ?? 'Sua localização') . (
-            !empty($geo['region_code']) ? ", {$geo['region_code']}" : (!empty($geo['region']) ? ", {$geo['region']}" : '')
+        if (empty($geo['latitude']) || empty($geo['longitude'])) {
+            return $this->byCoords(-5.795, -35.209, 'Natal, RN', 'fallback');
+        }
+
+        $lat = (float) $geo['latitude'];
+        $lon = (float) $geo['longitude'];
+        $city = trim(($geo['city'] ?? 'Localização aproximada').(
+            ! empty($geo['region_code']) ? ", {$geo['region_code']}" : (! empty($geo['region']) ? ", {$geo['region']}" : '')
         ));
 
-        return $this->byCoords($lat, $lon, $city);
+        return $this->byCoords($lat, $lon, $city, 'ip');
     }
 
     /**
@@ -128,9 +160,13 @@ final class WeatherClient
      */
     private static function isPrivateIp(?string $ip): bool
     {
-        if (!$ip) return true;
+        if (! $ip) {
+            return true;
+        }
 
-        if ($ip === '::1') return true;
+        if ($ip === '::1') {
+            return true;
+        }
 
         if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             if (
@@ -144,6 +180,11 @@ final class WeatherClient
         }
 
         return false;
+    }
+
+    private function coordsCacheKey(float $lat, float $lon, string $source): string
+    {
+        return sprintf('wx:%s:%s:%s', round($lat, 3), round($lon, 3), $source);
     }
 
     /** Descrição PT-BR do weather_code do Open-Meteo */

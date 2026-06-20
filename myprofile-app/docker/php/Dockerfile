@@ -14,11 +14,12 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
+    libpq-dev \
     libzip-dev \
     apt-utils \
     libonig-dev
 
-RUN docker-php-ext-install zip pdo_mysql mbstring exif
+RUN docker-php-ext-install zip pdo_pgsql mbstring exif
 RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
 RUN docker-php-ext-install gd
 

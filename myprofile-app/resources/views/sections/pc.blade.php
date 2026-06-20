@@ -1,391 +1,335 @@
-{{-- resources/views/sections/pc.blade.php --}}
-<section id="setup" class="max-w-7xl mx-auto px-4 py-16">
-    <header class="mb-8">
-        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Setup</p>
-        <h2 class="mt-1 text-3xl font-bold text-slate-900">Minha Máquina</h2>
-        <p class="mt-2 max-w-2xl text-slate-600">
-            Configuração focada em desenvolvimento (Laravel/PHP, Vite/Tailwind) e jogos em 1080p/1440p.
-        </p>
-    </header>
-
-    @php
-        // Resumo rápido
-        $chips = [
-            ['label' => 'CPU', 'value' => 'Core i5-14600K'],
-            ['label' => 'AIO', 'value' => 'iCUE LINK H100i LCD (240mm)'],
-            ['label' => 'GPU', 'value' => 'RTX 4060 Ti 8GB'],
-            ['label' => 'RAM', 'value' => '64GB (4×16) DDR5-6200 CL36'],
-            ['label' => 'Armazenamento', 'value' => 'NVMe 1TB (Kingston NV2)'],
-        ];
-
-        // Especificações (sem links)
-        $pc = [
-            [
-                'grupo' => 'Processador',
-                'modelo' => 'Intel Core i5-14600K (14ª geração)',
-                'detalhes' => '14 núcleos • 20 threads • Turbo até 5.3 GHz • LGA1700',
-                'icone' => '🧠',
-                'tag' => 'CPU',
-            ],
-            [
-                'grupo' => 'Refrigeração líquida',
-                'modelo' => 'Corsair iCUE LINK H100i LCD RGB (240mm)',
-                'detalhes' => 'Radiador 240 mm • tela LCD • RGB • compatível Intel/AMD',
-                'icone' => '💧',
-                'tag' => 'AIO',
-            ],
-            [
-                'grupo' => 'Placa-mãe',
-                'modelo' => 'ASUS ROG Strix B760-F Gaming Wi-Fi (DDR5)',
-                'detalhes' => 'ATX • LGA1700 • DDR5 • Wi-Fi',
-                'icone' => '🖧',
-                'tag' => 'Motherboard',
-            ],
-            [
-                'grupo' => 'Memória',
-                'modelo' => 'Corsair Dominator Platinum RGB 64GB (4×16)',
-                'detalhes' => 'DDR5 • 6200 MHz • CL36',
-                'icone' => '💾',
-                'tag' => 'RAM',
-            ],
-            [
-                'grupo' => 'Armazenamento',
-                'modelo' => 'Kingston NV2 1TB (M.2 2280 NVMe)',
-                'detalhes' => 'PCIe 4.0 • ~3500 MB/s leitura • ~2100 MB/s gravação',
-                'icone' => '🗄️',
-                'tag' => 'NVMe',
-            ],
-            [
-                'grupo' => 'Placa de vídeo',
-                'modelo' => 'ASUS Dual GeForce RTX 4060 Ti OC 8GB',
-                'detalhes' => 'GDDR6 • DLSS • Ray Tracing',
-                'icone' => '🎮',
-                'tag' => 'GPU',
-            ],
-            [
-                'grupo' => 'Gabinete',
-                'modelo' => 'Corsair iCUE 4000X RGB (Mid Tower)',
-                'detalhes' => 'Vidro temperado frontal e lateral • 3 fans RGB',
-                'icone' => '🖥️',
-                'tag' => 'Case',
-            ],
-        ];
-    @endphp
-
-    {{-- Resumo rápido --}}
-    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        @foreach ($chips as $c)
-            <div class="rounded-2xl border bg-white p-4">
-                <p class="text-xs uppercase tracking-wider text-slate-500">{{ $c['label'] }}</p>
-                <p class="mt-1 text-lg font-semibold">{{ $c['value'] }}</p>
-            </div>
-        @endforeach
-    </div>
-
-    {{-- Telemetria ao vivo (com histórico) --}}
-    <div x-data="telemetryBox()" x-init="init()" class="mt-6 rounded-2xl border bg-slate-900 text-white p-5">
-        <div class="flex items-start justify-between">
+<section id="lab" class="section">
+    <div class="container-shell">
+        <div class="section-header">
             <div>
-                <p class="text-xs uppercase tracking-wider text-slate-400">Telemetria em tempo real</p>
-                <h3 class="mt-1 text-xl font-semibold">Temperaturas / Carga</h3>
+                <span class="section-kicker">Lab pessoal</span>
+                <h2>Meu setup também<br>gera dados.</h2>
             </div>
-            <span class="rounded-full px-2.5 py-0.5 text-xs"
-                :class="stale ? 'bg-amber-500/20 text-amber-200' : 'bg-emerald-500/20 text-emerald-200'"
-                x-text="stale ? 'offline' : 'online'"></span>
+            <p>Uma área técnica para demonstrar coleta, persistência, histórico e degradação segura sem misturar o conteúdo profissional principal.</p>
         </div>
 
-        <!-- Cards: renderiza só os campos que existem (após carry-over) -->
-        <template
-            x-if="has('cpu_temp') || has('cpu_load') || has('gpu_temp') || has('gpu_load') || has('pump_rpm') || has('coolant_temp')">
-            <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <template x-if="has('cpu_temp') || has('cpu_load')">
-                    <div class="rounded-xl bg-white/10 p-4">
-                        <p class="text-xs text-slate-300">CPU</p>
-                        <p class="mt-1 text-2xl font-semibold" x-show="has('cpu_temp')"
-                            x-text="fmt1(curr.cpu_temp) + '°C'"></p>
-                        <p class="text-xs text-slate-400" x-show="has('cpu_load')"
-                            x-text="fmt1(curr.cpu_load) + '% carga'"></p>
-                    </div>
-                </template>
+        @php
+            $parts = [
+                ['label' => 'Processador', 'value' => 'Intel Core i5-14600K'],
+                ['label' => 'Placa de vídeo', 'value' => 'RTX 4060 Ti 8GB'],
+                ['label' => 'Memória', 'value' => '64GB DDR5-6200'],
+                ['label' => 'Armazenamento', 'value' => 'NVMe Kingston 1TB'],
+                ['label' => 'Refrigeração', 'value' => 'Corsair H100i LCD'],
+                ['label' => 'Sistema', 'value' => 'Windows + Docker'],
+            ];
+        @endphp
 
-                <template x-if="has('gpu_temp') || has('gpu_load')">
-                    <div class="rounded-xl bg-white/10 p-4">
-                        <p class="text-xs text-slate-300">GPU</p>
-                        <p class="mt-1 text-2xl font-semibold" x-show="has('gpu_temp')"
-                            x-text="fmt1(curr.gpu_temp) + '°C'"></p>
-                        <p class="text-xs text-slate-400" x-show="has('gpu_load')"
-                            x-text="fmt1(curr.gpu_load) + '% carga'"></p>
-                    </div>
-                </template>
-
-                <template x-if="has('pump_rpm')">
-                    <div class="rounded-xl bg-white/10 p-4">
-                        <p class="text-xs text-slate-300">Bomba AIO</p>
-                        <p class="mt-1 text-2xl font-semibold" x-text="fmt0(curr.pump_rpm) + ' RPM'"></p>
-                    </div>
-                </template>
-
-                <template x-if="has('coolant_temp')">
-                    <div class="rounded-xl bg-white/10 p-4">
-                        <p class="text-xs text-slate-300">Coolant</p>
-                        <p class="mt-1 text-2xl font-semibold" x-text="fmt1(curr.coolant_temp) + '°C'"></p>
-                    </div>
-                </template>
-            </div>
-        </template>
-
-        <p class="mt-3 text-xs text-slate-400" x-show="curr?.updated_at">
-            Atualizado <span x-text="new Date(curr.updated_at).toLocaleString()"></span>
-        </p>
-
-        <!-- Gráfico de histórico -->
-        <div class="mt-4 rounded-xl bg-white p-4">
-            <canvas id="telemetryChart" height="140"></canvas>
-        </div>
-
-        <!-- Debug opcional -->
-        <div class="mt-4 rounded-xl bg-black/30 p-3 text-xs">
-            <div class="mb-2 flex items-center gap-2">
-                <button @click="load(true)" class="rounded border border-white/20 px-2 py-1">Forçar atualização</button>
-                <span class="text-slate-400">URL: <code>{{ route('telemetry.show', [], false) }}</code></span>
-            </div>
-            <pre class="whitespace-pre-wrap" x-text="pretty(curr)"></pre>
-        </div>
-    </div>
-
-    <!-- Chart.js (CDN) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
-
-    <script>
-        function telemetryBox() {
-            const HISTORY_KEY = 'telemetry_history_v2'; // v2 pra evitar conflito com versões antigas
-            const MAX_POINTS = 120; // ~20 min se POLL_MS=10s
-
-            return {
-                // estado
-                curr: null, // amostra atual (com carry-over)
-                stale: true,
-                err: false,
-                timer: null,
-                chart: null,
-                seriesOrder: ['cpu_temp', 'gpu_temp', 'cpu_load', 'gpu_load', 'pump_rpm', 'coolant_temp'],
-                history: [], // [{ts, cpu_temp?, gpu_temp?, ...}]
-
-                // utils
-                n(x) {
-                    const v = Number(x);
-                    return Number.isFinite(v) ? v : null;
-                },
-                fmt1(x) {
-                    const v = this.n(x);
-                    return v == null ? '—' : v.toFixed(1);
-                },
-                fmt0(x) {
-                    const v = this.n(x);
-                    return v == null ? '—' : Math.round(v);
-                },
-                pretty(o) {
-                    try {
-                        return JSON.stringify(o, null, 2)
-                    } catch {
-                        return String(o)
-                    }
-                },
-                has(key) {
-                    return this.curr && this.curr[key] != null;
-                },
-
-                // persiste/restaura histórico
-                saveHistory() {
-                    try {
-                        localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history));
-                    } catch {}
-                },
-                loadHistory() {
-                    try {
-                        const raw = localStorage.getItem(HISTORY_KEY);
-                        if (raw) this.history = JSON.parse(raw) || [];
-                    } catch {
-                        this.history = [];
-                    }
-                },
-
-                // cria/atualiza o gráfico
-                ensureChart() {
-                    if (!window.Chart) return; // Chart.js ainda carregando
-                    const ctx = document.getElementById('telemetryChart').getContext('2d');
-
-                    // datasets apenas para séries que existem em algum ponto do histórico
-                    const labels = this.history.map(p => new Date(p.ts).toLocaleTimeString());
-                    const buildData = (key) => this.history.map(p => this.n(p[key]));
-
-                    const availableKeys = this.seriesOrder.filter(k =>
-                        this.history.some(p => this.n(p[k]) != null)
-                    );
-
-                    const datasetFor = (key) => ({
-                        label: ({
-                            cpu_temp: 'CPU °C',
-                            gpu_temp: 'GPU °C',
-                            cpu_load: 'CPU %',
-                            gpu_load: 'GPU %',
-                            pump_rpm: 'Bomba RPM',
-                            coolant_temp: 'Coolant °C'
-                        })[key] || key,
-                        data: buildData(key),
-                        tension: 0.25,
-                        pointRadius: 0,
-                        borderWidth: 2,
-                        spanGaps: true, // ignora buracos
-                    });
-
-                    if (!this.chart) {
-                        this.chart = new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels,
-                                datasets: availableKeys.map(datasetFor),
-                            },
-                            options: {
-                                animation: false,
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        labels: {
-                                            boxWidth: 10
-                                        }
-                                    },
-                                    tooltip: {
-                                        mode: 'index',
-                                        intersect: false
-                                    }
-                                },
-                                scales: {
-                                    x: {
-                                        display: true,
-                                        ticks: {
-                                            maxTicksLimit: 8
-                                        }
-                                    },
-                                    y: {
-                                        beginAtZero: false
-                                    }
-                                }
-                            }
-                        });
-                    } else {
-                        this.chart.data.labels = labels;
-
-                        // reconstroi datasets pra refletir quais chaves existem
-                        this.chart.data.datasets = availableKeys.map(datasetFor);
-                        this.chart.update('none');
-                    }
-                },
-
-                // normaliza amostra com carry-over do último ponto
-                carryOver(newSample) {
-                    const last = this.history.length ? this.history[this.history.length - 1] : null;
-                    const keys = ['cpu_temp', 'gpu_temp', 'cpu_load', 'gpu_load', 'pump_rpm', 'coolant_temp'];
-                    const out = {
-                        ts: Date.now()
-                    };
-                    for (const k of keys) {
-                        const v = newSample[k];
-                        out[k] = (v == null) ?
-                            (last ? last[k] ?? null : null) :
-                            this.n(v);
-                    }
-                    // timestamp/online
-                    out.updated_at = newSample.updated_at || (new Date()).toISOString();
-                    out.stale = !!newSample.stale;
-                    return out;
-                },
-
-                // carrega do backend
-                async load(verbose = false) {
-                    try {
-                        const url = '{{ route('telemetry.show', [], false) }}';
-                        const r = await fetch(url, {
-                            cache: 'no-store'
-                        });
-                        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-                        const j = await r.json();
-                        if (verbose) console.log('[telemetry] GET', url, j);
-
-                        // aplica carry-over para não exibir null
-                        const sample = this.carryOver(j);
-
-                        // guarda no histórico
-                        this.history.push(sample);
-                        if (this.history.length > MAX_POINTS) this.history.splice(0, this.history.length - MAX_POINTS);
-                        this.saveHistory();
-
-                        // estado atual e flags
-                        this.curr = sample;
-                        this.stale = !!j.stale;
-                        this.err = false;
-
-                        // atualiza gráfico
-                        this.ensureChart();
-
-                    } catch (e) {
-                        console.error('[telemetry] erro:', e);
-                        this.err = true;
-                        this.stale = true;
-
-                        // mesmo com erro, mantém último ponto (se existir) na tela
-                        if (this.history.length && !this.curr) {
-                            this.curr = this.history[this.history.length - 1];
-                        }
-                    }
-                },
-
-                init() {
-                    // histórico prévio
-                    this.loadHistory();
-                    if (this.history.length) {
-                        this.curr = this.history[this.history.length - 1];
-                        this.stale = !!this.curr.stale;
-                        // tenta desenhar um gráfico com o que já tem
-                        this.$nextTick(() => this.ensureChart());
-                    }
-
-                    // primeira carga + polling
-                    this.load(true);
-                    this.timer = setInterval(() => this.load(false), 10000);
-
-                    // foco/aba visível = força refresh
-                    document.addEventListener('visibilitychange', () => {
-                        if (!document.hidden) this.load(true);
-                    });
-                }
-            }
-        }
-    </script>
-
-
-
-    {{-- Especificações --}}
-    <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        @foreach ($pc as $p)
-            <article class="group rounded-2xl border bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-md">
-                <div class="flex items-start justify-between gap-3">
-                    <div class="min-w-0">
-                        <p class="text-xs font-medium uppercase tracking-wider text-slate-500">{{ $p['grupo'] }}</p>
-                        <h3 class="mt-1 font-semibold leading-snug">{{ $p['modelo'] }}</h3>
-                        <p class="mt-1 text-sm text-slate-600">{{ $p['detalhes'] }}</p>
-                    </div>
-                    <span class="shrink-0 grid h-10 w-10 place-items-center rounded-xl border bg-slate-50">
-                        <span class="text-lg" aria-hidden="true">{{ $p['icone'] }}</span>
-                    </span>
-                </div>
-                <div class="mt-4">
-                    <span class="inline-flex items-center rounded-full border bg-slate-50 px-2.5 py-0.5 text-xs">
-                        {{ $p['tag'] }}
-                    </span>
+        <div class="lab-grid">
+            <article class="panel">
+                <h3>Estação de desenvolvimento</h3>
+                <p>Configuração preparada para Laravel, containers, múltiplos serviços locais e jogos em 1080p/1440p.</p>
+                <div class="setup-summary">
+                    @foreach ($parts as $part)
+                        <div class="setup-part">
+                            <small>{{ $part['label'] }}</small>
+                            <strong>{{ $part['value'] }}</strong>
+                        </div>
+                    @endforeach
                 </div>
             </article>
-        @endforeach
+
+            <article
+                class="panel telemetry-panel"
+                x-data="telemetryPanel()"
+                x-init="init()"
+                @keydown.escape.window="closeHistory()"
+            >
+                <div class="telemetry-head">
+                    <div>
+                        <span class="card-kicker">API + PostgreSQL</span>
+                        <h3>Telemetria ao vivo e histórica</h3>
+                    </div>
+                    <span class="live-status" :class="`is-${status}`" x-text="statusLabel()"></span>
+                </div>
+
+                <div class="metric-grid telemetry-metric-grid">
+                    <template x-for="metric in metrics" :key="metric.key">
+                        <button
+                            type="button"
+                            class="metric metric-button"
+                            :disabled="!supported(metric.key)"
+                            :aria-label="supported(metric.key) ? `Abrir histórico de ${metric.label}` : `${metric.label}: não suportado`"
+                            @click="openHistory(metric)"
+                        >
+                            <small x-text="metric.label"></small>
+                            <strong x-text="metricValue(metric)" :class="metricClass(metric.key)">Carregando…</strong>
+                            <span class="metric-action" x-show="supported(metric.key) && status !== 'loading'">Ver histórico ↗</span>
+                        </button>
+                    </template>
+                </div>
+
+                <p class="integration-note" aria-live="polite" x-text="message"></p>
+
+                <div
+                    class="telemetry-modal-backdrop"
+                    x-show="history.open"
+                    x-transition.opacity
+                    @click.self="closeHistory()"
+                    x-cloak
+                >
+                    <section
+                        class="telemetry-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="telemetry-history-title"
+                        x-ref="historyDialog"
+                        tabindex="-1"
+                    >
+                        <div class="telemetry-modal-head">
+                            <div>
+                                <span class="card-kicker">Histórico sem interpolação</span>
+                                <h3 id="telemetry-history-title" x-text="history.label"></h3>
+                            </div>
+                            <button type="button" class="icon-button" @click="closeHistory()" aria-label="Fechar histórico">×</button>
+                        </div>
+
+                        <div class="history-filters" aria-label="Intervalo do histórico">
+                            <template x-for="range in ranges" :key="range">
+                                <button
+                                    type="button"
+                                    :class="{ 'is-active': history.range === range }"
+                                    :aria-pressed="history.range === range"
+                                    @click="changeRange(range)"
+                                    x-text="range"
+                                ></button>
+                            </template>
+                        </div>
+
+                        <p class="integration-note" x-show="history.loading">Carregando histórico…</p>
+                        <p class="integration-note" role="alert" x-show="history.error" x-text="history.error"></p>
+
+                        <div class="history-chart-wrap" x-show="!history.loading && !history.error">
+                            <canvas x-ref="historyChart" role="img" :aria-label="`Gráfico de ${history.label} nas últimas ${history.range}`"></canvas>
+                        </div>
+
+                        <dl class="history-summary" x-show="history.summary">
+                            <div><dt>Mínimo</dt><dd x-text="summaryValue('minimum')"></dd></div>
+                            <div><dt>Média</dt><dd x-text="summaryValue('average')"></dd></div>
+                            <div><dt>Máximo</dt><dd x-text="summaryValue('maximum')"></dd></div>
+                            <div><dt>Amostras</dt><dd x-text="history.summary?.samples ?? '—'"></dd></div>
+                        </dl>
+
+                        <div class="history-table-wrap" x-show="history.points.length">
+                            <table class="history-table">
+                                <caption>Últimos pontos disponíveis; lacunas não são preenchidas.</caption>
+                                <thead><tr><th scope="col">Horário</th><th scope="col">Valor</th></tr></thead>
+                                <tbody>
+                                    <template x-for="point in availableHistoryPoints()" :key="point.at">
+                                        <tr>
+                                            <td x-text="formatDate(point.at)"></td>
+                                            <td x-text="`${point.value}${history.unit}`"></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </article>
+        </div>
     </div>
 </section>
+
+@push('scripts')
+    <script>
+        function telemetryPanel() {
+            return {
+                data: {},
+                status: 'loading',
+                collectedAt: null,
+                machineStatus: 'offline',
+                message: 'Carregando telemetria…',
+                timer: null,
+                controller: null,
+                loading: false,
+                chart: null,
+                previousFocus: null,
+                ranges: ['1h', '6h', '12h', '24h'],
+                metrics: [
+                    { key: 'cpu_load', label: 'Uso da CPU', suffix: '%', digits: 1 },
+                    { key: 'cpu_temp', label: 'Temperatura da CPU', suffix: '°C', digits: 1 },
+                    { key: 'gpu_load', label: 'Uso da GPU', suffix: '%', digits: 1 },
+                    { key: 'gpu_temp', label: 'Temperatura da GPU', suffix: '°C', digits: 1 },
+                    { key: 'memory_usage', label: 'Memória', suffix: '%', digits: 1 },
+                    { key: 'disk_usage', label: 'Disco principal', suffix: '%', digits: 1 },
+                    { key: 'uptime_seconds', label: 'Tempo ligado', suffix: 's', digits: 0 },
+                    { key: 'pump_rpm', label: 'Bomba AIO', suffix: ' RPM', digits: 0 },
+                    { key: 'coolant_temp', label: 'Líquido', suffix: '°C', digits: 1 },
+                ],
+                history: {
+                    open: false,
+                    loading: false,
+                    error: '',
+                    metric: '',
+                    label: '',
+                    unit: '',
+                    range: '6h',
+                    points: [],
+                    summary: null,
+                },
+                async load() {
+                    if (this.loading) return;
+                    this.loading = true;
+                    this.controller = new AbortController();
+                    const timeout = setTimeout(() => this.controller.abort(), 8000);
+                    try {
+                        const response = await fetch('{{ url('/api/telemetry/latest') }}', {
+                            cache: 'no-store',
+                            signal: this.controller.signal,
+                        });
+                        if (!response.ok) throw new Error('Sem resposta');
+                        const payload = await response.json();
+                        this.status = payload.status ?? 'error';
+                        this.data = payload.data ?? {};
+                        this.collectedAt = payload.meta?.collected_at ?? null;
+                        this.machineStatus = payload.meta?.machine_status ?? 'offline';
+                        this.message = this.statusMessage();
+                    } catch (_) {
+                        this.status = 'error';
+                        this.message = 'Telemetria indisponível no momento.';
+                    } finally {
+                        clearTimeout(timeout);
+                        this.controller = null;
+                        this.loading = false;
+                    }
+                },
+                supported(key) {
+                    const raw = this.data[key];
+                    return !['loading', 'unavailable', 'error'].includes(this.status)
+                        && raw !== null && raw !== undefined && raw !== '';
+                },
+                value(key, suffix, digits = 1) {
+                    const raw = this.data[key];
+                    if (this.status === 'loading') return 'Carregando…';
+                    if (this.status === 'unavailable' || this.status === 'error') return '—';
+                    if (raw === null || raw === undefined || raw === '') return 'Não suportado neste dispositivo';
+                    const numeric = Number(raw);
+                    return Number.isFinite(numeric) ? `${numeric.toFixed(digits)}${suffix}` : 'Não suportado neste dispositivo';
+                },
+                metricValue(metric) {
+                    if (metric.key !== 'uptime_seconds') return this.value(metric.key, metric.suffix, metric.digits);
+                    if (!this.supported(metric.key)) return this.value(metric.key, metric.suffix, metric.digits);
+                    const seconds = Number(this.data[metric.key]);
+                    const days = Math.floor(seconds / 86400);
+                    const hours = Math.floor((seconds % 86400) / 3600);
+                    return days > 0 ? `${days}d ${hours}h` : `${hours}h`;
+                },
+                statusLabel() {
+                    return ({ loading: 'carregando', available: 'online', stale: this.machineStatus === 'offline' ? 'offline' : 'defasado', unavailable: 'offline', error: 'erro' })[this.status] ?? 'offline';
+                },
+                metricClass(key) {
+                    return this.supported(key) || this.status === 'loading' ? '' : 'metric-unsupported';
+                },
+                statusMessage() {
+                    if (this.status === 'available' && this.collectedAt) {
+                        return `Atualizado em ${new Date(this.collectedAt).toLocaleTimeString('pt-BR')}`;
+                    }
+                    if (this.status === 'stale' && this.collectedAt) {
+                        return `Leitura ${this.machineStatus === 'offline' ? 'offline' : 'defasada'}. Última atualização em ${new Date(this.collectedAt).toLocaleString('pt-BR')}.`;
+                    }
+                    return 'Telemetria indisponível no momento.';
+                },
+                async openHistory(metric) {
+                    if (!this.supported(metric.key)) return;
+                    this.previousFocus = document.activeElement;
+                    Object.assign(this.history, { open: true, metric: metric.key, label: metric.label, unit: metric.suffix.trim(), error: '' });
+                    document.body.classList.add('modal-open');
+                    await this.$nextTick();
+                    this.$refs.historyDialog?.focus();
+                    await this.loadHistory();
+                },
+                closeHistory() {
+                    if (!this.history.open) return;
+                    this.history.open = false;
+                    this.chart?.destroy();
+                    this.chart = null;
+                    document.body.classList.remove('modal-open');
+                    this.previousFocus?.focus();
+                },
+                async changeRange(range) {
+                    if (this.history.range === range) return;
+                    this.history.range = range;
+                    await this.loadHistory();
+                },
+                async loadHistory() {
+                    this.history.loading = true;
+                    this.history.error = '';
+                    try {
+                        const params = new URLSearchParams({ metric: this.history.metric, range: this.history.range });
+                        const response = await fetch(`{{ url('/api/telemetry/history') }}?${params}`, { cache: 'no-store' });
+                        if (!response.ok) throw new Error('Histórico indisponível');
+                        const payload = await response.json();
+                        this.history.points = payload.data?.points ?? [];
+                        this.history.summary = payload.data?.summary ?? null;
+                        this.history.unit = payload.meta?.unit ?? this.history.unit;
+                        if (payload.status !== 'available') {
+                            this.history.error = 'Ainda não há dados suficientes para este período.';
+                            return;
+                        }
+                        await this.$nextTick();
+                        await this.renderChart();
+                    } catch (_) {
+                        this.history.error = 'Não foi possível carregar o histórico agora.';
+                    } finally {
+                        this.history.loading = false;
+                    }
+                },
+                async renderChart() {
+                    const Chart = await window.loadTelemetryChart();
+                    this.chart?.destroy();
+                    const styles = getComputedStyle(document.documentElement);
+                    this.chart = new Chart(this.$refs.historyChart, {
+                        type: 'line',
+                        data: {
+                            labels: this.history.points.map(point => this.formatDate(point.at)),
+                            datasets: [{
+                                label: `${this.history.label} (${this.history.unit})`,
+                                data: this.history.points.map(point => point.value),
+                                borderColor: styles.getPropertyValue('--accent').trim(),
+                                backgroundColor: 'rgba(109, 74, 255, 0.12)',
+                                borderWidth: 2,
+                                pointRadius: 0,
+                                pointHoverRadius: 4,
+                                spanGaps: false,
+                                tension: 0.2,
+                                fill: true,
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: false,
+                            interaction: { intersect: false, mode: 'index' },
+                            scales: { y: { beginAtZero: false } },
+                        },
+                    });
+                },
+                summaryValue(key) {
+                    const value = this.history.summary?.[key];
+                    return value === null || value === undefined ? '—' : `${value}${this.history.unit}`;
+                },
+                availableHistoryPoints() {
+                    return this.history.points.filter(point => point.value !== null).slice(-12).reverse();
+                },
+                formatDate(value) {
+                    return new Date(value).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                },
+                init() {
+                    this.load();
+                    this.timer = setInterval(() => this.load(), 10000);
+                },
+                destroy() {
+                    clearInterval(this.timer);
+                    this.controller?.abort();
+                    this.chart?.destroy();
+                    document.body.classList.remove('modal-open');
+                },
+            };
+        }
+    </script>
+@endpush

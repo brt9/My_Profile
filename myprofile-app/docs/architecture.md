@@ -1,0 +1,36 @@
+# Arquitetura
+
+## Contexto
+
+A home pública usa Laravel, Blade, Tailwind CSS, Alpine.js e Chart.js carregado apenas quando um histórico é aberto. React/Inertia permanece restrito às páginas autenticadas.
+
+## Fluxo atual
+
+```mermaid
+flowchart LR
+    V[Visitante] --> B[Blade + Tailwind + Alpine]
+    B --> L[Laravel]
+    A[Agente .NET 1.1] -->|Bearer token| T[API de telemetria]
+    T --> P[(PostgreSQL)]
+    T --> C[(Cache)]
+    Q[Scheduler] --> P
+    L --> C
+    L --> G[GitHub API]
+    L --> S[Steam API]
+    L --> W[Open-Meteo]
+    L --> H[Integration health]
+```
+
+Chamadas externas não ficam no caminho crítico da home: a página lê snapshots locais e agenda atualização após a resposta. Cada integração normaliza o payload, aplica cache/timeout/retry e registra apenas estado e latência sanitizados.
+
+## Limites
+
+- `App\Services\GitHub`: dados públicos e cache do GitHub;
+- `App\Services\Steam`: biblioteca, presença e conquistas;
+- `App\Services\Weather`: previsão e origem da localização;
+- `App\Services\Telemetry`: ingestão, histórico, retenção e saúde;
+- `TelemetryController`: contrato HTTP público e ingestão autenticada;
+- `config/portfolio.php`: conteúdo público editável;
+- `tools/telemetry-agent`: coletor Windows independente.
+
+PostgreSQL é o banco principal no ambiente local, Docker e CI. SQLite continua suportado apenas para testes rápidos de portabilidade; o gate completo também executa a suíte em PostgreSQL.
