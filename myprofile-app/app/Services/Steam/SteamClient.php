@@ -12,6 +12,8 @@ final class SteamClient
 {
     private const BASE = 'https://api.steampowered.com';
 
+    private const CACHE_TTL_MINUTES = 30;
+
     public function __construct(
         private readonly string $key,
         private readonly string $steamId,
@@ -44,7 +46,7 @@ final class SteamClient
      */
     public function recentGames(int $limit = 6): array
     {
-        return Cache::remember($this->recentCacheKey(), 900, function () use ($limit) {
+        return Cache::remember($this->recentCacheKey(), $this->cacheExpiresAt(), function () use ($limit) {
             $res = $this->request()->get(self::BASE.'/IPlayerService/GetRecentlyPlayedGames/v1', [
                 'key' => $this->key,
                 'steamid' => $this->steamId,
@@ -74,7 +76,7 @@ final class SteamClient
      */
     public function librarySummary(int $top = 6): array
     {
-        return Cache::remember($this->libraryCacheKey(), 900, function () use ($top) {
+        return Cache::remember($this->libraryCacheKey(), $this->cacheExpiresAt(), function () use ($top) {
             $res = $this->request()->get(self::BASE.'/IPlayerService/GetOwnedGames/v1', [
                 'key' => $this->key,
                 'steamid' => $this->steamId,
@@ -116,25 +118,34 @@ final class SteamClient
      */
     public function currentGame(): ?array
     {
-        // cache curtinho pra não bater sempre
-        return Cache::remember($this->currentGameCacheKey(), 30, function () {
+        // O envelope mantém também o estado "não está jogando" em cache.
+        $cached = Cache::remember($this->currentGameCacheKey(), $this->cacheExpiresAt(), function (): array {
             $player = $this->request()->get(self::BASE.'/ISteamUser/GetPlayerSummaries/v2', [
                 'key' => $this->key,
                 'steamids' => $this->steamId,
             ])->throw()->json('response.players.0');
 
             if (! $player || empty($player['gameid'])) {
-                return null;
+                return ['value' => null];
             }
 
             $appid = (int) $player['gameid'];
 
-            return [
+            return ['value' => [
                 'appid' => $appid,
                 'name' => (string) ($player['gameextrainfo'] ?? 'Jogando agora'),
                 'image' => $this->headerImage($appid),
-            ];
+            ]];
         });
+
+        // Compatibilidade com valores gravados antes do envelope.
+        if (is_array($cached) && array_key_exists('value', $cached)) {
+            return is_array($cached['value']) ? $cached['value'] : null;
+        }
+
+        return is_array($cached)
+            ? $cached
+            : null;
     }
 
     /**
@@ -146,7 +157,7 @@ final class SteamClient
     {
         $key = $this->achievementsCacheKey($appId);
 
-        return Cache::remember($key, 900, function () use ($appId, $limit) {
+        return Cache::remember($key, $this->cacheExpiresAt(), function () use ($appId, $limit) {
             // PT-BR primeiro, com fallback
             $lang = 'brazilian';
 
@@ -243,6 +254,10 @@ final class SteamClient
     {
         $game = Cache::get($this->currentGameCacheKey());
 
+        if (is_array($game) && array_key_exists('value', $game)) {
+            return is_array($game['value']) ? $game['value'] : null;
+        }
+
         return is_array($game) ? $game : null;
     }
 
@@ -272,6 +287,11 @@ final class SteamClient
     private function achievementsCacheKey(int $appId): string
     {
         return "steam:achievements:{$this->steamId}:{$appId}";
+    }
+
+    private function cacheExpiresAt(): \DateTimeInterface
+    {
+        return now()->addMinutes(self::CACHE_TTL_MINUTES);
     }
 
     private function request(): PendingRequest

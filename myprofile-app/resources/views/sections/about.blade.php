@@ -19,7 +19,7 @@
                 <div class="current-role">
                     <span class="status-dot" aria-hidden="true"></span>
                     <div>
-                        <strong>{{ $portfolio['role'] }}</strong>
+                        <strong>{{ $portfolio['current_role'] ?? $portfolio['role'] }}</strong>
                         <p>{{ $portfolio['company'] }}<br>{{ $portfolio['location'] }}</p>
                     </div>
                 </div>
@@ -119,22 +119,45 @@
             <p>Experiência organizada por impacto, contexto e tecnologias — uma leitura rápida para recrutadores e clientes.</p>
         </div>
 
+        @if (($professional['source'] ?? 'portfolio') === 'linkedin_pdf')
+            <p class="content-source">Conteúdo profissional revisado a partir do perfil PDF do LinkedIn em {{ $professional['updated_at']?->format('d/m/Y') }}.</p>
+        @endif
+
         <div class="panel">
             <div class="timeline">
-                @foreach ($portfolio['experience'] as $experience)
+                @foreach ($professional['experiences'] as $experience)
                     <article class="timeline-item">
                         <span class="timeline-period">{{ $experience['period'] }}</span>
                         <h3>{{ $experience['role'] }}</h3>
                         <div class="timeline-company">{{ $experience['company'] }}</div>
+                        @if (!empty($experience['location']))<div class="timeline-location">{{ $experience['location'] }}</div>@endif
                         <p>{{ $experience['description'] }}</p>
-                        <div class="chip-list">
+                        @if (!empty($experience['stack']))<div class="chip-list">
                             @foreach ($experience['stack'] as $technology)
                                 <span class="chip">{{ $technology }}</span>
                             @endforeach
-                        </div>
+                        </div>@endif
                     </article>
                 @endforeach
             </div>
+        </div>
+
+        <div class="profile-detail-grid">
+            <article class="panel profile-detail-card">
+                <span class="section-kicker">Formação</span>
+                @foreach ($professional['education'] as $education)
+                    <h3>{{ $education['course'] }}</h3>
+                    <p>{{ $education['institution'] }}<br>{{ $education['period'] }}</p>
+                @endforeach
+            </article>
+            <article class="panel profile-detail-card">
+                <span class="section-kicker">Idiomas</span>
+                <div class="profile-language-list">
+                    @foreach ($professional['languages'] as $language)
+                        <div><strong>{{ $language['name'] }}</strong><span>{{ $language['level'] }}</span></div>
+                    @endforeach
+                </div>
+            </article>
         </div>
     </div>
 </section>

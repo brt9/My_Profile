@@ -1,16 +1,22 @@
 <article class="github-card">
     <div class="card-head">
-        <div>
-            <span class="card-kicker">GitHub API</span>
-            <h3>Projetos e atividade pública</h3>
+        <div class="integration-brand-heading">
+            <span class="brand-mark-medium brand-mark-github"><x-icons.github /></span>
+            <div>
+                <span class="card-kicker">GitHub API</span>
+                <h3>Projetos e atividade pública</h3>
+            </div>
         </div>
-        <a href="{{ $portfolio['social']['github'] }}" target="_blank" rel="noopener noreferrer" class="text-link">@brt9 ↗</a>
+        <a href="{{ $portfolio['social']['github'] }}" target="_blank" rel="noopener noreferrer" class="github-profile-link"><x-icons.github /> @brt9 <span aria-hidden="true">↗</span></a>
     </div>
 
     @if ($github)
         <div class="github-summary">
             <div class="github-profile">
-                <img src="{{ $github['profile']['avatar'] }}" alt="Avatar de {{ $github['profile']['login'] }}" loading="lazy">
+                <span class="github-avatar-wrap">
+                    <img src="{{ $github['profile']['avatar'] }}" alt="Avatar de {{ $github['profile']['login'] }}" loading="lazy">
+                    <span class="github-avatar-badge" aria-hidden="true"><x-icons.github /></span>
+                </span>
                 <div>
                     <strong>{{ $github['profile']['name'] ?: $github['profile']['login'] }}</strong>
                     <span>{{ '@'.$github['profile']['login'] }}</span>

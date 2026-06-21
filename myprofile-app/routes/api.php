@@ -28,3 +28,7 @@ Route::get('health/integrations', IntegrationHealthController::class)
 Route::post('weather/location', [WeatherController::class, 'show'])
     ->middleware('throttle:30,1')
     ->name('weather.location');
+
+Route::get('weather/visitor', [WeatherController::class, 'visitor'])
+    ->middleware('throttle:30,1')
+    ->name('weather.visitor');

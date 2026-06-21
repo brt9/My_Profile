@@ -30,7 +30,7 @@
         <div class="container-shell nav-inner">
             <a href="#inicio" class="brand" aria-label="Início">
                 <span class="brand-mark" aria-hidden="true">PF</span>
-                <span>pedro<span>.dev</span></span>
+                <span>pedrofelipe<span>.dev</span></span>
             </a>
 
             <div class="desktop-nav">
@@ -38,6 +38,8 @@
                 <a href="#projetos">Projetos</a>
                 <a href="#automacoes">Automações</a>
                 <a href="#experiencia">Experiência</a>
+                <a href="#agenda">Agenda</a>
+                <a href="#estudos">Idiomas</a>
                 <a href="#lab">Lab</a>
                 <a href="#contato">Contato</a>
             </div>
@@ -59,6 +61,8 @@
             <a href="#projetos">Projetos</a>
             <a href="#automacoes">Automações</a>
             <a href="#experiencia">Experiência</a>
+            <a href="#agenda">Agenda</a>
+            <a href="#estudos">Idiomas</a>
             <a href="#lab">Lab</a>
             <a href="#contato">Contato</a>
         </div>
@@ -91,7 +95,6 @@
 
             <div class="footer-meta">
                 <p>© <span data-current-year>{{ date('Y') }}</span> {{ $profile['name'] }}. Feito com Laravel.</p>
-                <a href="#inicio">Voltar ao topo ↑</a>
             </div>
         </div>
     </footer>

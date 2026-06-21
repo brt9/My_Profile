@@ -11,3 +11,15 @@ Artisan::command('inspire', function () {
 Schedule::command('telemetry:maintain')
     ->hourly()
     ->withoutOverlapping();
+
+Schedule::command('calendar:sync')
+    ->everyFifteenMinutes()
+    ->withoutOverlapping();
+
+Schedule::command('duolingo:sync')
+    ->everySixHours()
+    ->withoutOverlapping();
+
+Schedule::command('weather:capture-natal')
+    ->everyFifteenMinutes()
+    ->withoutOverlapping();

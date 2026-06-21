@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Services\Calendar\CalendarDashboard;
+use App\Services\Duolingo\DuolingoDashboard;
 use App\Services\GitHub\GitHubClient;
+use App\Services\Professional\ProfessionalProfile;
 use App\Services\Steam\SteamClient;
 use App\Services\Telemetry\IntegrationHealthMonitor;
 use App\Services\Weather\WeatherClient;
@@ -13,8 +16,12 @@ use Throwable;
 
 final class HomeController extends Controller
 {
-    public function __invoke(IntegrationHealthMonitor $health)
-    {
+    public function __invoke(
+        IntegrationHealthMonitor $health,
+        CalendarDashboard $calendarDashboard,
+        DuolingoDashboard $duolingoDashboard,
+        ProfessionalProfile $professionalProfile,
+    ) {
         $portfolio = config('portfolio');
         $github = null;
         $externalCallsEnabled = ! app()->environment('testing')
@@ -108,6 +115,13 @@ final class HomeController extends Controller
             'featuredAchievements' => $achievements,
             'weatherNatal' => $weatherNatal,
             'weatherVisitor' => $weatherVisitor,
+            'calendar' => ($portfolio['integrations']['calendar'] ?? false)
+                ? $calendarDashboard->forHome()
+                : null,
+            'duolingo' => ($portfolio['integrations']['duolingo'] ?? false)
+                ? $duolingoDashboard->forHome()
+                : null,
+            'professional' => $professionalProfile->publicData(),
         ]);
     }
 }

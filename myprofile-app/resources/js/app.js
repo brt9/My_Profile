@@ -41,24 +41,56 @@ document.querySelectorAll('[data-current-year]').forEach((node) => {
 });
 
 const weatherCard = document.querySelector('[data-weather-card]');
-const locateButton = weatherCard?.querySelector('[data-weather-locate]');
-const weatherStatus = weatherCard?.querySelector('[data-weather-status]');
+const visitorWeather = weatherCard?.querySelector('[data-weather-scope="visitor"]');
+const locateButton = visitorWeather?.querySelector('[data-weather-locate]');
 
 const weatherText = (selector, value) => {
-    const node = weatherCard?.querySelector(selector);
+    const node = visitorWeather?.querySelector(selector);
     if (node) node.textContent = value;
 };
 
 const updateWeather = (weather) => {
-    weatherText('[data-weather-title]', `Clima em ${weather.label ?? 'sua localização'}`);
+    const previousSource = visitorWeather?.dataset.weatherSource;
+    if (weather.source !== 'browser' || previousSource !== 'ip') {
+        weatherText('[data-weather-title]', weather.label ?? 'Sua cidade');
+    }
     weatherText('[data-weather-icon]', weather.emoji ?? '⛅');
     weatherText('[data-weather-temp]', Number.isFinite(Number(weather.temp)) ? `${Math.round(Number(weather.temp))}°` : '—');
     weatherText('[data-weather-condition]', weather.condition ?? 'Tempo variável');
     weatherText('[data-weather-origin]', `${weather.origin ?? 'Localização autorizada no navegador'}. Coordenadas não são armazenadas.`);
+    weatherText('[data-weather-source]', weather.source === 'browser' ? 'Exata' : 'Aproximada');
     weatherText('[data-weather-feels]', Number.isFinite(Number(weather.feels_like)) ? `${Math.round(Number(weather.feels_like))}°` : '—');
     weatherText('[data-weather-humidity]', Number.isFinite(Number(weather.humidity)) ? `${weather.humidity}%` : '—');
     weatherText('[data-weather-wind]', Number.isFinite(Number(weather.wind_kmh)) ? `${weather.wind_kmh} km/h` : '—');
+    if (visitorWeather) visitorWeather.dataset.weatherSource = weather.source ?? 'unknown';
+    visitorWeather?.setAttribute('aria-busy', 'false');
 };
+
+const loadVisitorWeather = async () => {
+    if (!weatherCard?.dataset.weatherVisitorEndpoint) return;
+
+    try {
+        const response = await fetch(weatherCard.dataset.weatherVisitorEndpoint, {
+            headers: { 'Accept': 'application/json' },
+        });
+        const payload = await response.json();
+        if (!response.ok || payload.status !== 'available') throw new Error('weather unavailable');
+
+        updateWeather(payload.data);
+        weatherText(
+            '[data-weather-status]',
+            payload.data.source === 'fallback'
+                ? 'Sua cidade não pôde ser identificada. Você pode autorizar a localização exata.'
+                : 'Clima aproximado pela cidade identificada no seu IP.',
+        );
+    } catch {
+        visitorWeather?.setAttribute('aria-busy', 'false');
+        weatherText('[data-weather-condition]', 'Clima local indisponível');
+        weatherText('[data-weather-status]', 'Não foi possível identificar sua cidade. Você pode autorizar a localização exata.');
+    }
+};
+
+void loadVisitorWeather();
 
 locateButton?.addEventListener('click', () => {
     if (!navigator.geolocation) {
@@ -110,3 +142,119 @@ document.addEventListener('error', (event) => {
     image.closest('[data-game-cover]')?.classList.add('is-error');
     image.remove();
 }, true);
+
+const calendarManager = document.querySelector('[data-calendar-manager]');
+const calendarForm = calendarManager?.querySelector('[data-calendar-event-form]');
+const calendarStatus = calendarManager?.querySelector('[data-calendar-status]');
+const calendarCancel = calendarManager?.querySelector('[data-calendar-cancel]');
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+
+const setCalendarStatus = (message, isError = false) => {
+    if (!calendarStatus) return;
+    calendarStatus.textContent = message;
+    calendarStatus.classList.toggle('is-error', isError);
+};
+
+const resetCalendarForm = () => {
+    if (!(calendarForm instanceof HTMLFormElement)) return;
+    calendarForm.reset();
+    calendarForm.elements.event_id.value = '';
+    calendarCancel?.setAttribute('hidden', '');
+    const heading = calendarManager?.querySelector('.calendar-manager-heading h3');
+    if (heading) heading.textContent = 'Novo compromisso';
+};
+
+calendarForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!(calendarForm instanceof HTMLFormElement) || !calendarManager?.dataset.endpoint) return;
+
+    const fields = calendarForm.elements;
+    const eventId = fields.event_id.value;
+    const payload = {
+        title: fields.title.value,
+        category: fields.category.value,
+        starts_at: fields.starts_at.value,
+        ends_at: fields.ends_at.value,
+        all_day: fields.all_day.checked,
+        sync_google: fields.sync_google?.checked ?? false,
+    };
+    const submitButton = calendarForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    setCalendarStatus(eventId ? 'Atualizando compromisso…' : 'Salvando compromisso…');
+
+    try {
+        const response = await fetch(eventId ? `${calendarManager.dataset.endpoint}/${eventId}` : calendarManager.dataset.endpoint, {
+            method: eventId ? 'PUT' : 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            const firstError = Object.values(result.errors ?? {}).flat()[0];
+            throw new Error(firstError ?? result.message ?? 'Não foi possível salvar o compromisso.');
+        }
+
+        setCalendarStatus('Compromisso salvo no banco local.');
+        window.location.reload();
+    } catch (error) {
+        setCalendarStatus(error instanceof Error ? error.message : 'Não foi possível salvar o compromisso.', true);
+    } finally {
+        submitButton.disabled = false;
+    }
+});
+
+calendarManager?.querySelectorAll('[data-calendar-edit]').forEach((button) => {
+    button.addEventListener('click', () => {
+        const item = button.closest('[data-calendar-item]');
+        if (!(calendarForm instanceof HTMLFormElement) || !item) return;
+
+        const fields = calendarForm.elements;
+        fields.event_id.value = item.dataset.id ?? '';
+        fields.title.value = item.dataset.title ?? '';
+        fields.category.value = item.dataset.category ?? 'reuniao';
+        fields.starts_at.value = item.dataset.startsAt ?? '';
+        fields.ends_at.value = item.dataset.endsAt ?? '';
+        fields.all_day.checked = item.dataset.allDay === '1';
+        calendarCancel?.removeAttribute('hidden');
+        const heading = calendarManager.querySelector('.calendar-manager-heading h3');
+        if (heading) heading.textContent = 'Editar compromisso';
+        setCalendarStatus('');
+        calendarForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        fields.title.focus();
+    });
+});
+
+calendarCancel?.addEventListener('click', () => {
+    resetCalendarForm();
+    setCalendarStatus('Edição cancelada.');
+});
+
+calendarManager?.querySelectorAll('[data-calendar-delete]').forEach((button) => {
+    button.addEventListener('click', async () => {
+        const item = button.closest('[data-calendar-item]');
+        const id = item?.dataset.id;
+        if (!id || !calendarManager.dataset.endpoint) return;
+        if (!window.confirm(`Excluir “${item.dataset.title ?? 'este compromisso'}”?`)) return;
+
+        button.disabled = true;
+        setCalendarStatus('Excluindo compromisso…');
+        try {
+            const response = await fetch(`${calendarManager.dataset.endpoint}/${id}`, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+            });
+            if (!response.ok) throw new Error('Não foi possível excluir o compromisso.');
+            setCalendarStatus('Compromisso excluído.');
+            window.location.reload();
+        } catch (error) {
+            setCalendarStatus(error instanceof Error ? error.message : 'Não foi possível excluir o compromisso.', true);
+            button.disabled = false;
+        }
+    });
+});

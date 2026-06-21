@@ -76,6 +76,43 @@ img {
     max-width: 100%;
 }
 
+.brand-icon {
+    display: block;
+    width: 1em;
+    height: 1em;
+    flex: 0 0 auto;
+    object-fit: contain;
+}
+
+.brand-mark-large,
+.brand-mark-medium {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+}
+
+.brand-mark-large {
+    width: 72px;
+    height: 72px;
+    border-radius: 22px;
+    font-size: 2.7rem;
+}
+
+.brand-mark-medium {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    font-size: 1.7rem;
+}
+
+.brand-section-title,
+.integration-brand-heading {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 16px;
+}
+
 [hidden] {
     display: none !important;
 }
@@ -146,10 +183,10 @@ img {
 .desktop-nav {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 18px;
     margin-left: auto;
     color: var(--muted);
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     font-weight: 650;
 }
 
@@ -513,6 +550,7 @@ img {
 .weather-card,
 .steam-card,
 .github-card {
+    min-width: 0;
     border: 1px solid var(--border);
     border-radius: 24px;
     background: var(--surface);
@@ -541,6 +579,47 @@ img {
     display: flex;
     align-items: flex-start;
     gap: 14px;
+}
+
+.profile-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.profile-detail-card {
+    height: 100%;
+}
+
+.profile-detail-card h3 {
+    margin-top: 12px;
+}
+
+.profile-detail-card p {
+    margin-bottom: 0;
+}
+
+.profile-language-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.profile-language-list div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+}
+
+.profile-language-list span {
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-align: right;
 }
 
 .competency-grid {
@@ -764,6 +843,19 @@ img {
     font-weight: 650;
 }
 
+.timeline-location,
+.content-source,
+.sync-note,
+.integration-disclaimer {
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
+.content-source {
+    margin: -20px 0 22px;
+    text-align: right;
+}
+
 .timeline-item p {
     max-width: 760px;
     margin: 12px 0 16px;
@@ -778,10 +870,21 @@ img {
 
 .setup-part,
 .metric {
+    min-width: 0;
     border: 1px solid var(--border);
     border-radius: 16px;
     background: var(--surface-soft);
     padding: 15px;
+}
+
+.setup-part strong,
+.card-head > div,
+.card-head h3,
+.weather-card,
+.steam-card,
+.github-card {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .setup-part small,
@@ -799,8 +902,8 @@ img {
 }
 
 .telemetry-panel {
-    background: #16151c;
-    color: #f5f3ef;
+    background: var(--surface);
+    color: var(--text);
 }
 
 .telemetry-head {
@@ -822,8 +925,8 @@ img {
 }
 
 .telemetry-panel .metric {
-    border-color: rgba(255, 255, 255, 0.09);
-    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--border);
+    background: var(--surface-soft);
 }
 
 .telemetry-panel .metric strong {
@@ -854,7 +957,7 @@ img {
 .metric-button:not(:disabled):focus-visible {
     transform: translateY(-2px);
     border-color: rgba(167, 139, 250, 0.8);
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--accent-soft);
 }
 
 .metric-button:disabled {
@@ -865,7 +968,7 @@ img {
 .metric-action {
     display: block;
     margin-top: 12px;
-    color: #c4b5fd;
+    color: var(--accent);
     font-size: 0.7rem;
     font-weight: 750;
 }
@@ -993,13 +1096,810 @@ body.modal-open {
 .integration-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
     gap: 18px;
     margin-top: 18px;
+}
+
+.integration-grid > *,
+.project-grid > *,
+.competency-grid > *,
+.automation-grid > * {
+    height: 100%;
+}
+
+.integration-empty,
+.calendar-shell,
+.duolingo-dashboard,
+.duolingo-card {
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: var(--surface);
+}
+
+.integration-empty {
+    padding: clamp(24px, 4vw, 38px);
+}
+
+.integration-empty strong {
+    display: block;
+    font-size: 1.08rem;
+}
+
+.integration-empty p {
+    margin: 7px 0 0;
+    color: var(--muted);
+}
+
+.integration-flash {
+    border: 1px solid rgba(39, 194, 129, 0.34);
+    border-radius: 14px;
+    background: rgba(39, 194, 129, 0.1);
+    padding: 11px 14px;
+}
+
+.calendar-shell {
+    overflow: hidden;
+}
+
+.calendar-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    border-bottom: 1px solid var(--border);
+    padding: 18px;
+}
+
+.calendar-view-label {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+}
+
+.calendar-view-label strong {
+    font-size: 0.95rem;
+}
+
+.calendar-view-label span {
+    color: var(--muted);
+    font: 700 0.7rem/1.2 ui-monospace, monospace;
+}
+
+.calendar-table-wrap {
+    overflow-x: auto;
+    padding: 18px;
+}
+
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.calendar-table thead th {
+    padding: 0 10px 10px;
+    color: var(--muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.calendar-table thead th:first-child {
+    width: 100px;
+}
+
+.calendar-table tbody th,
+.calendar-table tbody td {
+    border-top: 1px solid var(--border);
+    padding: 10px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.calendar-table tbody th strong,
+.calendar-table tbody th span {
+    display: block;
+}
+
+.calendar-table tbody th span {
+    color: var(--muted);
+    font-size: 0.72rem;
+}
+
+.calendar-table tbody tr.is-today th {
+    border-left: 3px solid var(--accent);
+}
+
+.calendar-empty-day {
+    display: block;
+    padding: 12px 4px;
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
+.calendar-single-event {
+    display: flex;
+    min-width: 0;
+    min-height: 58px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+    border-radius: 12px;
+    background: var(--accent-soft);
+    padding: 12px 15px;
+}
+
+.calendar-single-event strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar-single-event time {
+    flex: 0 0 auto;
+    color: var(--muted);
+    font: 700 0.76rem/1.2 ui-monospace, monospace;
+}
+
+.calendar-gantt {
+    min-width: 0;
+}
+
+.calendar-gantt-hours {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 0 4px 5px;
+    color: var(--muted);
+    font-size: 0.62rem;
+}
+
+.calendar-gantt-hours span:not(:first-child) {
+    text-align: center;
+}
+
+.calendar-gantt-hours span:last-child {
+    text-align: right;
+}
+
+.calendar-track {
+    position: relative;
+    min-height: calc(var(--event-rows) * 38px + 12px);
+    overflow: hidden;
+    border-radius: 12px;
+    background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--border) 25%);
+}
+
+.calendar-event {
+    position: absolute;
+    z-index: 1;
+    top: calc(var(--event-row) * 38px + 5px);
+    left: var(--event-start);
+    width: max(var(--event-width), 4%);
+    min-width: 52px;
+    height: 32px;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+    border-radius: 9px;
+    background: var(--accent-soft);
+    padding: 4px 7px;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+.calendar-event strong,
+.calendar-event span {
+    overflow: hidden;
+    display: block;
+    font-size: 0.65rem;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+}
+
+.calendar-event span {
+    color: var(--muted);
+    font-size: 0.58rem;
+}
+
+.calendar-event.category-estudo { background: rgba(39, 194, 129, 0.14); }
+.calendar-event.category-entrega { background: rgba(255, 122, 89, 0.16); }
+.calendar-event.category-reuniao { background: rgba(61, 145, 255, 0.15); }
+.calendar-event.category-tarefa { background: rgba(243, 190, 52, 0.17); }
+
+.calendar-single-event.category-estudo { background: rgba(39, 194, 129, 0.14); }
+.calendar-single-event.category-entrega { background: rgba(255, 122, 89, 0.16); }
+.calendar-single-event.category-reuniao { background: rgba(61, 145, 255, 0.15); }
+.calendar-single-event.category-tarefa { background: rgba(243, 190, 52, 0.17); }
+
+.calendar-warning {
+    margin: 18px;
+    border-radius: 16px;
+    background: color-mix(in srgb, #f3be34 11%, var(--surface));
+}
+
+.calendar-manager {
+    border-top: 1px solid var(--border);
+    background: var(--surface-soft);
+    padding: clamp(18px, 3vw, 28px);
+}
+
+.calendar-manager-heading,
+.calendar-managed-item,
+.calendar-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.calendar-manager-heading h3 {
+    margin: 5px 0 0;
+    font-size: 1.25rem;
+}
+
+.calendar-manager-badge {
+    border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--border));
+    border-radius: 999px;
+    background: var(--accent-soft);
+    padding: 7px 10px;
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 750;
+}
+
+.calendar-event-form {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.calendar-field {
+    display: grid;
+    gap: 7px;
+    min-width: 0;
+}
+
+.calendar-field-wide {
+    grid-column: span 2;
+}
+
+.calendar-field span,
+.calendar-check span {
+    color: var(--muted);
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.calendar-field input,
+.calendar-field select {
+    width: 100%;
+    min-height: 46px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    outline: 0;
+    background: var(--surface);
+    padding: 10px 12px;
+    color: var(--text);
+    font: inherit;
+}
+
+.calendar-field input:focus,
+.calendar-field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.calendar-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 44px;
+}
+
+.calendar-check input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+}
+
+.calendar-form-actions,
+.calendar-form-status {
+    grid-column: 1 / -1;
+}
+
+.calendar-form-actions {
+    justify-content: flex-start;
+}
+
+.calendar-form-status {
+    min-height: 1.2em;
+    margin: 0;
+    color: #18875d;
+    font-size: 0.78rem;
+}
+
+.calendar-form-status.is-error,
+.text-button.is-danger {
+    color: #c53b35;
+}
+
+.calendar-managed-list {
+    display: grid;
+    gap: 8px;
+    margin-top: 22px;
+}
+
+.calendar-managed-item {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    padding: 12px 14px;
+}
+
+.calendar-managed-item strong,
+.calendar-managed-item span {
+    display: block;
+}
+
+.calendar-managed-item span {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 0.72rem;
+}
+
+.calendar-item-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.admin-integration-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-top: 1px solid var(--border);
+    padding: 18px;
+}
+
+.admin-integration-actions .button,
+.admin-integration-actions .text-button {
+    min-height: 44px;
+}
+
+.duolingo-section {
+    --duolingo-green: #58cc02;
+    --duolingo-green-strong: #46a302;
+    --duolingo-blue: #1cb0f6;
+    background:
+        radial-gradient(circle at 92% 8%, rgba(88, 204, 2, 0.11), transparent 25rem),
+        radial-gradient(circle at 8% 90%, rgba(28, 176, 246, 0.08), transparent 24rem);
+    padding-block: clamp(62px, 7vw, 88px);
+}
+
+.duolingo-section-header {
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.duolingo-section-header h2 {
+    font-size: clamp(1.9rem, 3.8vw, 3.15rem);
+}
+
+.brand-mark-duolingo {
+    background: linear-gradient(145deg, rgba(88, 204, 2, 0.18), rgba(28, 176, 246, 0.13));
+    color: var(--duolingo-green-strong);
+    box-shadow: 0 14px 35px rgba(88, 204, 2, 0.14);
+}
+
+.brand-mark-duolingo .brand-icon {
+    width: 88%;
+    height: 88%;
+}
+
+.duolingo-avatar .brand-icon {
+    width: 82%;
+    height: 82%;
+    border-radius: 12px;
+}
+
+.duolingo-empty {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.duolingo-dashboard {
+    padding: clamp(18px, 3vw, 26px);
+    box-shadow: var(--shadow);
+}
+
+.duolingo-profile-panel {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.9fr) minmax(320px, 1.2fr) auto;
+    align-items: center;
+    gap: clamp(16px, 3vw, 28px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 0 18px;
+}
+
+.duolingo-profile-identity {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 16px;
+}
+
+.duolingo-avatar {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid rgba(88, 204, 2, 0.26);
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--duolingo-green-strong);
+    font-size: 2.25rem;
+    box-shadow: 0 14px 30px rgba(88, 204, 2, 0.13);
+}
+
+.duolingo-profile-identity h3 {
+    overflow: hidden;
+    margin: 5px 0 0;
+    font-size: 1.25rem;
+    text-overflow: ellipsis;
+}
+
+.duolingo-profile-identity p {
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-size: 0.76rem;
+}
+
+.duolingo-profile-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+}
+
+.duolingo-profile-metrics div {
+    min-width: 0;
+    padding: 11px 13px;
+}
+
+.duolingo-profile-metrics div + div {
+    border-left: 1px solid var(--border);
+}
+
+.duolingo-profile-metrics dt,
+.duolingo-profile-metrics dd,
+.duolingo-metrics dt,
+.duolingo-metrics dd {
+    margin: 0;
+}
+
+.duolingo-profile-metrics dt,
+.duolingo-metrics dt {
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 650;
+    text-transform: uppercase;
+}
+
+.duolingo-profile-metrics dd {
+    margin-top: 3px;
+    font-size: 1rem;
+    font-weight: 850;
+    letter-spacing: -0.035em;
+}
+
+.duolingo-profile-button {
+    min-width: 132px;
+    background: var(--duolingo-green-strong);
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(70, 163, 2, 0.2);
+}
+
+.duolingo-profile-button .brand-icon {
+    font-size: 1.05rem;
+}
+
+.duolingo-content-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 18px 0 12px;
+}
+
+.duolingo-content-head h3 {
+    margin: 4px 0 0;
+    font-size: 1.35rem;
+}
+
+.duolingo-content-head > span {
+    color: var(--muted);
+    font-size: 0.76rem;
+}
+
+.duolingo-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+.duolingo-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(250px, 0.65fr) minmax(400px, 1.35fr);
+    min-width: 0;
+    align-items: stretch;
+    gap: 12px 20px;
+    overflow: hidden;
+    border-radius: 18px;
+    padding: 18px;
+}
+
+.duolingo-card::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--duolingo-green), var(--duolingo-blue));
+    content: "";
+}
+
+.duolingo-course-title {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 12px;
+}
+
+.language-code {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 14px;
+    background: rgba(28, 176, 246, 0.12);
+    color: #087daf;
+    font: 850 0.78rem/1 ui-monospace, monospace;
+}
+
+.duolingo-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    background: rgba(88, 204, 2, 0.12);
+    padding: 6px 9px;
+    color: var(--duolingo-green-strong);
+    font-size: 0.68rem;
+    font-weight: 750;
+}
+
+.duolingo-live-badge > span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--duolingo-green);
+    box-shadow: 0 0 0 4px rgba(88, 204, 2, 0.12);
+}
+
+.duolingo-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 16px 0 0;
+}
+
+.duolingo-progress-visual {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-width: 0;
+}
+
+.duolingo-metrics div {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface-soft);
+    padding: 11px 12px;
+}
+
+.duolingo-metrics dd {
+    margin-top: 4px;
+    font-size: 1.2rem;
+    font-weight: 850;
+    letter-spacing: -0.04em;
+}
+
+.duolingo-metrics dd.is-positive {
+    color: var(--duolingo-green-strong);
+}
+
+.duolingo-metrics dd.is-negative {
+    color: #d34d45;
+}
+
+.duolingo-chart-shell,
+.duolingo-chart-placeholder {
+    margin-top: 0;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface-soft) 65%, transparent);
+    padding: 15px;
+}
+
+.duolingo-chart-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.duolingo-chart-heading > div > span,
+.duolingo-chart-heading > div > strong {
+    display: block;
+}
+
+.duolingo-chart-heading > div > span {
+    color: var(--muted);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+}
+
+.duolingo-chart-heading > div > strong {
+    margin-top: 2px;
+    font-size: 0.88rem;
+}
+
+.duolingo-chart {
+    display: block;
+    width: 100%;
+    height: 148px;
+    margin-top: 6px;
+    color: var(--duolingo-green-strong);
+}
+
+.duolingo-chart-gridline {
+    stroke: var(--border);
+    stroke-width: 1;
+    stroke-dasharray: 4 6;
+}
+
+.duolingo-chart-axis {
+    stroke: color-mix(in srgb, var(--muted) 70%, transparent);
+    stroke-width: 1;
+}
+
+.duolingo-chart-axis-label,
+.duolingo-chart-axis-title {
+    fill: var(--muted);
+    font: 650 7px/1 ui-monospace, monospace;
+}
+
+.duolingo-chart-axis-title {
+    fill: var(--text);
+    font-size: 8px;
+    font-weight: 850;
+}
+
+.duolingo-chart-date {
+    font-size: 6.5px;
+}
+
+.duolingo-chart-point {
+    fill: var(--surface);
+    stroke: currentColor;
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+}
+
+.duolingo-chart-placeholder {
+    min-height: 122px;
+    text-align: center;
+}
+
+.placeholder-bars {
+    display: flex;
+    height: 48px;
+    align-items: end;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.placeholder-bars span {
+    width: 16px;
+    border-radius: 6px 6px 2px 2px;
+    background: linear-gradient(180deg, rgba(88, 204, 2, 0.38), rgba(28, 176, 246, 0.12));
+}
+
+.placeholder-bars span:nth-child(1) { height: 28%; }
+.placeholder-bars span:nth-child(2) { height: 44%; }
+.placeholder-bars span:nth-child(3) { height: 55%; }
+.placeholder-bars span:nth-child(4) { height: 70%; }
+.placeholder-bars span:nth-child(5) { height: 88%; }
+
+.duolingo-chart-placeholder strong {
+    display: block;
+    font-size: 0.9rem;
+}
+
+.duolingo-chart-placeholder p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.76rem;
+}
+
+.integration-disclaimer {
+    margin-top: 16px;
+}
+
+.brand-mark-github {
+    background: color-mix(in srgb, var(--text) 8%, transparent);
+    color: var(--text);
+}
+
+.github-profile-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px 11px;
+    color: var(--text);
+    font-size: 0.78rem;
+    font-weight: 750;
+    transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.github-profile-link:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+}
+
+.github-profile-link .brand-icon {
+    font-size: 1rem;
+}
+
+.github-avatar-wrap {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.github-avatar-badge {
+    position: absolute;
+    right: -5px;
+    bottom: -5px;
+    display: grid;
+    width: 25px;
+    height: 25px;
+    place-items: center;
+    border: 3px solid var(--surface);
+    border-radius: 50%;
+    background: var(--text);
+    color: var(--surface);
+    font-size: 0.72rem;
 }
 
 .weather-card,
 .steam-card,
 .github-card {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    background: var(--surface);
     padding: 24px;
 }
 
@@ -1110,6 +2010,7 @@ body.modal-open {
 
 .card-head {
     display: flex;
+    min-width: 0;
     align-items: flex-start;
     justify-content: space-between;
     gap: 18px;
@@ -1127,11 +2028,56 @@ body.modal-open {
     text-transform: uppercase;
 }
 
+.weather-location {
+    margin-top: 18px;
+    border: 1px solid var(--border);
+    border-radius: 19px;
+    background: var(--surface-soft);
+    padding: 18px;
+}
+
+.weather-location-primary {
+    background: linear-gradient(145deg, var(--accent-soft), var(--surface-soft) 72%);
+}
+
+.weather-location-head {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.weather-location-head h4 {
+    margin: 3px 0 0;
+    font-size: 1.05rem;
+    overflow-wrap: anywhere;
+}
+
+.weather-location-label {
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.weather-location-badge {
+    flex: 0 0 auto;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    padding: 5px 8px;
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 750;
+}
+
 .weather-main {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-top: 24px;
+    margin-top: 18px;
 }
 
 .weather-icon {
@@ -1162,6 +2108,15 @@ body.modal-open {
     margin: 15px 0 0;
     color: var(--muted);
     font-size: 0.78rem;
+}
+
+.weather-captured-at {
+    margin: 15px 0 0;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    color: var(--muted);
+    font-size: 0.74rem;
+    line-height: 1.55;
 }
 
 .weather-consent {
@@ -1378,6 +2333,11 @@ body.modal-open {
     border-radius: 9px;
 }
 
+.achievement > div {
+    min-width: 0;
+    overflow: hidden;
+}
+
 .achievement strong,
 .achievement small {
     display: block;
@@ -1405,9 +2365,10 @@ body.modal-open {
     position: relative;
     overflow: hidden;
     border-radius: 30px;
-    background: #17151d;
+    border: 1px solid var(--border);
+    background: var(--surface);
     padding: clamp(30px, 7vw, 72px);
-    color: #f7f4ef;
+    color: var(--text);
 }
 
 .contact-panel::after {
@@ -1417,7 +2378,7 @@ body.modal-open {
     width: 430px;
     height: 430px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(109, 74, 255, 0.58), transparent 68%);
+    background: radial-gradient(circle, var(--accent-soft), transparent 68%);
     content: "";
 }
 
@@ -1428,18 +2389,18 @@ body.modal-open {
 
 .contact-panel p {
     max-width: 650px;
-    color: #b8b4bd;
+    color: var(--muted);
 }
 
 .contact-panel .button-primary {
-    background: #f6f4ef;
-    color: #18151d;
+    background: var(--accent);
+    color: #fff;
 }
 
 .contact-panel .button-secondary {
-    border-color: rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.06);
-    color: #f6f4ef;
+    border-color: var(--border);
+    background: var(--surface-soft);
+    color: var(--text);
 }
 
 .site-footer {
@@ -1490,7 +2451,7 @@ body.modal-open {
 
 .footer-meta {
     width: 100%;
-    justify-content: space-between;
+    justify-content: center;
     border-top: 1px solid var(--border);
     padding-top: 14px;
 }
@@ -1542,6 +2503,19 @@ body.modal-open {
 
     .github-summary {
         grid-template-columns: 1fr;
+    }
+
+    .calendar-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .duolingo-profile-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .duolingo-profile-button {
+        justify-self: start;
     }
 
     .project-card:last-child {
@@ -1601,12 +2575,136 @@ body.modal-open {
         margin-bottom: 30px;
     }
 
+    .brand-section-title {
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    .brand-mark-large {
+        width: 56px;
+        height: 56px;
+        border-radius: 17px;
+        font-size: 2.05rem;
+    }
+
+    .brand-section-title > div {
+        min-width: 0;
+    }
+
+    .brand-section-title h2 {
+        font-size: clamp(1.75rem, 9vw, 2.45rem);
+    }
+
+    .duolingo-profile-panel {
+        padding: 0 0 16px;
+    }
+
+    .duolingo-dashboard {
+        padding: 16px;
+    }
+
+    .duolingo-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        font-size: 2rem;
+    }
+
+    .duolingo-profile-metrics div {
+        padding: 11px 8px;
+        text-align: center;
+    }
+
+    .duolingo-profile-metrics dd {
+        font-size: 0.95rem;
+    }
+
+    .duolingo-content-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .duolingo-card > .card-head,
+    .github-card > .card-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .duolingo-card {
+        grid-template-columns: 1fr;
+    }
+
+    .duolingo-progress-visual {
+        grid-column: auto;
+        grid-row: auto;
+    }
+
+    .github-profile-link {
+        align-self: stretch;
+        justify-content: center;
+    }
+
     .project-grid,
     .integration-grid,
+    .profile-detail-grid,
     .github-repositories,
     .competency-grid,
-    .automation-grid {
+    .automation-grid,
+    .duolingo-grid {
         grid-template-columns: 1fr;
+    }
+
+    .calendar-table-wrap {
+        padding: 12px;
+    }
+
+    .calendar-table thead th:first-child {
+        width: 76px;
+    }
+
+    .calendar-table tbody th,
+    .calendar-table tbody td {
+        padding: 8px 6px;
+    }
+
+    .calendar-single-event {
+        min-height: 54px;
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: center;
+        gap: 3px;
+        padding: 10px 12px;
+    }
+
+    .calendar-event {
+        min-width: 42px;
+        padding-inline: 5px;
+    }
+
+    .calendar-event strong,
+    .calendar-event span {
+        font-size: 0.6rem;
+    }
+
+    .calendar-event-form {
+        grid-template-columns: 1fr;
+    }
+
+    .calendar-field-wide,
+    .calendar-form-actions,
+    .calendar-form-status {
+        grid-column: auto;
+    }
+
+    .calendar-manager-heading,
+    .calendar-managed-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .content-source {
+        margin-top: -12px;
+        text-align: left;
     }
 
     .github-metrics {
@@ -1638,6 +2736,15 @@ body.modal-open {
 
     .weather-details {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .weather-location {
+        padding: 15px;
+    }
+
+    .weather-location-head {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
     .weather-consent {

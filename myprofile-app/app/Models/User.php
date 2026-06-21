@@ -19,8 +19,10 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'google_id',
         'name',
         'email',
+        'email_verified_at',
         'password',
     ];
 
@@ -30,6 +32,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $hidden = [
+        'google_id',
         'password',
         'remember_token',
     ];

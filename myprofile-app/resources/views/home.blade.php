@@ -68,6 +68,14 @@
         </div>
     </section>
 
+    @if ($calendar)
+        @include('sections.calendar')
+    @endif
+
+    @if ($duolingo)
+        @include('sections.duolingo')
+    @endif
+
     <section id="contato" class="section">
         <div class="container-shell">
             <div class="contact-panel">

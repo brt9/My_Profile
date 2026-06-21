@@ -18,6 +18,10 @@ flowchart LR
     L --> G[GitHub API]
     L --> S[Steam API]
     L --> W[Open-Meteo]
+    O[Admin autenticado] -->|OAuth| GC[Google Calendar]
+    GC --> J[Job de sincronização]
+    D[Duolingo público] --> J
+    J --> P
     L --> H[Integration health]
 ```
 
@@ -29,6 +33,9 @@ Chamadas externas não ficam no caminho crítico da home: a página lê snapshot
 - `App\Services\Steam`: biblioteca, presença e conquistas;
 - `App\Services\Weather`: previsão e origem da localização;
 - `App\Services\Telemetry`: ingestão, histórico, retenção e saúde;
+- `App\Services\Calendar`: OAuth, FreeBusy/eventos, projeção privada e dashboard semanal;
+- `App\Services\Duolingo`: adaptador não oficial, snapshots e circuit breaker;
+- `App\Services\Professional`: projeção do conteúdo profissional revisado em configuração;
 - `TelemetryController`: contrato HTTP público e ingestão autenticada;
 - `config/portfolio.php`: conteúdo público editável;
 - `tools/telemetry-agent`: coletor Windows independente.

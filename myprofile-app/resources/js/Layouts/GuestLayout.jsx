@@ -3,16 +3,23 @@ import { Link } from '@inertiajs/react';
 
 export default function GuestLayout({ children }) {
     return (
-        <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0 dark:bg-gray-900">
-            <div>
-                <Link href="/">
-                    <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" />
+        <main className="auth-shell">
+            <section className="auth-intro" aria-label="Apresentação">
+                <Link href="/" className="auth-brand" aria-label="Voltar ao portfólio">
+                    <ApplicationLogo className="auth-logo" />
+                    <span>pedrofelipe<strong>.dev</strong></span>
                 </Link>
-            </div>
+                <div className="auth-intro-copy">
+                    <span className="auth-kicker">Área reservada</span>
+                    <h1>Projetos, agenda e integrações em um só lugar.</h1>
+                    <p>Entre para administrar os dados do portfólio com segurança.</p>
+                </div>
+                <p className="auth-back-link"><Link href="/">← Voltar ao portfólio</Link></p>
+            </section>
 
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg dark:bg-gray-800">
-                {children}
-            </div>
-        </div>
+            <section className="auth-form-side">
+                <div className="auth-card">{children}</div>
+            </section>
+        </main>
     );
 }

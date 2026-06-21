@@ -19,9 +19,20 @@ if ($envText -match '(?m)^APP_KEY=\s*$') {
 }
 
 npm run build
+php artisan migrate --force
+
+$scheduler = Start-Process -FilePath 'php' -ArgumentList @('artisan', 'schedule:work') -WorkingDirectory $PSScriptRoot -WindowStyle Hidden -PassThru
 
 Write-Host ''
 Write-Host 'Portfólio disponível em http://127.0.0.1:8085' -ForegroundColor Green
+Write-Host 'Scheduler ativo para telemetria, Google Agenda e Duolingo.' -ForegroundColor Green
 Write-Host 'Pressione Ctrl+C para encerrar.' -ForegroundColor DarkGray
 
-php -d zlib.output_compression=On -S 127.0.0.1:8085 -t public
+try {
+    php -d zlib.output_compression=On -S 127.0.0.1:8085 -t public
+}
+finally {
+    if ($scheduler -and -not $scheduler.HasExited) {
+        Stop-Process -Id $scheduler.Id -Force -ErrorAction SilentlyContinue
+    }
+}

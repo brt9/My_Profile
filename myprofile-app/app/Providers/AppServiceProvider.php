@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\Calendar\GoogleCalendarClient;
+use App\Services\Duolingo\DuolingoClient;
+use App\Services\Duolingo\DuolingoProvider;
 use Carbon\Carbon;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -16,7 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(GoogleCalendarClient::class, fn (): GoogleCalendarClient => GoogleCalendarClient::fromConfig());
+        $this->app->singleton(DuolingoProvider::class, fn (): DuolingoProvider => DuolingoClient::fromConfig());
     }
 
     /**

@@ -3,6 +3,7 @@
 ## Rotas públicas
 
 - `GET /api/telemetry`: última leitura sanitizada.
+- `GET /api/weather/visitor`: clima aproximado da cidade identificada pelo IP, com rate limit.
 - `POST /api/weather/location`: clima para coordenadas autorizadas, com rate limit.
 
 ## Rota autenticada por token

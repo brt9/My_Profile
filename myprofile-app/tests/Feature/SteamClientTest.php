@@ -35,4 +35,46 @@ test('steam client maps games library and translated achievements', function () 
     expect($steam->recentGames()[0]['playtime'])->toBe(120)
         ->and($steam->librarySummary()['total_minutes'])->toBe(600)
         ->and($steam->achievements(10)[0]['name'])->toBe('Primeira vitória');
+
+    Http::assertSentCount(4);
+
+    $steam->recentGames();
+    $steam->librarySummary();
+    $steam->achievements(10);
+    $this->travel(29)->minutes();
+    $steam->recentGames();
+    $steam->librarySummary();
+    $steam->achievements(10);
+
+    Http::assertSentCount(4);
+
+    $this->travel(2)->minutes();
+    $steam->recentGames();
+    $steam->librarySummary();
+    $steam->achievements(10);
+
+    Http::assertSentCount(8);
+});
+
+test('steam caches the empty current game state for thirty minutes', function () {
+    Cache::flush();
+    Http::fake([
+        'api.steampowered.com/ISteamUser/GetPlayerSummaries/v2*' => Http::response([
+            'response' => ['players' => [['personaname' => 'Pedro']]],
+        ]),
+    ]);
+
+    $steam = new SteamClient('key', 'steam-id');
+
+    expect($steam->currentGame())->toBeNull()
+        ->and($steam->currentGame())->toBeNull()
+        ->and($steam->cachedCurrentGame())->toBeNull();
+
+    $this->travel(29)->minutes();
+    expect($steam->currentGame())->toBeNull();
+    Http::assertSentCount(1);
+
+    $this->travel(2)->minutes();
+    expect($steam->currentGame())->toBeNull();
+    Http::assertSentCount(2);
 });

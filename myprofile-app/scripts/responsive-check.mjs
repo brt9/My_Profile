@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -102,7 +102,18 @@ for (const [width, height] of sizes) {
                     return rect.right > window.innerWidth + 1 || rect.left < -1;
                 })
                 .slice(0, 6)
-                .map(element => ({ tag: element.tagName, className: element.className, right: Math.round(element.getBoundingClientRect().right) }));
+                .map(element => {
+                    const rect = element.getBoundingClientRect();
+                    return {
+                        tag: element.tagName,
+                        className: element.className,
+                        parentClass: element.parentElement?.className ?? '',
+                        text: element.textContent?.trim().slice(0, 80) ?? '',
+                        left: Math.round(rect.left),
+                        right: Math.round(rect.right),
+                        width: Math.round(rect.width),
+                    };
+                });
             return {
                 viewport: window.innerWidth,
                 pageWidth: document.documentElement.scrollWidth,
@@ -293,6 +304,35 @@ const weatherConsentValid = weatherConsentReport.denied.includes('Permissão neg
     && weatherConsentReport.timedOut.includes('Tempo de localização esgotado');
 failed ||= !weatherConsentValid;
 console.log(`${weatherConsentValid ? 'PASS' : 'FAIL'} weather consent fallbacks`, weatherConsentReport);
+
+if (process.env.RESPONSIVE_SCREENSHOT) {
+    const selector = process.env.RESPONSIVE_SCREENSHOT_SELECTOR ?? '#estudos';
+    const sectionEvaluation = await command('Runtime.evaluate', {
+        expression: `(() => {
+            const element = document.querySelector(${JSON.stringify(selector)});
+            if (!element) return null;
+            const rect = element.getBoundingClientRect();
+            return {
+                x: rect.left + window.scrollX,
+                y: rect.top + window.scrollY,
+                width: rect.width,
+                height: rect.height,
+            };
+        })()`,
+        returnByValue: true,
+    });
+    const clip = sectionEvaluation.result.value;
+    if (!clip) throw new Error(`Seletor de captura não encontrado: ${selector}`);
+    const capture = await command('Page.captureScreenshot', {
+        format: 'png',
+        fromSurface: true,
+        captureBeyondViewport: true,
+        clip: { ...clip, scale: 1 },
+    });
+    const screenshotPath = path.resolve(process.env.RESPONSIVE_SCREENSHOT);
+    await writeFile(screenshotPath, Buffer.from(capture.data, 'base64'));
+    console.log(`PASS screenshot ${selector}`, screenshotPath);
+}
 
 socket.close();
 child.kill();

@@ -44,4 +44,30 @@ return [
         'username' => env('GITHUB_USERNAME', 'brt9'),
         'token' => env('GITHUB_TOKEN'),
     ],
+
+    'google_calendar' => [
+        'enabled' => env('GOOGLE_CALENDAR_ENABLED', false),
+        'client_id' => env('GOOGLE_CALENDAR_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CALENDAR_CLIENT_SECRET'),
+        'redirect_uri' => env('GOOGLE_CALENDAR_REDIRECT_URI'),
+        'calendar_ids' => array_values(array_filter(array_map('trim', explode(',', (string) env('GOOGLE_CALENDAR_IDS', 'primary'))))),
+        'public_event_ids' => array_values(array_filter(array_map('trim', explode(',', (string) env('GOOGLE_CALENDAR_PUBLIC_EVENT_IDS', ''))))),
+        'write_enabled' => env('GOOGLE_CALENDAR_WRITE_ENABLED', false),
+        'sync_past_days' => (int) env('GOOGLE_CALENDAR_SYNC_PAST_DAYS', 7),
+        'sync_future_days' => (int) env('GOOGLE_CALENDAR_SYNC_FUTURE_DAYS', 45),
+    ],
+
+    'google_login' => [
+        'enabled' => env('GOOGLE_LOGIN_ENABLED', true),
+        'client_id' => env('GOOGLE_LOGIN_CLIENT_ID', env('GOOGLE_CALENDAR_CLIENT_ID')),
+        'client_secret' => env('GOOGLE_LOGIN_CLIENT_SECRET', env('GOOGLE_CALENDAR_CLIENT_SECRET')),
+        'redirect_uri' => env('GOOGLE_LOGIN_REDIRECT_URI', rtrim((string) env('APP_URL'), '/').'/auth/google/callback'),
+    ],
+
+    'duolingo' => [
+        'enabled' => env('DUOLINGO_ENABLED', false),
+        'username' => env('DUOLINGO_USERNAME'),
+        'endpoint' => env('DUOLINGO_ENDPOINT', 'https://www.duolingo.com/2017-06-30/users'),
+        'cache_hours' => (int) env('DUOLINGO_CACHE_HOURS', 6),
+    ],
 ];

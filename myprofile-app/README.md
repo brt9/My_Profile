@@ -13,8 +13,10 @@ Portfólio em Laravel 12 que combina uma vitrine profissional com um laboratóri
 | Clima | disponível | Open-Meteo, fallback Natal/RN e geolocalização somente por consentimento |
 | Steam | opcional | biblioteca, jogos recentes e conquistas; depende de credenciais privadas |
 | Telemetria | disponível | agente .NET 1.1, CPU/GPU/RAM/disco/uptime, PostgreSQL, histórico e retenção |
-| Calendar | planejado | integração OAuth com projeção privada por padrão |
-| Duolingo | planejado | adaptador experimental atrás de feature flag |
+| Google Agenda | leitura e escrita opcionais | CRUD local, OAuth, allowlist, snapshot e agenda semanal |
+| Login Google | disponível | OpenID, e-mail verificado, state e vínculo seguro de conta |
+| Duolingo | disponível | perfil `Pedro_Felipe_Brt`, snapshots diários, histórico e circuit breaker |
+| Perfil profissional | conteúdo revisado | experiências e formação validadas a partir do PDF do LinkedIn |
 
 Falhas externas são isoladas: GitHub, Steam, clima e telemetria podem ficar indisponíveis simultaneamente sem derrubar a home.
 
@@ -29,7 +31,7 @@ Blade + Tailwind + Alpine
              |
         PostgreSQL + histórico
    /  |  \
-GitHub Steam Open-Meteo
+GitHub Steam Open-Meteo Google Duolingo
 ```
 
 O projeto permanece um monólito modular Laravel. PostgreSQL 16 persiste snapshots e agregados de telemetria; Chart.js é carregado sob demanda para os gráficos. Veja [arquitetura](docs/architecture.md) e [ADRs](docs/adr/).
@@ -40,6 +42,10 @@ O projeto permanece um monólito modular Laravel. PostgreSQL 16 persiste snapsho
 - o agente usa Bearer token, identificador aleatório e não publica hostname, usuário, IP ou identificadores de hardware;
 - coordenadas autorizadas são enviadas no corpo de uma requisição e não são persistidas;
 - clientes externos usam timeout, retry limitado, cache e mensagens de erro sanitizadas;
+- Google Calendar solicita somente o escopo configurado, criptografa o refresh token e nunca persiste descrições, participantes ou links;
+- o login Google usa `openid email profile`, exige e-mail verificado e não persiste access token;
+- Duolingo usa somente o nome público, sem senha/cookie, e não persiste o payload bruto;
+- o conteúdo profissional é estático, revisado e não depende de scraping ou upload administrativo;
 - contatos vazios são ocultados.
 
 Detalhes: [docs/security.md](docs/security.md).
@@ -62,4 +68,4 @@ As instruções de instalação, variáveis e execução estão em [docs/develop
 
 ## Roadmap
 
-O plano de releases, gates e critérios de aceite está em [PORTFOLIO-ROADMAP.md](PORTFOLIO-ROADMAP.md). R1 está concluída e R2 está implementada, aguardando apenas a janela operacional de 24 horas. A única pendência externa da R0 é rotacionar a chave Steam que havia sido colocada fora do `.env`.
+O plano de releases, gates e critérios de aceite está em [PORTFOLIO-ROADMAP.md](PORTFOLIO-ROADMAP.md). R1–R5 têm implementação técnica; os gates operacionais de Calendar, Duolingo e telemetria dependem de conexão real e janela de coleta. A única pendência externa da R0 é rotacionar a chave Steam que havia sido colocada fora do `.env`.

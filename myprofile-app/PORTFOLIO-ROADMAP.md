@@ -60,7 +60,7 @@ Auditoria realizada no repositório em 20 de junho de 2026.
 | React/Inertia | dependências e área autenticada presentes | a home pública não usa React ou Next.js |
 | Banco principal | PostgreSQL 16 no local, Docker e CI | falta comprovar rotina externa de backup no ambiente de produção |
 | Telemetria | agente .NET 1.1; CPU/GPU, RAM, disco, uptime, controladores e histórico | gate operacional de 24 horas ainda em observação |
-| Steam | biblioteca, atividade, conquistas, cache e fallback de imagens | falta histórico próprio e atualização por job |
+| Steam | biblioteca, atividade, conquistas, cache uniforme de 30 minutos e fallback de imagens | falta histórico próprio e atualização por job |
 | Clima | Open-Meteo, origem explícita e geolocalização consentida | falta health check agregado das integrações |
 | GitHub | integração pública, cache, documentação e teste de resiliência | falta atualização por job e histórico próprio |
 | Footer | identidade, contatos condicionais, ano e retorno ao topo | concluído para a Release 1 |
@@ -424,7 +424,7 @@ Demonstrar experiência com modelagem, consultas SQL, PostgreSQL/MySQL, Power BI
 
 **Gate da Release 3:** revisão final do conteúdo por Pedro e links sociais reais configurados.
 
-**Status em 20 de junho de 2026:** estrutura implementada com competências ligadas a evidências, três projetos no formato contexto–ação–resultado, três automações documentadas e GitHub/LinkedIn reais configurados. As afirmações são limitadas ao que o repositório comprova. O gate permanece pendente apenas da revisão final de Pedro, pois o LinkedIn público recusou a leitura automatizada.
+**Status em 21 de junho de 2026:** estrutura implementada com competências ligadas a evidências, três projetos no formato contexto–ação–resultado, três automações documentadas e GitHub/LinkedIn reais configurados. O conteúdo profissional foi revisado a partir do PDF do LinkedIn e mantido no código, sem importador administrativo.
 
 ### Release 4 — Google Calendar com privacidade (P2, L)
 
@@ -441,7 +441,7 @@ Demonstrar experiência com modelagem, consultas SQL, PostgreSQL/MySQL, Power BI
 
 Definir allowlist de calendários/eventos publicáveis. O frontend recebe somente:
 
-- título aprovado ou genérico (“Ocupado”);
+- título aprovado ou genérico (“Compromisso”);
 - data e intervalo de horário;
 - tipo de atividade;
 - status normalizado.
@@ -451,9 +451,9 @@ Eventos privados nunca terão descrição, participantes, sala, link de reunião
 #### 4.3 Sincronização e Gantt
 
 - sincronizar por job e servir dados do cache local;
-- semana como visualização padrão; mês como visão agregada;
-- categorias: reunião, tarefa, estudo, entrega e projeto;
-- legenda, filtro, estado vazio e fallback em lista no mobile;
+- próximos 7 dias como única visualização em tabela, mantendo dias vazios;
+- linha simples para um compromisso e Gantt para múltiplos no mesmo dia;
+- título e horário como únicos dados visuais do compromisso;
 - não carregar a agenda diretamente durante o request da home.
 
 **Aceite:** testes comprovam que evento privado vira somente bloco ocupado; token revogado degrada para estado indisponível; Gantt é navegável por teclado e legível no mobile.
@@ -465,6 +465,8 @@ Documentação de referência:
 - [Google OAuth 2.0 para aplicações web](https://developers.google.com/identity/protocols/oauth2/web-server)
 
 **Gate da Release 4:** revisão manual de privacidade com calendário contendo eventos públicos, privados, cancelados e recorrentes.
+
+**Status em 21 de junho de 2026:** implementado OAuth administrativo com state, refresh token criptografado, escopo FreeBusy por padrão, allowlist opcional de títulos, projeção segura, job a cada 15 minutos, revogação e tabela dos próximos sete dias, inclusive vazios. Um compromisso aparece em linha simples; múltiplos no mesmo dia usam Gantt. Filtros e resumo mensal foram removidos. A conta administrativa está conectada e a sincronização real segue saudável. O gate final ainda requer a matriz manual com eventos públicos, privados, cancelados e recorrentes.
 
 ### Release 5 — Duolingo experimental (P2, M/L)
 
@@ -497,6 +499,8 @@ Esta integração depende de endpoints não oficiais e deve permanecer isolada, 
 **Aceite:** mudanças no payload externo não causam erro 500 na home; fixtures cobrem campos ausentes; feature flag desliga rota, job e interface.
 
 **Gate da Release 5:** sete dias de snapshots consistentes e nenhuma credencial privada necessária para manter o recurso.
+
+**Status em 20 de junho de 2026:** implementado adaptador isolado, normalização defensiva, timeout/retry/circuit breaker, upsert diário por curso, job a cada 6 horas, cards, gráfico e tabela acessível. O perfil público `Pedro_Felipe_Brt` foi conectado e o primeiro snapshot real registrou Inglês, 2.911 XP e sequência de 47 dias. O gate operacional de sete dias começou nesta data.
 
 ### Release 6 — Documentação, qualidade e entrega (P1 contínuo, M)
 
