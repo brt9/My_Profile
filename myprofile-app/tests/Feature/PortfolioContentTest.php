@@ -7,14 +7,20 @@ test('professional content is structured around evidence and results', function 
         ->and($portfolio['social']['linkedin'])->toBe('https://www.linkedin.com/in/pedrofelipebrt9')
         ->and($portfolio['competencies'])->toHaveCount(6)
         ->and($portfolio['projects'])->toHaveCount(3)
-        ->and($portfolio['automations'])->toHaveCount(3);
+        ->and($portfolio['experience'])->toHaveCount(3)
+        ->and($portfolio['language_note'])->toBe('Vivência internacional por 1 ano e 11 meses.')
+        ->and($portfolio)->not->toHaveKey('automations');
 
     foreach ($portfolio['competencies'] as $competency) {
         expect($competency)
-            ->toHaveKeys(['title', 'items', 'evidence', 'href'])
+            ->toHaveKeys(['title', 'description', 'items', 'evidence', 'href'])
+            ->and($competency['description'])->not->toBeEmpty()
             ->and($competency['items'])->not->toBeEmpty()
             ->and($competency['href'])->toStartWith('#');
     }
+
+    expect($portfolio['competencies'][0]['items'])->toHaveCount(7)
+        ->and($portfolio['competencies'][1]['items'])->toHaveCount(7);
 
     foreach ($portfolio['projects'] as $project) {
         expect($project)
@@ -24,20 +30,42 @@ test('professional content is structured around evidence and results', function 
             ->and($project['result'])->not->toBeEmpty();
     }
 
-    foreach ($portfolio['automations'] as $automation) {
-        expect($automation)
-            ->toHaveKeys(['title', 'before', 'solution', 'result', 'stack', 'responsibility'])
-            ->and($automation['responsibility'])->not->toBeEmpty();
-    }
+    expect($portfolio['projects'][0]['url'])->toBe('https://www.bardoti.xyz');
 });
 
-test('home presents professional narrative and real social links', function () {
+test('home presents the professional narrative without removed sections', function () {
     $this->get('/')
         ->assertOk()
-        ->assertSee('Competências com evidências', false)
-        ->assertSee('Contexto')
-        ->assertSee('Responsabilidade')
-        ->assertSee('Menos operação manual')
+        ->assertSee('Competências, tecnologias e evidências', false)
+        ->assertSee('O que faz')
+        ->assertSee('technology-badge', false)
+        ->assertSee('technology-logo', false)
+        ->assertSee('https://www.bardoti.xyz', false)
+        ->assertSee('Abrir o site BardoTI', false)
+        ->assertSee('Vivência internacional por 1 ano e 11 meses.')
+        ->assertDontSee('Teixeira Construções / ETS')
+        ->assertDontSee('id="automacoes"', false)
+        ->assertDontSee('id="contato"', false)
         ->assertSee('https://github.com/brt9', false)
         ->assertSee('https://www.linkedin.com/in/pedrofelipebrt9', false);
+});
+
+test('home sections follow the defined visual order', function () {
+    $template = file_get_contents(resource_path('views/home.blade.php'));
+    $needles = [
+        "@include('sections.about')",
+        "@include('sections.projects')",
+        "@include('sections.experience')",
+        'id="github"',
+        "@include('sections.pc')",
+        "@include('sections.calendar')",
+        "@include('sections.duolingo')",
+        'id="steam"',
+        'id="clima"',
+    ];
+
+    $positions = array_map(fn (string $needle): int|false => strpos($template, $needle), $needles);
+
+    expect($positions)->not->toContain(false)
+        ->and($positions)->toBe(collect($positions)->sort()->values()->all());
 });

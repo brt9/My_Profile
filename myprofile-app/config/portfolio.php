@@ -21,45 +21,51 @@ return [
     'stats' => [
         ['value' => '10+ anos', 'label' => 'Experiência operacional'],
         ['value' => 'Laravel', 'label' => 'Stack principal'],
-        ['value' => '4', 'label' => 'Experiências em destaque'],
+        ['value' => '3', 'label' => 'Experiências em destaque'],
         ['value' => 'Natal/RN', 'label' => 'Brasil'],
     ],
     'competencies' => [
         [
             'title' => 'Backend',
-            'items' => ['Laravel', 'PHP 8', 'APIs REST', 'Integrações', 'Testes'],
+            'description' => 'APIs, regras de negócio, persistência e integrações resilientes para sistemas que precisam continuar operando.',
+            'items' => ['Laravel', 'PHP 8', 'APIs REST', 'PostgreSQL', 'MySQL', 'Pest', 'Docker'],
             'evidence' => 'Sistemas de gestão, telemetria e integrações resilientes',
             'href' => '#projetos',
         ],
         [
             'title' => 'Frontend',
-            'items' => ['JavaScript', 'Blade', 'Vue.js', 'Alpine.js', 'Bootstrap'],
+            'description' => 'Interfaces responsivas que organizam fluxos complexos e mantêm as ações importantes fáceis de encontrar.',
+            'items' => ['JavaScript', 'Blade', 'Vue.js', 'Alpine.js', 'Tailwind CSS', 'Bootstrap', 'Vite'],
             'evidence' => 'Interfaces responsivas para operação diária',
             'href' => '#projetos',
         ],
         [
             'title' => 'Dados e BI',
+            'description' => 'Consultas, indicadores e painéis que transformam registros operacionais em decisões rastreáveis.',
             'items' => ['PostgreSQL', 'MySQL', 'SQL', 'Power BI', 'Dashboards'],
             'evidence' => 'Indicadores, relatórios e rastreabilidade operacional',
             'href' => '#experiencia',
         ],
         [
             'title' => 'Implantação',
+            'description' => 'Configuração, homologação, treinamento e suporte para levar o produto do ambiente técnico ao uso real.',
             'items' => ['Homologação', 'Suporte', 'Documentação', 'Treinamento', 'Nginx'],
             'evidence' => 'Entrega completa da configuração ao acompanhamento',
             'href' => '#experiencia',
         ],
         [
             'title' => 'Infraestrutura e qualidade',
+            'description' => 'Ambientes reproduzíveis, testes automatizados e pipelines que reduzem falhas durante a entrega.',
             'items' => ['Docker', 'Git', 'GitHub Actions', 'Pest', 'CI/CD'],
             'evidence' => 'Ambientes repetíveis, testes e automação de entrega',
-            'href' => '#automacoes',
+            'href' => '#github',
         ],
         [
             'title' => 'Geo e automação',
+            'description' => 'Mapas, scripts e aplicações instaláveis que simplificam tarefas repetitivas e fluxos de campo.',
             'items' => ['QGIS', 'GeoJSON', 'PowerShell', 'IA', 'PWA'],
             'evidence' => 'Ferramentas internas e fluxos operacionais automatizados',
-            'href' => '#automacoes',
+            'href' => '#projetos',
         ],
     ],
     'experience' => [
@@ -87,14 +93,6 @@ return [
             'description' => 'Gestão operacional de almoxarifado e criação do BardoTI, utilizado desde maio de 2023 para solicitações, rastreamento em tempo real, relatórios, rastreabilidade por QR Code e código de barras e integração com Power BI.',
             'stack' => ['PHP', 'Laravel', 'JavaScript', 'MySQL', 'Power BI', 'PWA', 'QR Code'],
         ],
-        [
-            'period' => '02/2025 — 01/2026',
-            'role' => 'Desenvolvedor Full Stack Freelancer',
-            'company' => 'Teixeira Construções / ETS',
-            'location' => 'Remoto',
-            'description' => 'Plataforma de RH e ponto eletrônico com cálculo de jornadas, contracheques em PDF, gestão de colaboradores e permissões, testes, publicação com Nginx, treinamento e documentação.',
-            'stack' => ['Laravel', 'MySQL', 'Blade', 'Bootstrap', 'Nginx', 'CI/CD'],
-        ],
     ],
     'education' => [
         [
@@ -107,6 +105,7 @@ return [
         ['name' => 'Português', 'level' => 'Nativo ou bilíngue'],
         ['name' => 'Inglês', 'level' => 'Profissional'],
     ],
+    'language_note' => 'Vivência internacional por 1 ano e 11 meses.',
     'projects' => [
         [
             'number' => '01',
@@ -116,6 +115,7 @@ return [
             'result' => 'Sistema implantado em maio de 2023 e mantido em uso para apoiar a operação e os indicadores no Power BI.',
             'stack' => ['Laravel', 'PHP', 'JavaScript', 'MySQL', 'PWA'],
             'status' => 'Em uso',
+            'url' => 'https://www.bardoti.xyz',
         ],
         [
             'number' => '02',
@@ -134,32 +134,6 @@ return [
             'result' => 'Fluxo administrativo centralizado, com publicação automatizada e equipe treinada.',
             'stack' => ['Laravel', 'MySQL', 'Blade', 'Bootstrap', 'Nginx'],
             'status' => 'Entregue',
-        ],
-    ],
-    'automations' => [
-        [
-            'title' => 'Agente de telemetria para Windows',
-            'before' => 'Consultar o estado do computador manualmente em ferramentas locais.',
-            'solution' => 'Executável .NET coleta métricas suportadas e envia amostras autenticadas para a API.',
-            'result' => 'Leitura centralizada com estados online, defasado e offline calculados pelo servidor.',
-            'stack' => ['.NET 8', 'PowerShell', 'Laravel API'],
-            'responsibility' => 'Arquitetura, implementação, empacotamento e documentação.',
-        ],
-        [
-            'title' => 'Agenda local com Google opcional',
-            'before' => 'A agenda dependia da autorização e da disponibilidade do Google.',
-            'solution' => 'CRUD local persistente, sincronização bidirecional controlada e snapshot seguro dos eventos externos.',
-            'result' => 'Compromissos continuam disponíveis e editáveis mesmo sem conexão com o provedor.',
-            'stack' => ['Laravel', 'Google Calendar API', 'Scheduler'],
-            'responsibility' => 'Modelagem, API, sincronização, privacidade e interface.',
-        ],
-        [
-            'title' => 'Clima persistente de Natal',
-            'before' => 'Falhas temporárias da API deixavam o card sem informação.',
-            'solution' => 'Captura agendada no banco com fallback para o último registro válido e horário visível.',
-            'result' => 'O dado mais recente de Natal permanece disponível mesmo durante indisponibilidade externa.',
-            'stack' => ['Open-Meteo', 'Laravel Scheduler', 'PostgreSQL'],
-            'responsibility' => 'Persistência, expiração, fallback e apresentação.',
         ],
     ],
     'integrations' => [

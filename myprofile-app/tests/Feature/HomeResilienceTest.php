@@ -16,6 +16,7 @@ test('home remains useful when all external integrations fail', function () {
         ->assertOk()
         ->assertSee('Pedro Felipe')
         ->assertSee('Trabalho em funcionamento')
-        ->assertSee('Telemetria ao vivo')
-        ->assertSee('Contato');
+        ->assertSee('Saúde da estação em tempo real')
+        ->assertSee('Natal em tempo real')
+        ->assertDontSee('id="contato"', false);
 });

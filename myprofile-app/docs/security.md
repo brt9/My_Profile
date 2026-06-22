@@ -13,7 +13,7 @@
 - conexão, callback, sincronização manual e revogação exigem usuário verificado cujo e-mail coincide com `PORTFOLIO_ADMIN_EMAIL`;
 - OAuth usa state descartável e refresh token com cast `encrypted`;
 - o escopo é `calendar.events` quando a escrita está ativa e `calendar.events.readonly` quando desativada; a projeção local mantém títulos genéricos por padrão;
-- a projeção local guarda título genérico, categoria, horário e estado; nunca descrição, participantes, localização ou link de reunião;
+- quando autorizado explicitamente por configuração, a projeção local guarda o título sanitizado; nunca são armazenados descrição, participantes, localização ou link de reunião;
 - revogação remove o espelho vindo do Google e preserva compromissos criados localmente; token inválido mantém o último snapshot marcado como defasado.
 
 ## Login com Google

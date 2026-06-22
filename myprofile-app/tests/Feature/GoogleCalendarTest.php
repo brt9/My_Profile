@@ -20,7 +20,25 @@ beforeEach(function () {
     config()->set('services.google_calendar.redirect_uri', 'http://localhost/admin/calendar/callback');
     config()->set('services.google_calendar.calendar_ids', ['primary']);
     config()->set('services.google_calendar.public_event_ids', ['public-event']);
+    config()->set('services.google_calendar.show_event_titles', false);
     config()->set('portfolio.integrations.calendar', true);
+});
+
+test('calendar projection publishes sanitized google titles when explicitly enabled', function () {
+    config()->set('services.google_calendar.show_event_titles', true);
+    $projector = app(CalendarEventProjector::class);
+    $base = [
+        'start' => ['dateTime' => '2026-06-22T12:00:00Z'],
+        'end' => ['dateTime' => '2026-06-22T13:00:00Z'],
+        'summary' => '  <b>Reunião com cliente</b>  ',
+    ];
+
+    $visible = $projector->project($base + ['id' => 'regular-event'], 'primary', []);
+    $private = $projector->project($base + ['id' => 'private-event', 'visibility' => 'private'], 'primary', []);
+
+    expect($visible['public_title'])->toBe('Reunião com cliente')
+        ->and($visible['category'])->toBe('projeto')
+        ->and($private['public_title'])->toBe('Reunião com cliente');
 });
 
 test('calendar projection is private by default and only publishes allowlisted titles', function () {
@@ -249,13 +267,16 @@ test('calendar dashboard presents a rolling seven day window', function () {
     expect($dashboard['range_label'])->toBe('20/06–26/06')
         ->and($dashboard['event_count'])->toBe(1)
         ->and(count($dashboard['days']))->toBe(7)
+        ->and(count($dashboard['month_days']))->toBe(42)
+        ->and($dashboard['month_label'])->toBe('Junho 2026')
         ->and(collect($dashboard['days'])->firstWhere('date', '2026-06-22')['events'][0]['title'])->toBe('Compromisso')
+        ->and(collect($dashboard['month_days'])->firstWhere('date', '2026-06-22')['events'][0]['title'])->toBe('Compromisso')
         ->and(collect($dashboard['days'])->firstWhere('date', '2026-06-22')['events'][0]['time'])->toBe('Dia inteiro');
 
     CarbonImmutable::setTestNow();
 });
 
-test('calendar interface removes filters and uses gantt only for days with multiple appointments', function () {
+test('calendar interface offers weekly gantt and monthly calendar without category filters', function () {
     CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-06-21 10:00:00', 'America/Fortaleza'));
     config()->set('portfolio.presentation_timezone', 'America/Fortaleza');
     $user = User::factory()->create();
@@ -285,11 +306,13 @@ test('calendar interface removes filters and uses gantt only for days with multi
         ->assertSee('Próximos 7 dias')
         ->assertSee('09:00–10:00')
         ->assertSee('14:30–15:30')
-        ->assertSee('Sem compromisso')
+        ->assertSee('Disponível')
         ->assertSee('calendar-table', false)
         ->assertSee('calendar-gantt', false)
+        ->assertSee('calendar-month-grid', false)
+        ->assertSee('data-calendar-view-button="month"', false)
         ->assertDontSee('Filtrar agenda por categoria')
-        ->assertDontSee('Resumo do mês');
+        ->assertDontSee('calendar-manager', false);
 
     CarbonImmutable::setTestNow();
 });

@@ -1,14 +1,18 @@
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Security.Principal;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using LibreHardwareMonitor.Hardware;
+using LibreHardwareMonitor.PawnIo;
 
 namespace PcTelemetryAgent;
 
 internal static class Program
 {
-    internal const string Version = "1.1.0";
+    internal const string Version = "1.2.1";
 
     public static async Task<int> Main(string[] args)
     {
@@ -46,6 +50,36 @@ internal static class Program
         {
             Console.Error.WriteLine("Informe endpoint e token válidos em telemetry-agent.json.");
             return 2;
+        }
+
+        if (!IsAdministrator())
+        {
+            Console.WriteLine("A temperatura da CPU exige acesso administrativo.");
+            Console.WriteLine("Solicitando permissao do Windows...");
+
+            try
+            {
+                RelaunchAsAdministrator(args);
+                return 0;
+            }
+            catch (Win32Exception exception) when (exception.NativeErrorCode == 1223)
+            {
+                Console.Error.WriteLine("Permissao administrativa cancelada. A telemetria nao foi iniciada.");
+                return 5;
+            }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine($"Nao foi possivel iniciar o agente como administrador: {exception.Message}");
+                return 5;
+            }
+        }
+
+        if (!PawnIo.IsInstalled)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("PawnIO nao esta instalado. A Integridade de memoria do Windows pode impedir a leitura da temperatura da CPU.");
+            Console.WriteLine("Instalador oficial: https://github.com/namazso/PawnIO.Setup/releases/latest");
+            Console.ResetColor();
         }
 
         var computer = new Computer
@@ -87,10 +121,9 @@ internal static class Program
 
         do
         {
-            var payload = collector.Collect();
-
             try
             {
+                var payload = collector.Collect();
                 using var response = await client.PostAsJsonAsync(endpoint, payload, JsonOptions.Default, cancellation.Token);
                 var status = response.IsSuccessStatusCode ? "enviado" : $"HTTP {(int)response.StatusCode}";
                 Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {status} | CPU {Display(payload.CpuTemp, "°C")} | GPU {Display(payload.GpuTemp, "°C")}");
@@ -124,6 +157,32 @@ internal static class Program
     {
         var index = Array.FindIndex(args, value => value.Equals(name, StringComparison.OrdinalIgnoreCase));
         return index >= 0 && index + 1 < args.Length ? args[index + 1] : null;
+    }
+
+    private static bool IsAdministrator()
+    {
+        using var identity = WindowsIdentity.GetCurrent();
+        return new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
+    }
+
+    private static void RelaunchAsAdministrator(string[] args)
+    {
+        var executable = Environment.ProcessPath
+            ?? throw new InvalidOperationException("Caminho do executavel nao identificado.");
+        var startInfo = new ProcessStartInfo(executable)
+        {
+            UseShellExecute = true,
+            Verb = "runas",
+            WorkingDirectory = AppContext.BaseDirectory,
+        };
+
+        foreach (var argument in args)
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
+
+        _ = Process.Start(startInfo)
+            ?? throw new InvalidOperationException("O Windows nao iniciou o processo elevado.");
     }
 
     private static string Display(float? value, string suffix) => value is null ? "—" : $"{value:0.0}{suffix}";

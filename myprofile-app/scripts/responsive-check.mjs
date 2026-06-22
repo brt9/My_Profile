@@ -183,7 +183,7 @@ const telemetryEvaluation = await command('Runtime.evaluate', {
 
 const telemetryReport = telemetryEvaluation.result.value;
 const telemetryValid = telemetryReport.zeroValue === '0.0% carga'
-    && telemetryReport.unsupportedValue === 'Não suportado neste dispositivo'
+    && telemetryReport.unsupportedValue === 'Sensor indisponível'
     && telemetryReport.unavailableMessage === 'Telemetria indisponível no momento.'
     && telemetryReport.serverErrorMessage === 'Telemetria indisponível no momento.'
     && telemetryReport.timeoutMessage === 'Telemetria indisponível no momento.';
@@ -305,8 +305,52 @@ const weatherConsentValid = weatherConsentReport.denied.includes('Permissão neg
 failed ||= !weatherConsentValid;
 console.log(`${weatherConsentValid ? 'PASS' : 'FAIL'} weather consent fallbacks`, weatherConsentReport);
 
+const githubYearEvaluation = await command('Runtime.evaluate', {
+    expression: `(async () => {
+        const element = document.querySelector('[data-github-activity]');
+        const calendar = window.Alpine?.$data(element);
+        if (!calendar) return { available: false };
+        const initialYear = calendar.calendar.year;
+        await calendar.previousYear();
+        for (let attempt = 0; attempt < 80 && calendar.loading; attempt += 1) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        const months = [...element.querySelectorAll('.github-calendar-months span')]
+            .map(item => item.textContent.trim())
+            .filter(Boolean);
+        return {
+            available: true,
+            initialYear,
+            selectedYear: calendar.calendar.year,
+            total: calendar.calendar.total,
+            cells: element.querySelectorAll('.github-calendar-week .github-contribution-day').length,
+            hasJanuary: months.includes('Jan'),
+            hasDecember: months.includes('Dez'),
+            hasError: Boolean(calendar.error),
+        };
+    })()`,
+    awaitPromise: true,
+    returnByValue: true,
+});
+const githubYearReport = githubYearEvaluation.result.value;
+const githubYearValid = githubYearReport.available
+    && githubYearReport.selectedYear === githubYearReport.initialYear - 1
+    && githubYearReport.total > 0
+    && githubYearReport.cells >= 365
+    && githubYearReport.hasJanuary
+    && githubYearReport.hasDecember
+    && !githubYearReport.hasError;
+failed ||= !githubYearValid;
+console.log(`${githubYearValid ? 'PASS' : 'FAIL'} GitHub yearly navigation`, githubYearReport);
+
 if (process.env.RESPONSIVE_SCREENSHOT) {
     const selector = process.env.RESPONSIVE_SCREENSHOT_SELECTOR ?? '#estudos';
+    if (process.env.RESPONSIVE_THEME === 'dark') {
+        await command('Runtime.evaluate', {
+            expression: "document.documentElement.classList.add('dark')",
+        });
+        await sleep(250);
+    }
     const sectionEvaluation = await command('Runtime.evaluate', {
         expression: `(() => {
             const element = document.querySelector(${JSON.stringify(selector)});

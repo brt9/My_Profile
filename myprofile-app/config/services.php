@@ -52,6 +52,7 @@ return [
         'redirect_uri' => env('GOOGLE_CALENDAR_REDIRECT_URI'),
         'calendar_ids' => array_values(array_filter(array_map('trim', explode(',', (string) env('GOOGLE_CALENDAR_IDS', 'primary'))))),
         'public_event_ids' => array_values(array_filter(array_map('trim', explode(',', (string) env('GOOGLE_CALENDAR_PUBLIC_EVENT_IDS', ''))))),
+        'show_event_titles' => env('GOOGLE_CALENDAR_SHOW_EVENT_TITLES', false),
         'write_enabled' => env('GOOGLE_CALENDAR_WRITE_ENABLED', false),
         'sync_past_days' => (int) env('GOOGLE_CALENDAR_SYNC_PAST_DAYS', 7),
         'sync_future_days' => (int) env('GOOGLE_CALENDAR_SYNC_FUTURE_DAYS', 45),

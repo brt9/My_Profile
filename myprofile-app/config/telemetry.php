@@ -15,8 +15,6 @@ return [
         'gpu_temp' => ['column' => 'gpu_temperature', 'label' => 'Temperatura da GPU', 'unit' => '°C', 'precision' => 1],
         'memory_usage' => ['column' => 'memory_usage', 'label' => 'Uso da memória', 'unit' => '%', 'precision' => 1],
         'disk_usage' => ['column' => 'disk_usage', 'label' => 'Uso do disco', 'unit' => '%', 'precision' => 1],
-        'pump_rpm' => ['column' => 'pump_rpm', 'label' => 'Bomba AIO', 'unit' => 'RPM', 'precision' => 0],
-        'coolant_temp' => ['column' => 'coolant_temperature', 'label' => 'Temperatura do líquido', 'unit' => '°C', 'precision' => 1],
         'uptime_seconds' => ['column' => 'uptime_seconds', 'label' => 'Tempo ligado', 'unit' => 's', 'precision' => 0],
     ],
     'ranges' => [

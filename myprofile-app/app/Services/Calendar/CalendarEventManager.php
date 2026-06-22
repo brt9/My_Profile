@@ -71,14 +71,25 @@ final class CalendarEventManager
     private function eventAttributes(array $data): array
     {
         $timezone = (string) config('portfolio.presentation_timezone', 'America/Fortaleza');
+        $allDay = (bool) ($data['all_day'] ?? false);
+        $start = CarbonImmutable::parse((string) $data['starts_at'], $timezone);
+        $end = CarbonImmutable::parse((string) $data['ends_at'], $timezone);
+
+        if ($allDay) {
+            $start = $start->startOfDay();
+            $end = $end->startOfDay();
+            if ($end->lessThanOrEqualTo($start)) {
+                $end = $start->addDay();
+            }
+        }
 
         return [
             'public_title' => Str::limit(strip_tags(trim((string) $data['title'])), 100, '…'),
             'category' => (string) $data['category'],
             'status' => 'confirmado',
-            'starts_at' => CarbonImmutable::parse((string) $data['starts_at'], $timezone)->utc(),
-            'ends_at' => CarbonImmutable::parse((string) $data['ends_at'], $timezone)->utc(),
-            'all_day' => (bool) ($data['all_day'] ?? false),
+            'starts_at' => $start->utc(),
+            'ends_at' => $end->utc(),
+            'all_day' => $allDay,
         ];
     }
 

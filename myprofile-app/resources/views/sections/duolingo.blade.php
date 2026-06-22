@@ -5,7 +5,7 @@
     $duolingoPrimaryCourse = collect($duolingo['courses'])->first();
 @endphp
 
-<section id="estudos" class="section duolingo-section">
+<section id="estudos" class="section section-alt duolingo-section">
     <div class="container-shell">
         <div class="section-header duolingo-section-header">
             <div class="brand-section-title">

@@ -12,6 +12,7 @@
         <span class="project-status">API + banco</span>
     </div>
 
+    <div class="weather-locations">
     <section class="weather-location weather-location-primary" data-weather-scope="natal" aria-labelledby="weather-natal-title">
         <div class="weather-location-head">
             <div>
@@ -75,4 +76,5 @@
             <p class="integration-note" data-weather-status role="status" aria-live="polite">Buscando o clima da sua cidade…</p>
         </div>
     </section>
+    </div>
 </article>

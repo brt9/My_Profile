@@ -12,7 +12,7 @@ Portfólio em Laravel 12 que combina uma vitrine profissional com um laboratóri
 | GitHub | disponível | perfil, repositórios e atividade pública com cache |
 | Clima | disponível | Open-Meteo, fallback Natal/RN e geolocalização somente por consentimento |
 | Steam | opcional | biblioteca, jogos recentes e conquistas; depende de credenciais privadas |
-| Telemetria | disponível | agente .NET 1.1, CPU/GPU/RAM/disco/uptime, PostgreSQL, histórico e retenção |
+| Telemetria | disponível | agente .NET 1.2 com inicialização automática, CPU/GPU/RAM/disco/uptime, PostgreSQL, histórico e retenção |
 | Google Agenda | leitura e escrita opcionais | CRUD local, OAuth, allowlist, snapshot e agenda semanal |
 | Login Google | disponível | OpenID, e-mail verificado, state e vínculo seguro de conta |
 | Duolingo | disponível | perfil `Pedro_Felipe_Brt`, snapshots diários, histórico e circuit breaker |
@@ -64,7 +64,7 @@ Os testes cobrem integrações, autorização da telemetria, estados vazios/defa
 
 ## Desenvolvimento
 
-As instruções de instalação, variáveis e execução estão em [docs/development.md](docs/development.md). No Windows, `start-portfolio.cmd` inicia o site e `start-telemetry-agent.cmd` inicia o agente.
+As instruções de instalação, variáveis e execução estão em [docs/development.md](docs/development.md). No Windows, `start-portfolio.cmd` inicia o site e `install-telemetry-agent-task.cmd` mantém o agente ativo após o login.
 
 ## Roadmap
 

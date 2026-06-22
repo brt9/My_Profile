@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GitHubContributionController;
 use App\Http\Controllers\IntegrationHealthController;
 use App\Http\Controllers\TelemetryController;
 use App\Http\Controllers\WeatherController;
@@ -24,6 +25,10 @@ Route::prefix('telemetry')->as('telemetry.')->group(function (): void {
 Route::get('health/integrations', IntegrationHealthController::class)
     ->middleware('throttle:30,1')
     ->name('health.integrations');
+
+Route::get('github/contributions', GitHubContributionController::class)
+    ->middleware('throttle:30,1')
+    ->name('github.contributions');
 
 Route::post('weather/location', [WeatherController::class, 'show'])
     ->middleware('throttle:30,1')

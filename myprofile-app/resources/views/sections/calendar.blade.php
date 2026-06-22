@@ -4,25 +4,30 @@
         && hash_equals(mb_strtolower((string) config('portfolio.admin_email')), mb_strtolower((string) auth()->user()->email));
 @endphp
 
-<section id="agenda" class="section section-alt">
+<section id="agenda" class="section">
     <div class="container-shell">
         <div class="section-header">
             <div>
-                <span class="section-kicker">Agenda</span>
-                <h2>Próximos 7 dias.</h2>
+                <span class="section-kicker">Disponibilidade</span>
+                <h2>Agenda de trabalho e estudos.</h2>
             </div>
-            <p>Os compromissos são mantidos no banco local. A sincronização com o Google é opcional e nunca impede a exibição do último dado salvo.</p>
+            <p>Consulte reuniões, blocos de desenvolvimento, estudos e entregas pela semana ou pelo mês. Somente título público e horário são exibidos.</p>
         </div>
 
         @if (session('calendar_status'))
             <p class="integration-flash" role="status">{{ session('calendar_status') }}</p>
         @endif
 
-        <div class="calendar-shell">
+        <div class="calendar-shell" data-calendar-shell data-week-label="{{ $calendar['range_label'] }}" data-month-label="{{ $calendar['month_label'] }}">
             <div class="calendar-toolbar">
                 <div class="calendar-view-label">
-                    <strong>Próximos 7 dias</strong>
-                    <span>{{ $calendar['range_label'] }}</span>
+                    <strong data-calendar-period-title>Próximos 7 dias</strong>
+                    <span data-calendar-period-label>{{ $calendar['range_label'] }}</span>
+                </div>
+
+                <div class="calendar-view-switch" role="group" aria-label="Visualização da agenda">
+                    <button type="button" class="is-active" data-calendar-view-button="week" aria-pressed="true">Semana</button>
+                    <button type="button" data-calendar-view-button="month" aria-pressed="false">Mês</button>
                 </div>
 
                 @if ($calendar['last_synced_at'])
@@ -37,7 +42,7 @@
                 </div>
             @endif
 
-            <div class="calendar-table-wrap">
+            <div class="calendar-table-wrap" data-calendar-view-panel="week">
                 <table class="calendar-table">
                     <thead><tr><th scope="col">Dia</th><th scope="col">Compromissos</th></tr></thead>
                     <tbody>
@@ -46,7 +51,7 @@
                                 <th scope="row"><strong>{{ $day['weekday'] }}</strong><span>{{ $day['label'] }}</span></th>
                                 <td>
                                     @if (count($day['events']) === 0)
-                                        <span class="calendar-empty-day">Sem compromisso</span>
+                                        <span class="calendar-empty-day">Disponível</span>
                                     @elseif (count($day['events']) === 1)
                                         @php($event = $day['events'][0])
                                         <div class="calendar-single-event category-{{ $event['category'] }}" aria-label="{{ $event['title'] }}, {{ $event['time'] }}">
@@ -58,7 +63,7 @@
                                             <div class="calendar-gantt-hours" aria-hidden="true"><span>00h</span><span>06h</span><span>12h</span><span>18h</span><span>24h</span></div>
                                             <div class="calendar-track" style="--event-rows: {{ count($day['events']) }}">
                                                 @foreach ($day['events'] as $event)
-                                                    <div class="calendar-event category-{{ $event['category'] }}"
+                                                    <div class="calendar-event category-{{ $event['category'] }} {{ $event['all_day'] ? 'is-all-day' : '' }}"
                                                         style="--event-start: {{ $event['offset'] }}%; --event-width: {{ $event['width'] }}%; --event-row: {{ $loop->index }}"
                                                         tabindex="0"
                                                         aria-label="{{ $event['title'] }}, {{ $event['time'] }}">
@@ -76,21 +81,49 @@
                 </table>
             </div>
 
+            <div class="calendar-month-wrap" data-calendar-view-panel="month" hidden>
+                <div class="calendar-month-weekdays" aria-hidden="true">
+                    @foreach (['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'] as $weekday)
+                        <span>{{ $weekday }}</span>
+                    @endforeach
+                </div>
+                <div class="calendar-month-grid" aria-label="Agenda de {{ $calendar['month_label'] }}">
+                    @foreach ($calendar['month_days'] as $day)
+                        <article class="calendar-month-day {{ !$day['is_current_month'] ? 'is-outside' : '' }} {{ $day['is_today'] ? 'is-today' : '' }}">
+                            <time datetime="{{ $day['date'] }}">{{ $day['day'] }}</time>
+                            <div class="calendar-month-events">
+                                @foreach (array_slice($day['events'], 0, 3) as $event)
+                                    <div class="calendar-month-event category-{{ $event['category'] }}" title="{{ $event['title'] }} · {{ $event['time'] }}">
+                                        <span>{{ $event['time'] }}</span>
+                                        <strong>{{ $event['title'] }}</strong>
+                                    </div>
+                                @endforeach
+                                @if (count($day['events']) > 3)
+                                    <span class="calendar-month-more">+{{ count($day['events']) - 3 }} compromisso(s)</span>
+                                @endif
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </div>
+
             @if ($isPortfolioAdmin)
                 <div class="calendar-manager" data-calendar-manager data-endpoint="{{ route('calendar.events.store') }}">
                     <div class="calendar-manager-heading">
                         <div>
                             <span class="section-kicker">Administração local</span>
-                            <h3>Novo compromisso</h3>
+                            <h3>Adicionar à agenda</h3>
                         </div>
                         <span class="calendar-manager-badge">Banco local</span>
                     </div>
+
+                    <p class="calendar-manager-copy">Cadastre reuniões, tarefas, períodos de estudo ou entregas. O registro local funciona mesmo sem conexão com o Google.</p>
 
                     <form class="calendar-event-form" data-calendar-event-form novalidate>
                         <input type="hidden" name="event_id">
                         <label class="calendar-field calendar-field-wide">
                             <span>Título público</span>
-                            <input name="title" type="text" maxlength="100" required placeholder="Ex.: Reunião de projeto">
+                            <input name="title" type="text" maxlength="100" required placeholder="Ex.: Reunião de implantação">
                         </label>
                         <label class="calendar-field">
                             <span>Categoria</span>

@@ -148,6 +148,32 @@ const calendarForm = calendarManager?.querySelector('[data-calendar-event-form]'
 const calendarStatus = calendarManager?.querySelector('[data-calendar-status]');
 const calendarCancel = calendarManager?.querySelector('[data-calendar-cancel]');
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+const calendarShell = document.querySelector('[data-calendar-shell]');
+
+const setCalendarView = (view) => {
+    if (!calendarShell || !['week', 'month'].includes(view)) return;
+
+    calendarShell.querySelectorAll('[data-calendar-view-panel]').forEach((panel) => {
+        panel.toggleAttribute('hidden', panel.dataset.calendarViewPanel !== view);
+    });
+    calendarShell.querySelectorAll('[data-calendar-view-button]').forEach((button) => {
+        const active = button.dataset.calendarViewButton === view;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-pressed', String(active));
+    });
+
+    const title = calendarShell.querySelector('[data-calendar-period-title]');
+    const label = calendarShell.querySelector('[data-calendar-period-label]');
+    if (title) title.textContent = view === 'month' ? 'Visão mensal' : 'Próximos 7 dias';
+    if (label) label.textContent = view === 'month' ? calendarShell.dataset.monthLabel : calendarShell.dataset.weekLabel;
+    localStorage.setItem('portfolio-calendar-view', view);
+};
+
+calendarShell?.querySelectorAll('[data-calendar-view-button]').forEach((button) => {
+    button.addEventListener('click', () => setCalendarView(button.dataset.calendarViewButton));
+});
+
+setCalendarView(localStorage.getItem('portfolio-calendar-view') ?? 'week');
 
 const setCalendarStatus = (message, isError = false) => {
     if (!calendarStatus) return;
@@ -161,7 +187,7 @@ const resetCalendarForm = () => {
     calendarForm.elements.event_id.value = '';
     calendarCancel?.setAttribute('hidden', '');
     const heading = calendarManager?.querySelector('.calendar-manager-heading h3');
-    if (heading) heading.textContent = 'Novo compromisso';
+    if (heading) heading.textContent = 'Adicionar à agenda';
 };
 
 calendarForm?.addEventListener('submit', async (event) => {

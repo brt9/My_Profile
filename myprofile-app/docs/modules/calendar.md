@@ -27,7 +27,7 @@ Ao mudar essa opção é necessário autorizar a conta novamente. Se a chamada e
 
 ## Privacidade
 
-Eventos importados do Google armazenam apenas projeções públicas. Com `GOOGLE_CALENDAR_PUBLIC_EVENT_IDS` vazio, o título vira **Compromisso**. Não são persistidos participantes, descrição, sala, link de reunião ou payload bruto; a chave do provedor é um SHA-256 e o ID necessário para escrita fica criptografado.
+Eventos importados do Google armazenam apenas a projeção necessária. Com `GOOGLE_CALENDAR_SHOW_EVENT_TITLES=true`, todos exibem o título sanitizado. A allowlist `GOOGLE_CALENDAR_PUBLIC_EVENT_IDS` permite liberar apenas títulos específicos quando a opção global estiver desativada. Não são persistidos participantes, descrição, sala, link de reunião ou payload bruto; a chave do provedor é um SHA-256 e o ID necessário para escrita fica criptografado.
 
 Ao revogar o Google, o espelho vindo do provedor é removido. Eventos criados localmente são preservados e voltam ao estado `local_only`.
 

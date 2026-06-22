@@ -45,6 +45,7 @@ O script de inicialização ativa compressão HTTP para aproximar o servidor loc
 | `GOOGLE_CALENDAR_REDIRECT_URI` | sim para Calendar | não | callback cadastrado no Google Cloud |
 | `GOOGLE_CALENDAR_WRITE_ENABLED` | não | não | ativa criação, edição e exclusão também no Google |
 | `GOOGLE_CALENDAR_PUBLIC_EVENT_IDS` | não | pessoal | IDs autorizados a publicar título; vazio usa somente FreeBusy |
+| `GOOGLE_CALENDAR_SHOW_EVENT_TITLES` | não | pessoal | publica títulos sanitizados de todos os eventos |
 | `GOOGLE_LOGIN_ENABLED` | não | não | habilita o botão de login Google |
 | `GOOGLE_LOGIN_REDIRECT_URI` | sim para login Google | não | callback `/auth/google/callback` cadastrado no Google Cloud |
 | `DUOLINGO_ENABLED` | não | não | feature flag experimental |
@@ -55,9 +56,10 @@ Nunca copie valores reais para `.env.example`, documentação, logs ou issues.
 ## Telemetria
 
 1. Execute `configure-telemetry.cmd` para gerar e alinhar o token.
-2. Execute `start-telemetry-agent.cmd` como administrador.
-3. Use `PC-Telemetry-Agent.exe --list-sensors` para diagnóstico.
-4. Em produção, mantenha `php artisan schedule:work` supervisionado.
+2. Instale PawnIO quando a Integridade de memória do Windows estiver ativa.
+3. Execute `install-telemetry-agent-task.cmd` uma vez para iniciar no login e reiniciar em caso de falha.
+4. Use `start-telemetry-agent.cmd` somente para execução manual e `PC-Telemetry-Agent.exe --list-sensors` para diagnóstico.
+5. Em produção, mantenha `php artisan schedule:work` supervisionado.
 
 O executável gerado fica em `dist/telemetry-agent` e não é versionado. Para recompilar, instale o SDK local e execute `build-telemetry-agent.ps1`.
 

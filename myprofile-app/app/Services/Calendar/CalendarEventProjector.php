@@ -41,13 +41,14 @@ final class CalendarEventProjector
         }
 
         $visibility = (string) ($event['visibility'] ?? 'default');
-        $isExplicitlyPublic = in_array($eventId, $publicEventIds, true)
-            && ! in_array($visibility, ['private', 'confidential'], true);
-        $title = $isExplicitlyPublic ? $this->sanitizeTitle($event['summary'] ?? null) : 'Compromisso';
-        $type = $isExplicitlyPublic ? data_get($event, 'extendedProperties.private.portfolio_type') : null;
+        $canPublishTitle = (bool) config('services.google_calendar.show_event_titles')
+            || (in_array($eventId, $publicEventIds, true)
+                && ! in_array($visibility, ['private', 'confidential'], true));
+        $title = $canPublishTitle ? $this->sanitizeTitle($event['summary'] ?? null) : 'Compromisso';
+        $type = $canPublishTitle ? data_get($event, 'extendedProperties.private.portfolio_type') : null;
         $category = is_string($type) && in_array(Str::lower($type), self::CATEGORIES, true)
             ? Str::lower($type)
-            : ($isExplicitlyPublic ? 'projeto' : 'ocupado');
+            : ($canPublishTitle ? 'projeto' : 'ocupado');
 
         return [
             'provider_event_id' => $eventId,

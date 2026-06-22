@@ -10,7 +10,7 @@ A home pública usa Laravel, Blade, Tailwind CSS, Alpine.js e Chart.js carregado
 flowchart LR
     V[Visitante] --> B[Blade + Tailwind + Alpine]
     B --> L[Laravel]
-    A[Agente .NET 1.1] -->|Bearer token| T[API de telemetria]
+    A[Agente .NET 1.2] -->|Bearer token| T[API de telemetria]
     T --> P[(PostgreSQL)]
     T --> C[(Cache)]
     Q[Scheduler] --> P

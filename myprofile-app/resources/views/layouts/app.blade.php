@@ -28,20 +28,16 @@
 
     <nav class="site-nav" aria-label="Navegação principal">
         <div class="container-shell nav-inner">
-            <a href="#inicio" class="brand" aria-label="Início">
+            <a href="/#inicio" class="brand" aria-label="Início">
                 <span class="brand-mark" aria-hidden="true">PF</span>
                 <span>pedrofelipe<span>.dev</span></span>
             </a>
 
             <div class="desktop-nav">
-                <a href="#sobre">Sobre</a>
-                <a href="#projetos">Projetos</a>
-                <a href="#automacoes">Automações</a>
-                <a href="#experiencia">Experiência</a>
-                <a href="#agenda">Agenda</a>
-                <a href="#estudos">Idiomas</a>
-                <a href="#lab">Lab</a>
-                <a href="#contato">Contato</a>
+                <a href="/#sobre">Sobre</a>
+                <a href="/#projetos">Projetos</a>
+                <a href="/#experiencia">Experiência</a>
+                <a href="/#agenda">Agenda</a>
             </div>
 
             <div class="nav-actions">
@@ -57,14 +53,10 @@
         </div>
 
         <div id="mobile-menu" class="mobile-menu container-shell" data-mobile-menu hidden>
-            <a href="#sobre">Sobre</a>
-            <a href="#projetos">Projetos</a>
-            <a href="#automacoes">Automações</a>
-            <a href="#experiencia">Experiência</a>
-            <a href="#agenda">Agenda</a>
-            <a href="#estudos">Idiomas</a>
-            <a href="#lab">Lab</a>
-            <a href="#contato">Contato</a>
+            <a href="/#sobre">Sobre</a>
+            <a href="/#projetos">Projetos</a>
+            <a href="/#experiencia">Experiência</a>
+            <a href="/#agenda">Agenda</a>
         </div>
     </nav>
 

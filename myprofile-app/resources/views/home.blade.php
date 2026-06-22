@@ -18,7 +18,7 @@
 
                     <div class="hero-actions">
                         <a href="#projetos" class="button button-primary">Explorar projetos <span aria-hidden="true">↓</span></a>
-                        <a href="#contato" class="button button-secondary">Entrar em contato</a>
+                        <a href="#experiencia" class="button button-secondary">Ver trajetória</a>
                     </div>
                 </div>
 
@@ -48,25 +48,25 @@
     </header>
 
     @include('sections.about')
-    @include('sections.pc')
+    @include('sections.projects')
+    @include('sections.experience')
 
-    <section id="integracoes" class="section section-alt">
+    <section id="github" class="section">
         <div class="container-shell">
             <div class="section-header">
                 <div>
-                    <span class="section-kicker">Integrações</span>
-                    <h2>Dados reais, não só cards.</h2>
+                    <span class="section-kicker">GitHub</span>
+                    <h2>Código público e evolução.</h2>
                 </div>
-                <p>Recursos do projeto consumindo serviços externos com cache, tolerância a falhas e apresentação responsiva.</p>
+                <p>Projetos, tecnologias e histórico anual de contribuições reunidos logo após a trajetória profissional.</p>
             </div>
-
-            <div class="integration-grid">
-                @include('sections.weather')
-                @include('sections.steam')
+            <div class="integration-grid integration-grid-single">
                 @include('sections.github')
             </div>
         </div>
     </section>
+
+    @include('sections.pc')
 
     @if ($calendar)
         @include('sections.calendar')
@@ -76,27 +76,32 @@
         @include('sections.duolingo')
     @endif
 
-    <section id="contato" class="section">
+    <section id="steam" class="section">
         <div class="container-shell">
-            <div class="contact-panel">
-                <span class="section-kicker">Contato</span>
-                <h2>Tem um problema interessante<br>para resolver?</h2>
-                <p>Estou aberto a conversas sobre desenvolvimento web, Laravel, integrações e produtos digitais. Veja o código no GitHub ou fale comigo pelo LinkedIn.</p>
-
-                <div class="contact-actions">
-                    @if ($portfolio['email'])
-                        <a href="mailto:{{ $portfolio['email'] }}" class="button button-primary">Enviar e-mail</a>
-                    @endif
-                    @if ($portfolio['social']['linkedin'])
-                        <a href="{{ $portfolio['social']['linkedin'] }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">LinkedIn ↗</a>
-                    @endif
-                    @if ($portfolio['social']['github'])
-                        <a href="{{ $portfolio['social']['github'] }}" target="_blank" rel="noopener noreferrer" class="button button-secondary">GitHub ↗</a>
-                    @endif
-                    @unless ($portfolio['email'] || $portfolio['social']['linkedin'] || $portfolio['social']['github'])
-                        <a href="#inicio" class="button button-primary">Conhecer meu trabalho ↑</a>
-                    @endunless
+            <div class="section-header">
+                <div>
+                    <span class="section-kicker">Steam</span>
+                    <h2>Jogos também geram dados.</h2>
                 </div>
+                <p>A atividade pública da Steam transforma biblioteca, tempo de jogo e conquistas recentes em uma leitura compacta.</p>
+            </div>
+            <div class="integration-grid integration-grid-single">
+                @include('sections.steam')
+            </div>
+        </div>
+    </section>
+
+    <section id="clima" class="section section-alt">
+        <div class="container-shell">
+            <div class="section-header">
+                <div>
+                    <span class="section-kicker">Clima</span>
+                    <h2>Natal em tempo real.</h2>
+                </div>
+                <p>O último dado válido permanece disponível no banco mesmo quando a fonte externa está temporariamente indisponível.</p>
+            </div>
+            <div class="integration-grid integration-grid-single">
+                @include('sections.weather')
             </div>
         </div>
     </section>

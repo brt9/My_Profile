@@ -1,11 +1,11 @@
-<section id="lab" class="section">
+<section id="lab" class="section section-alt">
     <div class="container-shell">
         <div class="section-header">
             <div>
-                <span class="section-kicker">Lab pessoal</span>
-                <h2>Meu setup também<br>gera dados.</h2>
+                <span class="section-kicker">Ambiente técnico</span>
+                <h2>Hardware monitorado.<br>Dados preservados.</h2>
             </div>
-            <p>Uma área técnica para demonstrar coleta, persistência, histórico e degradação segura sem misturar o conteúdo profissional principal.</p>
+            <p>Uma demonstração prática de Laravel recebendo métricas autenticadas do Windows, armazenando histórico no PostgreSQL e tratando sensores indisponíveis sem inventar valores.</p>
         </div>
 
         @php
@@ -20,9 +20,9 @@
         @endphp
 
         <div class="lab-grid">
-            <article class="panel">
-                <h3>Estação de desenvolvimento</h3>
-                <p>Configuração preparada para Laravel, containers, múltiplos serviços locais e jogos em 1080p/1440p.</p>
+            <article class="panel setup-panel">
+                <h3>Ambiente de desenvolvimento</h3>
+                <p>Máquina usada para desenvolver e testar aplicações Laravel com Docker, PostgreSQL, filas, tarefas agendadas e front-end Vite.</p>
                 <div class="setup-summary">
                     @foreach ($parts as $part)
                         <div class="setup-part">
@@ -41,8 +41,8 @@
             >
                 <div class="telemetry-head">
                     <div>
-                        <span class="card-kicker">API + PostgreSQL</span>
-                        <h3>Telemetria ao vivo e histórica</h3>
+                        <span class="card-kicker">Laravel API · PostgreSQL</span>
+                        <h3>Saúde da estação em tempo real</h3>
                     </div>
                     <span class="live-status" :class="`is-${status}`" x-text="statusLabel()"></span>
                 </div>
@@ -53,12 +53,12 @@
                             type="button"
                             class="metric metric-button"
                             :disabled="!supported(metric.key)"
-                            :aria-label="supported(metric.key) ? `Abrir histórico de ${metric.label}` : `${metric.label}: não suportado`"
+                            :aria-label="supported(metric.key) ? `Abrir histórico de ${metric.label}` : `${metric.label}: sensor indisponível`"
                             @click="openHistory(metric)"
                         >
                             <small x-text="metric.label"></small>
                             <strong x-text="metricValue(metric)" :class="metricClass(metric.key)">Carregando…</strong>
-                            <span class="metric-action" x-show="supported(metric.key) && status !== 'loading'">Ver histórico ↗</span>
+                            <span class="metric-action" x-show="supported(metric.key) && status !== 'loading'">Abrir histórico ↗</span>
                         </button>
                     </template>
                 </div>
@@ -158,8 +158,6 @@
                     { key: 'memory_usage', label: 'Memória', suffix: '%', digits: 1 },
                     { key: 'disk_usage', label: 'Disco principal', suffix: '%', digits: 1 },
                     { key: 'uptime_seconds', label: 'Tempo ligado', suffix: 's', digits: 0 },
-                    { key: 'pump_rpm', label: 'Bomba AIO', suffix: ' RPM', digits: 0 },
-                    { key: 'coolant_temp', label: 'Líquido', suffix: '°C', digits: 1 },
                 ],
                 history: {
                     open: false,
@@ -207,9 +205,9 @@
                     const raw = this.data[key];
                     if (this.status === 'loading') return 'Carregando…';
                     if (this.status === 'unavailable' || this.status === 'error') return '—';
-                    if (raw === null || raw === undefined || raw === '') return 'Não suportado neste dispositivo';
+                    if (raw === null || raw === undefined || raw === '') return 'Sensor indisponível';
                     const numeric = Number(raw);
-                    return Number.isFinite(numeric) ? `${numeric.toFixed(digits)}${suffix}` : 'Não suportado neste dispositivo';
+                    return Number.isFinite(numeric) ? `${numeric.toFixed(digits)}${suffix}` : 'Sensor indisponível';
                 },
                 metricValue(metric) {
                     if (metric.key !== 'uptime_seconds') return this.value(metric.key, metric.suffix, metric.digits);
