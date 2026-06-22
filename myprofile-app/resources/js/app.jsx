@@ -1,11 +1,14 @@
 import '../css/auth.css';
 import './bootstrap';
+import { registerPwa } from './pwa';
 
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+
+registerPwa();
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

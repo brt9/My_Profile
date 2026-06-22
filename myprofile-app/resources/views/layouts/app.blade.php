@@ -8,8 +8,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? $profile['name'].' — '.$profile['role'] }}</title>
     <meta name="description" content="{{ $metaDescription ?? $profile['headline'] }}">
-    <meta name="theme-color" content="#6d4aff">
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    <meta name="application-name" content="Pedro Felipe">
+    <meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#111116" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('icons/icon-32.png') }}?v=2">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=2">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/icon-180.png') }}?v=2">
     <script>
         (() => {
             const saved = localStorage.getItem('portfolio-theme');

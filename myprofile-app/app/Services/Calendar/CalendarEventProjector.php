@@ -29,9 +29,17 @@ final class CalendarEventProjector
             return null;
         }
 
+        $allDay = isset($event['start']['date']) && ! isset($event['start']['dateTime']);
+
         try {
-            $startsAt = CarbonImmutable::parse($startValue)->utc();
-            $endsAt = CarbonImmutable::parse($endValue)->utc();
+            if ($allDay) {
+                $timezone = (string) config('portfolio.presentation_timezone', 'America/Fortaleza');
+                $startsAt = CarbonImmutable::parse($startValue, $timezone)->startOfDay()->utc();
+                $endsAt = CarbonImmutable::parse($endValue, $timezone)->startOfDay()->utc();
+            } else {
+                $startsAt = CarbonImmutable::parse($startValue)->utc();
+                $endsAt = CarbonImmutable::parse($endValue)->utc();
+            }
         } catch (Throwable) {
             return null;
         }
@@ -63,7 +71,7 @@ final class CalendarEventProjector
             },
             'starts_at' => $startsAt,
             'ends_at' => $endsAt,
-            'all_day' => isset($event['start']['date']) && ! isset($event['start']['dateTime']),
+            'all_day' => $allDay,
             'source' => 'google',
             'sync_status' => 'synced',
             'synced_at' => now()->utc(),

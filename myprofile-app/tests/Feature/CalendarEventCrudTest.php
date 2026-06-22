@@ -84,6 +84,44 @@ test('calendar dashboard keeps same-day appointments as separate gantt rows', fu
         ->and($allDay['width'])->toBe(100.0);
 });
 
+test('single timed appointment uses its proportional gantt position and duration', function () {
+    CarbonImmutable::setTestNow('2026-06-21 08:00:00 America/Fortaleza');
+    config()->set('portfolio.integrations.calendar', true);
+    $user = User::factory()->create();
+
+    CalendarEvent::query()->create([
+        'user_id' => $user->id,
+        'provider_event_key' => hash('sha256', 'single-timed-event'),
+        'public_title' => 'Compromisso com horário',
+        'category' => 'reuniao',
+        'starts_at' => CarbonImmutable::parse('2026-06-24 04:05', 'America/Fortaleza')->utc(),
+        'ends_at' => CarbonImmutable::parse('2026-06-24 08:06', 'America/Fortaleza')->utc(),
+        'all_day' => false,
+    ]);
+
+    $dashboard = app(CalendarDashboard::class)->forHome();
+    $event = collect($dashboard['days'])->firstWhere('date', '2026-06-24')['events'][0];
+
+    expect($event['all_day'])->toBeFalse()
+        ->and($event['time'])->toBe('04:05–08:06')
+        ->and($event['detail_time'])->toBe('04:05–08:06')
+        ->and($event['duration'])->toBe('4 horas e 1 min')
+        ->and($event['offset'])->toBe(17.014)
+        ->and($event['width'])->toBe(16.736);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('1 compromisso neste dia')
+        ->assertSee('data-calendar-event-dialog', false)
+        ->assertSee('data-calendar-event-open', false)
+        ->assertSee('data-event-duration="4 horas e 1 min"', false)
+        ->assertSee('aria-haspopup="dialog"', false)
+        ->assertSee('--event-start: 17.014%; --event-width: 16.736%', false)
+        ->assertDontSee('calendar-single-event', false);
+
+    CarbonImmutable::setTestNow();
+});
+
 test('all-day local events are normalized to full-day boundaries', function () {
     $admin = User::factory()->create(['email' => 'admin@example.com']);
     config()->set('portfolio.admin_email', $admin->email);

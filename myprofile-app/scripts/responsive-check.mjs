@@ -343,6 +343,83 @@ const githubYearValid = githubYearReport.available
 failed ||= !githubYearValid;
 console.log(`${githubYearValid ? 'PASS' : 'FAIL'} GitHub yearly navigation`, githubYearReport);
 
+const calendarModalEvaluation = await command('Runtime.evaluate', {
+    expression: `(async () => {
+        const trigger = document.querySelector('[data-calendar-view-panel="week"] [data-calendar-event-open]');
+        const dialog = document.querySelector('[data-calendar-event-dialog]');
+        if (!trigger || !(dialog instanceof HTMLDialogElement)) return { available: false };
+
+        trigger.click();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        const dialogRect = dialog.getBoundingClientRect();
+        const report = {
+            available: true,
+            modalOpen: dialog.open,
+            horizontalCenterDelta: Math.round(Math.abs((dialogRect.left + dialogRect.width / 2) - window.innerWidth / 2)),
+            verticalCenterDelta: Math.round(Math.abs((dialogRect.top + dialogRect.height / 2) - window.innerHeight / 2)),
+            title: dialog.querySelector('[data-calendar-dialog-title]')?.textContent.trim() ?? '',
+            date: dialog.querySelector('[data-calendar-dialog-date]')?.textContent.trim() ?? '',
+            time: dialog.querySelector('[data-calendar-dialog-time]')?.textContent.trim() ?? '',
+            duration: dialog.querySelector('[data-calendar-dialog-duration]')?.textContent.trim() ?? '',
+            source: dialog.querySelector('[data-calendar-dialog-source]')?.textContent.trim() ?? '',
+        };
+        dialog.close();
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        report.closed = !dialog.open;
+        report.focusRestored = document.activeElement === trigger;
+
+        return report;
+    })()`,
+    awaitPromise: true,
+    returnByValue: true,
+});
+const calendarModalReport = calendarModalEvaluation.result.value;
+const calendarModalValid = calendarModalReport.available
+    && calendarModalReport.modalOpen
+    && calendarModalReport.horizontalCenterDelta <= 8
+    && calendarModalReport.verticalCenterDelta <= 1
+    && calendarModalReport.title.length > 0
+    && calendarModalReport.date.length > 0
+    && calendarModalReport.time.length > 0
+    && calendarModalReport.duration.length > 0
+    && calendarModalReport.source.length > 0
+    && calendarModalReport.closed
+    && calendarModalReport.focusRestored;
+failed ||= !calendarModalValid;
+console.log(`${calendarModalValid ? 'PASS' : 'FAIL'} calendar event modal`, calendarModalReport);
+
+const pwaEvaluation = await command('Runtime.evaluate', {
+    expression: `(async () => {
+        const manifestLink = document.querySelector('link[rel="manifest"]');
+        const manifest = manifestLink
+            ? await fetch(manifestLink.href).then(response => response.json())
+            : null;
+        const registration = await Promise.race([
+            navigator.serviceWorker?.ready ?? Promise.resolve(null),
+            new Promise(resolve => setTimeout(() => resolve(null), 5000)),
+        ]);
+
+        return {
+            hasManifest: Boolean(manifest),
+            display: manifest?.display ?? null,
+            iconSizes: manifest?.icons?.map(icon => icon.sizes) ?? [],
+            hasWorker: Boolean(registration?.active),
+            scope: registration?.scope ?? null,
+        };
+    })()`,
+    awaitPromise: true,
+    returnByValue: true,
+});
+const pwaReport = pwaEvaluation.result.value;
+const pwaValid = pwaReport.hasManifest
+    && pwaReport.display === 'standalone'
+    && pwaReport.iconSizes.includes('192x192')
+    && pwaReport.iconSizes.includes('512x512')
+    && pwaReport.hasWorker
+    && pwaReport.scope === 'http://127.0.0.1:8085/';
+failed ||= !pwaValid;
+console.log(`${pwaValid ? 'PASS' : 'FAIL'} PWA manifest and service worker`, pwaReport);
+
 if (process.env.RESPONSIVE_SCREENSHOT) {
     const selector = process.env.RESPONSIVE_SCREENSHOT_SELECTOR ?? '#estudos';
     if (process.env.RESPONSIVE_THEME === 'dark') {

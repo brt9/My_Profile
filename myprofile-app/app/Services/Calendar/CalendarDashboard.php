@@ -99,8 +99,7 @@ final class CalendarDashboard
         $segments = [];
 
         foreach ($events as $event) {
-            $start = CarbonImmutable::instance($event->starts_at)->setTimezone($timezone);
-            $end = CarbonImmutable::instance($event->ends_at)->setTimezone($timezone);
+            [$start, $end] = $this->eventBounds($event, $timezone);
             if ($end->lessThanOrEqualTo($dayStart) || $start->greaterThanOrEqualTo($dayEnd)) {
                 continue;
             }
@@ -120,6 +119,9 @@ final class CalendarDashboard
                 'source' => $event->source,
                 'sync_status' => $event->sync_status,
                 'time' => $isAllDay ? 'Dia inteiro' : $visibleStart->format('H:i').'–'.$visibleEnd->format('H:i'),
+                'detail_date' => $this->eventDateLabel($start, $end, $isAllDay),
+                'detail_time' => $this->eventTimeLabel($start, $end, $isAllDay),
+                'duration' => $this->eventDurationLabel($start, $end, $isAllDay),
                 'offset' => round(($startMinutes / 1440) * 100, 3),
                 'width' => round((min($durationMinutes, 1440 - $startMinutes) / 1440) * 100, 3),
             ];
@@ -137,8 +139,7 @@ final class CalendarDashboard
         $items = [];
 
         foreach ($events as $event) {
-            $start = CarbonImmutable::instance($event->starts_at)->setTimezone($timezone);
-            $end = CarbonImmutable::instance($event->ends_at)->setTimezone($timezone);
+            [$start, $end] = $this->eventBounds($event, $timezone);
             if ($end->lessThanOrEqualTo($dayStart) || $start->greaterThanOrEqualTo($dayEnd)) {
                 continue;
             }
@@ -149,10 +150,80 @@ final class CalendarDashboard
                 'id' => $event->getKey(),
                 'title' => $event->public_title,
                 'category' => $event->category,
+                'status' => $event->status,
+                'all_day' => $isAllDay,
+                'source' => $event->source,
+                'sync_status' => $event->sync_status,
                 'time' => $isAllDay ? 'Dia inteiro' : ($start->lessThan($dayStart) ? 'Em andamento' : $start->format('H:i')),
+                'detail_date' => $this->eventDateLabel($start, $end, $isAllDay),
+                'detail_time' => $this->eventTimeLabel($start, $end, $isAllDay),
+                'duration' => $this->eventDurationLabel($start, $end, $isAllDay),
             ];
         }
 
         return $items;
+    }
+
+    /** @return array{CarbonImmutable, CarbonImmutable} */
+    private function eventBounds(CalendarEvent $event, string $timezone): array
+    {
+        $start = CarbonImmutable::instance($event->starts_at);
+        $end = CarbonImmutable::instance($event->ends_at);
+
+        // All-day dates from older Google snapshots were stored at 00:00 UTC.
+        // Preserve their calendar date instead of shifting them to the previous evening.
+        if ($event->all_day && $event->source === 'google' && $start->isStartOfDay() && $end->isStartOfDay()) {
+            return [
+                CarbonImmutable::parse($start->utc()->toDateString(), $timezone)->startOfDay(),
+                CarbonImmutable::parse($end->utc()->toDateString(), $timezone)->startOfDay(),
+            ];
+        }
+
+        return [$start->setTimezone($timezone), $end->setTimezone($timezone)];
+    }
+
+    private function eventDateLabel(CarbonImmutable $start, CarbonImmutable $end, bool $isAllDay): string
+    {
+        $displayEnd = $isAllDay ? $end->subSecond() : $end;
+
+        if ($start->isSameDay($displayEnd)) {
+            return ucfirst($start->locale('pt_BR')->translatedFormat('l, d \d\e F \d\e Y'));
+        }
+
+        return $start->format('d/m/Y').' – '.$displayEnd->format('d/m/Y');
+    }
+
+    private function eventTimeLabel(CarbonImmutable $start, CarbonImmutable $end, bool $isAllDay): string
+    {
+        if ($isAllDay) {
+            return 'Dia inteiro';
+        }
+
+        if ($start->isSameDay($end)) {
+            return $start->format('H:i').'–'.$end->format('H:i');
+        }
+
+        return $start->format('d/m H:i').' – '.$end->format('d/m H:i');
+    }
+
+    private function eventDurationLabel(CarbonImmutable $start, CarbonImmutable $end, bool $isAllDay): string
+    {
+        $minutes = max(0, (int) round($start->diffInMinutes($end)));
+
+        if ($isAllDay) {
+            $days = max(1, (int) ceil($minutes / 1440));
+
+            return $days === 1 ? '1 dia' : $days.' dias';
+        }
+
+        if ($minutes < 60) {
+            return $minutes.' min';
+        }
+
+        $hours = intdiv($minutes, 60);
+        $remainingMinutes = $minutes % 60;
+        $hourLabel = $hours === 1 ? '1 hora' : $hours.' horas';
+
+        return $remainingMinutes === 0 ? $hourLabel : $hourLabel.' e '.$remainingMinutes.' min';
     }
 }

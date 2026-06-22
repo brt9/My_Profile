@@ -2,6 +2,16 @@
     $isPortfolioAdmin = auth()->check()
         && filled(config('portfolio.admin_email'))
         && hash_equals(mb_strtolower((string) config('portfolio.admin_email')), mb_strtolower((string) auth()->user()->email));
+    $calendarCategoryLabels = [
+        'reuniao' => 'Reunião',
+        'tarefa' => 'Tarefa',
+        'estudo' => 'Estudo',
+        'entrega' => 'Entrega',
+        'projeto' => 'Projeto',
+        'ocupado' => 'Compromisso',
+    ];
+    $calendarSourceLabels = ['google' => 'Google Agenda', 'local' => 'Agenda local'];
+    $calendarStatusLabels = ['confirmado' => 'Confirmado', 'provisorio' => 'Provisório'];
 @endphp
 
 <section id="agenda" class="section">
@@ -52,24 +62,28 @@
                                 <td>
                                     @if (count($day['events']) === 0)
                                         <span class="calendar-empty-day">Disponível</span>
-                                    @elseif (count($day['events']) === 1)
-                                        @php($event = $day['events'][0])
-                                        <div class="calendar-single-event category-{{ $event['category'] }}" aria-label="{{ $event['title'] }}, {{ $event['time'] }}">
-                                            <strong>{{ $event['title'] }}</strong>
-                                            <time>{{ $event['time'] }}</time>
-                                        </div>
                                     @else
-                                        <div class="calendar-gantt" aria-label="{{ count($day['events']) }} compromissos neste dia">
+                                        <div class="calendar-gantt" aria-label="{{ count($day['events']) }} {{ count($day['events']) === 1 ? 'compromisso' : 'compromissos' }} neste dia">
                                             <div class="calendar-gantt-hours" aria-hidden="true"><span>00h</span><span>06h</span><span>12h</span><span>18h</span><span>24h</span></div>
                                             <div class="calendar-track" style="--event-rows: {{ count($day['events']) }}">
                                                 @foreach ($day['events'] as $event)
-                                                    <div class="calendar-event category-{{ $event['category'] }} {{ $event['all_day'] ? 'is-all-day' : '' }}"
+                                                    <button type="button"
+                                                        class="calendar-event category-{{ $event['category'] }} {{ $event['all_day'] ? 'is-all-day' : '' }}"
                                                         style="--event-start: {{ $event['offset'] }}%; --event-width: {{ $event['width'] }}%; --event-row: {{ $loop->index }}"
-                                                        tabindex="0"
-                                                        aria-label="{{ $event['title'] }}, {{ $event['time'] }}">
+                                                        data-calendar-event-open
+                                                        data-event-title="{{ $event['title'] }}"
+                                                        data-event-date="{{ $event['detail_date'] }}"
+                                                        data-event-time="{{ $event['detail_time'] }}"
+                                                        data-event-duration="{{ $event['duration'] }}"
+                                                        data-event-category="{{ $event['category'] }}"
+                                                        data-event-category-label="{{ $calendarCategoryLabels[$event['category']] ?? ucfirst($event['category']) }}"
+                                                        data-event-source="{{ $calendarSourceLabels[$event['source']] ?? ucfirst($event['source']) }}"
+                                                        data-event-status="{{ $calendarStatusLabels[$event['status']] ?? ucfirst($event['status']) }}"
+                                                        aria-haspopup="dialog"
+                                                        aria-label="Ver detalhes de {{ $event['title'] }}, {{ $event['time'] }}">
                                                         <strong>{{ $event['title'] }}</strong>
                                                         <span>{{ $event['time'] }}</span>
-                                                    </div>
+                                                    </button>
                                                 @endforeach
                                             </div>
                                         </div>
@@ -93,10 +107,22 @@
                             <time datetime="{{ $day['date'] }}">{{ $day['day'] }}</time>
                             <div class="calendar-month-events">
                                 @foreach (array_slice($day['events'], 0, 3) as $event)
-                                    <div class="calendar-month-event category-{{ $event['category'] }}" title="{{ $event['title'] }} · {{ $event['time'] }}">
+                                    <button type="button"
+                                        class="calendar-month-event category-{{ $event['category'] }}"
+                                        data-calendar-event-open
+                                        data-event-title="{{ $event['title'] }}"
+                                        data-event-date="{{ $event['detail_date'] }}"
+                                        data-event-time="{{ $event['detail_time'] }}"
+                                        data-event-duration="{{ $event['duration'] }}"
+                                        data-event-category="{{ $event['category'] }}"
+                                        data-event-category-label="{{ $calendarCategoryLabels[$event['category']] ?? ucfirst($event['category']) }}"
+                                        data-event-source="{{ $calendarSourceLabels[$event['source']] ?? ucfirst($event['source']) }}"
+                                        data-event-status="{{ $calendarStatusLabels[$event['status']] ?? ucfirst($event['status']) }}"
+                                        aria-haspopup="dialog"
+                                        aria-label="Ver detalhes de {{ $event['title'] }}, {{ $event['time'] }}">
                                         <span>{{ $event['time'] }}</span>
                                         <strong>{{ $event['title'] }}</strong>
-                                    </div>
+                                    </button>
                                 @endforeach
                                 @if (count($day['events']) > 3)
                                     <span class="calendar-month-more">+{{ count($day['events']) - 3 }} compromisso(s)</span>
@@ -199,5 +225,29 @@
                 </div>
             @endif
         </div>
+
+        <dialog class="calendar-event-dialog" data-calendar-event-dialog aria-labelledby="calendar-event-dialog-title">
+            <form method="dialog" class="calendar-event-dialog-card">
+                <button type="submit" class="calendar-event-dialog-close" aria-label="Fechar detalhes do compromisso">×</button>
+
+                <div class="calendar-event-dialog-heading">
+                    <span class="calendar-event-dialog-category" data-calendar-dialog-category>Compromisso</span>
+                    <h3 id="calendar-event-dialog-title" data-calendar-dialog-title></h3>
+                    <p>Detalhes públicos do compromisso selecionado.</p>
+                </div>
+
+                <dl class="calendar-event-dialog-details">
+                    <div><dt>Data</dt><dd data-calendar-dialog-date></dd></div>
+                    <div><dt>Horário</dt><dd data-calendar-dialog-time></dd></div>
+                    <div><dt>Duração</dt><dd data-calendar-dialog-duration></dd></div>
+                    <div><dt>Origem</dt><dd data-calendar-dialog-source></dd></div>
+                </dl>
+
+                <div class="calendar-event-dialog-footer">
+                    <span class="calendar-event-dialog-status"><span aria-hidden="true"></span><span data-calendar-dialog-status></span></span>
+                    <button type="submit" class="button button-secondary">Fechar</button>
+                </div>
+            </form>
+        </dialog>
     </div>
 </section>

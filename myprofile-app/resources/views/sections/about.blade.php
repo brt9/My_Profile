@@ -16,17 +16,21 @@
 
             <aside class="panel">
                 <h3>Atuação atual</h3>
-                <div class="current-role">
-                    <span class="status-dot" aria-hidden="true"></span>
-                    <div>
-                        <strong>{{ $portfolio['current_role'] ?? $portfolio['role'] }}</strong>
-                        <p>{{ $portfolio['company'] }}<br>{{ $portfolio['location'] }}</p>
-                    </div>
+                <div class="current-roles">
+                    @foreach ($portfolio['current_roles'] as $currentRole)
+                        <div class="current-role">
+                            <span class="status-dot" aria-hidden="true"></span>
+                            <div>
+                                <strong>{{ $currentRole['role'] }}</strong>
+                                <p>{{ $currentRole['company'] }}<br>{{ $currentRole['location'] }}</p>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </aside>
         </div>
 
-        <div class="competency-grid" aria-label="Competências, tecnologias e evidências">
+        <div class="competency-grid" aria-label="Competências e tecnologias">
             @foreach ($portfolio['competencies'] as $competency)
                 <article class="competency-card">
                     <div class="competency-card-copy">
@@ -38,9 +42,6 @@
                             <x-technology-badge :name="$skill" />
                         @endforeach
                     </div>
-                    <a class="evidence-link" href="{{ $competency['href'] }}">
-                        <span aria-hidden="true">↗</span> {{ $competency['evidence'] }}
-                    </a>
                 </article>
             @endforeach
         </div>

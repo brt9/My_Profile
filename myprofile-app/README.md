@@ -17,6 +17,7 @@ Portfólio em Laravel 13 que combina uma vitrine profissional com um laboratóri
 | Login Google | disponível | OpenID, e-mail verificado, state e vínculo seguro de conta |
 | Duolingo | disponível | perfil `Pedro_Felipe_Brt`, snapshots diários, histórico e circuit breaker |
 | Perfil profissional | conteúdo revisado | experiências e formação validadas a partir do PDF do LinkedIn |
+| PWA | disponível | instalação no dispositivo, ícones próprios, cache seguro de assets e tela offline |
 
 Falhas externas são isoladas: GitHub, Steam, clima e telemetria podem ficar indisponíveis simultaneamente sem derrubar a home.
 

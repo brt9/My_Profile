@@ -1,8 +1,10 @@
 import Alpine from 'alpinejs';
+import { registerPwa } from './pwa';
 
 const root = document.documentElement;
 
 window.Alpine = Alpine;
+registerPwa();
 
 window.loadTelemetryChart = async () => {
     const { default: Chart } = await import('chart.js/auto');
@@ -180,6 +182,46 @@ calendarShell?.querySelectorAll('[data-calendar-view-button]').forEach((button) 
 });
 
 setCalendarView(localStorage.getItem('portfolio-calendar-view') ?? 'week');
+
+const calendarEventDialog = document.querySelector('[data-calendar-event-dialog]');
+let calendarEventTrigger = null;
+
+const setCalendarDialogText = (selector, value) => {
+    const node = calendarEventDialog?.querySelector(selector);
+    if (node) node.textContent = value || '—';
+};
+
+document.querySelectorAll('[data-calendar-event-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+        if (!(calendarEventDialog instanceof HTMLDialogElement)) return;
+
+        calendarEventTrigger = button;
+        setCalendarDialogText('[data-calendar-dialog-title]', button.dataset.eventTitle);
+        setCalendarDialogText('[data-calendar-dialog-date]', button.dataset.eventDate);
+        setCalendarDialogText('[data-calendar-dialog-time]', button.dataset.eventTime);
+        setCalendarDialogText('[data-calendar-dialog-duration]', button.dataset.eventDuration);
+        setCalendarDialogText('[data-calendar-dialog-source]', button.dataset.eventSource);
+        setCalendarDialogText('[data-calendar-dialog-status]', button.dataset.eventStatus);
+
+        const category = calendarEventDialog.querySelector('[data-calendar-dialog-category]');
+        if (category) {
+            category.textContent = button.dataset.eventCategoryLabel || 'Compromisso';
+            category.dataset.category = button.dataset.eventCategory || 'ocupado';
+        }
+
+        calendarEventDialog.showModal();
+    });
+});
+
+calendarEventDialog?.addEventListener('click', (event) => {
+    if (event.target === calendarEventDialog) calendarEventDialog.close();
+});
+
+calendarEventDialog?.addEventListener('close', () => {
+    const trigger = calendarEventTrigger;
+    calendarEventTrigger = null;
+    window.requestAnimationFrame(() => trigger?.focus());
+});
 
 const setCalendarStatus = (message, isError = false) => {
     if (!calendarStatus) return;

@@ -1,0 +1,34 @@
+{
+  "id": "/",
+  "name": "Pedro Felipe — Desenvolvedor Full Stack",
+  "short_name": "Pedro Felipe",
+  "description": "Portfólio profissional, projetos, integrações e telemetria de Pedro Felipe.",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#111116",
+  "theme_color": "#111116",
+  "categories": ["business", "developer", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png?v=2",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png?v=2",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png?v=2",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

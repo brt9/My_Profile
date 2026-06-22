@@ -68,6 +68,23 @@ test('calendar projection is private by default and only publishes allowlisted t
         ->and($public)->not->toHaveKeys(['description', 'attendees', 'location', 'hangoutLink']);
 });
 
+test('calendar projection preserves google all-day dates in the presentation timezone', function () {
+    config()->set('portfolio.presentation_timezone', 'America/Fortaleza');
+
+    $projected = app(CalendarEventProjector::class)->project([
+        'id' => 'all-day-event',
+        'summary' => 'Evento integral',
+        'start' => ['date' => '2026-06-22'],
+        'end' => ['date' => '2026-06-23'],
+        'status' => 'confirmed',
+    ], 'primary', []);
+
+    expect($projected)->not->toBeNull()
+        ->and($projected['all_day'])->toBeTrue()
+        ->and($projected['starts_at']->toIso8601String())->toBe('2026-06-22T03:00:00+00:00')
+        ->and($projected['ends_at']->toIso8601String())->toBe('2026-06-23T03:00:00+00:00');
+});
+
 test('only configured administrator can start calendar oauth', function () {
     $admin = User::factory()->create(['email' => 'admin@example.com']);
     $other = User::factory()->create(['email' => 'other@example.com']);
