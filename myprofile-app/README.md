@@ -1,6 +1,6 @@
 # Portfólio técnico — Pedro Felipe
 
-Portfólio em Laravel 12 que combina uma vitrine profissional com um laboratório de integrações reais. O projeto demonstra Blade/Tailwind, APIs externas resilientes, cache, testes, segurança por token e um agente Windows de telemetria.
+Portfólio em Laravel 13 que combina uma vitrine profissional com um laboratório de integrações reais. O projeto demonstra Blade/Tailwind, APIs externas resilientes, cache, testes, segurança por token e um agente Windows de telemetria.
 
 ![Prévia do portfólio](docs/images/portfolio-preview.png)
 
@@ -12,7 +12,7 @@ Portfólio em Laravel 12 que combina uma vitrine profissional com um laboratóri
 | GitHub | disponível | perfil, repositórios e atividade pública com cache |
 | Clima | disponível | Open-Meteo, fallback Natal/RN e geolocalização somente por consentimento |
 | Steam | opcional | biblioteca, jogos recentes e conquistas; depende de credenciais privadas |
-| Telemetria | disponível | agente .NET 1.2 com inicialização automática, CPU/GPU/RAM/disco/uptime, PostgreSQL, histórico e retenção |
+| Telemetria | disponível | agente .NET 10/1.3 com inicialização automática, CPU/GPU/RAM/disco/uptime, PostgreSQL, histórico e retenção |
 | Google Agenda | leitura e escrita opcionais | CRUD local, OAuth, allowlist, snapshot e agenda semanal |
 | Login Google | disponível | OpenID, e-mail verificado, state e vínculo seguro de conta |
 | Duolingo | disponível | perfil `Pedro_Felipe_Brt`, snapshots diários, histórico e circuit breaker |
@@ -23,7 +23,7 @@ Falhas externas são isoladas: GitHub, Steam, clima e telemetria podem ficar ind
 ## Arquitetura
 
 ```text
-Blade + Tailwind + Alpine
+Blade + Tailwind 4 + Alpine 3
           |
        Laravel
        /  |  \
@@ -34,7 +34,7 @@ Blade + Tailwind + Alpine
 GitHub Steam Open-Meteo Google Duolingo
 ```
 
-O projeto permanece um monólito modular Laravel. PostgreSQL 16 persiste snapshots e agregados de telemetria; Chart.js é carregado sob demanda para os gráficos. Veja [arquitetura](docs/architecture.md) e [ADRs](docs/adr/).
+O projeto permanece um monólito modular Laravel. PostgreSQL 16 persiste snapshots e agregados de telemetria; Chart.js é carregado sob demanda para os gráficos. O banco permanece nessa versão até uma migração explícita do volume, enquanto o CI também valida PostgreSQL 18. Veja [arquitetura](docs/architecture.md) e [ADRs](docs/adr/).
 
 ## Segurança e privacidade
 
@@ -55,6 +55,7 @@ Detalhes: [docs/security.md](docs/security.md).
 ```powershell
 php artisan test
 vendor\bin\pint --test
+composer analyse
 npm run build
 npm run test:responsive
 npm run test:secrets

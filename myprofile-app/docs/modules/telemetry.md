@@ -1,13 +1,13 @@
 # Telemetria
 
-O agente .NET 8 usa LibreHardwareMonitor com PawnIO para coletar CPU, GPU, memória, disco principal e uptime. A tarefa agendada `MyProfile PC Telemetry` inicia o agente com privilégios elevados no login do Windows e tenta reiniciá-lo quando ocorre uma falha.
+O agente .NET 10 LTS usa LibreHardwareMonitor com PawnIO para coletar CPU, GPU, memória, disco principal e uptime. A tarefa agendada `MyProfile PC Telemetry` inicia o agente com privilégios elevados no login do Windows e tenta reiniciá-lo quando ocorre uma falha.
 
 Nenhum hostname, usuário, IP público ou identificador de hardware é enviado. `agent_id` é um UUID aleatório criado pela configuração.
 
 ## Fluxo
 
 ```text
-agente 1.2 -> POST /api/telemetry/push -> validação + idempotência
+agente 1.3 -> POST /api/telemetry/push -> validação + idempotência
                                       -> PostgreSQL (snapshot bruto)
                                       -> cache (última leitura)
                                       -> integration_health

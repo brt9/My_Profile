@@ -2,10 +2,10 @@
 
 ## Requisitos
 
-- PHP 8.3+ e Composer;
-- Node.js 20+ e npm;
-- .NET 8 Runtime para executar o agente;
-- SDK .NET 8 apenas para recompilar o agente.
+- PHP 8.3+ e Composer 2;
+- Node.js 24 LTS e npm;
+- .NET 10 Runtime para executar o agente;
+- SDK .NET 10 apenas para recompilar o agente.
 
 ## Instalação
 
@@ -65,7 +65,7 @@ O executável gerado fica em `dist/telemetry-agent` e não é versionado. Para r
 
 ## PostgreSQL e Docker
 
-O compose usa PostgreSQL 16 na porta local `5433`, com health check e volume persistente. A suíte do CI também executa contra PostgreSQL.
+O compose mantém PostgreSQL 16 na porta local `5433`, com health check e volume persistente. A atualização de versão principal exige dump e restore explícitos; o CI valida a aplicação isoladamente no PostgreSQL 18.
 
 ```powershell
 docker compose up -d postgres

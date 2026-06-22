@@ -5,12 +5,15 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  test:
+  application:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgres:18-alpine
         env:
           POSTGRES_DB: myprofile_test
           POSTGRES_USER: myprofile
@@ -31,19 +34,34 @@ jobs:
       DB_PASSWORD: myprofile_test
       DB_TIMEZONE: UTC
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.5'
           coverage: none
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           cache: npm
-      - run: composer install --no-interaction --prefer-dist
+      - run: composer install --no-interaction --no-progress --prefer-dist
       - run: npm ci
       - run: cp .env.example .env && php artisan key:generate
       - run: php artisan test
       - run: vendor/bin/pint --test
+      - run: composer analyse
       - run: npm run build
       - run: npm run test:secrets
+
+  telemetry-agent:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: tools/telemetry-agent
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet restore
+      - run: dotnet build --configuration Release --no-restore
+      - run: dotnet publish --configuration Release --runtime win-x64 --self-contained false

@@ -10,7 +10,7 @@ A home pública usa Laravel, Blade, Tailwind CSS, Alpine.js e Chart.js carregado
 flowchart LR
     V[Visitante] --> B[Blade + Tailwind + Alpine]
     B --> L[Laravel]
-    A[Agente .NET 1.2] -->|Bearer token| T[API de telemetria]
+    A[Agente .NET 10 / 1.3] -->|Bearer token| T[API de telemetria]
     T --> P[(PostgreSQL)]
     T --> C[(Cache)]
     Q[Scheduler] --> P
@@ -40,4 +40,4 @@ Chamadas externas não ficam no caminho crítico da home: a página lê snapshot
 - `config/portfolio.php`: conteúdo público editável;
 - `tools/telemetry-agent`: coletor Windows independente.
 
-PostgreSQL é o banco principal no ambiente local, Docker e CI. SQLite continua suportado apenas para testes rápidos de portabilidade; o gate completo também executa a suíte em PostgreSQL.
+PostgreSQL é o banco principal. O ambiente local preserva PostgreSQL 16 até uma migração explícita do volume; a CI usa PostgreSQL 18. SQLite continua suportado apenas para testes rápidos de portabilidade.

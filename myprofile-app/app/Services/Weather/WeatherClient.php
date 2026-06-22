@@ -245,7 +245,7 @@ final class WeatherClient
             'emoji' => $snapshot->emoji,
             'source' => 'database',
             'origin' => 'Último registro salvo para Natal/RN',
-            'captured_at' => $snapshot->captured_at?->toIso8601String(),
+            'captured_at' => $snapshot->captured_at->toIso8601String(),
             'is_stale' => true,
         ];
     }

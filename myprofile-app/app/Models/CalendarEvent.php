@@ -4,9 +4,28 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property int|null $connection_id
+ * @property string|null $provider_event_id
+ * @property string|null $provider_calendar_id
+ * @property string $public_title
+ * @property string $category
+ * @property string $status
+ * @property CarbonImmutable $starts_at
+ * @property CarbonImmutable $ends_at
+ * @property bool $all_day
+ * @property string $source
+ * @property string $sync_status
+ * @property CarbonImmutable|null $synced_at
+ * @property-read User|null $user
+ * @property-read GoogleCalendarConnection|null $connection
+ */
 class CalendarEvent extends Model
 {
     protected $fillable = [
@@ -28,11 +47,13 @@ class CalendarEvent extends Model
         ];
     }
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<GoogleCalendarConnection, $this> */
     public function connection(): BelongsTo
     {
         return $this->belongsTo(GoogleCalendarConnection::class, 'connection_id');

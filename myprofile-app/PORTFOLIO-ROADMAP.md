@@ -51,23 +51,23 @@ Um desenvolvedor que acessar o repositório deve conseguir compreender:
 
 ## 4. Diagnóstico do estado atual
 
-Auditoria realizada no repositório em 20 de junho de 2026.
+Auditoria revisada no repositório em 21 de junho de 2026.
 
 | Área | Estado atual | Lacuna principal |
 |---|---|---|
-| Backend | Laravel 12 / PHP 8.3+ | home lê snapshots locais; persistência histórica ainda não foi implementada |
-| Frontend público | Blade, Tailwind CSS, Alpine.js e Vite | estados críticos da Release 1 estão isolados; gráficos históricos ainda não existem |
-| React/Inertia | dependências e área autenticada presentes | a home pública não usa React ou Next.js |
-| Banco principal | PostgreSQL 16 no local, Docker e CI | falta comprovar rotina externa de backup no ambiente de produção |
-| Telemetria | agente .NET 1.1; CPU/GPU, RAM, disco, uptime, controladores e histórico | gate operacional de 24 horas ainda em observação |
+| Backend | Laravel 13 / PHP 8.3+ | snapshots, histórico e integrações estão persistidos; falta comprovar o deploy de produção |
+| Frontend público | Blade, Tailwind CSS 4, Alpine.js 3 e Vite 8 | estados críticos e gráficos históricos estão implementados |
+| React/Inertia | React 19 e Inertia 3 na área autenticada | a home pública permanece em Blade por simplicidade operacional |
+| Banco principal | PostgreSQL 16 local e PostgreSQL 18 na CI | a migração do volume local exige dump/restore explícitos |
+| Telemetria | agente .NET 10/1.3; CPU/GPU, RAM, disco, uptime, controladores e histórico | gate operacional de 24 horas ainda em observação |
 | Steam | biblioteca, atividade, conquistas, cache uniforme de 30 minutos e fallback de imagens | falta histórico próprio e atualização por job |
 | Clima | Open-Meteo, origem explícita e geolocalização consentida | falta health check agregado das integrações |
 | GitHub | integração pública, cache, documentação e teste de resiliência | falta atualização por job e histórico próprio |
 | Footer | identidade, contatos condicionais, ano e retorno ao topo | concluído para a Release 1 |
 | Conteúdo | resumo, projetos e experiência configuráveis | textos ainda são genéricos e não apresentam resultados concretos das automações |
-| Google Calendar | não implementado | OAuth, política de privacidade, cache e projeção segura |
-| Duolingo | não implementado | integração não oficial, feature flag, cache e snapshots |
-| Testes | testes de integrações e script responsivo iniciais | faltam contratos de erro, acessibilidade, segurança e persistência histórica |
+| Google Calendar | CRUD local, OAuth, sincronização e projeção pública segura | validar credenciais e sincronização no ambiente publicado |
+| Duolingo | integração não oficial, feature flag, cache, snapshots e gráfico | observar estabilidade da fonte pública |
+| Testes | contratos de integração, autorização, persistência, build e responsividade | ampliar testes visuais automatizados quando houver pipeline de navegador |
 
 ### Alerta de segurança P0
 

@@ -138,14 +138,30 @@ final class SteamClient
             ]];
         });
 
-        // Compatibilidade com valores gravados antes do envelope.
-        if (is_array($cached) && array_key_exists('value', $cached)) {
-            return is_array($cached['value']) ? $cached['value'] : null;
+        return $this->normalizeCurrentGameCache($cached);
+    }
+
+    /**
+     * Mantém compatibilidade com o formato de cache anterior ao envelope `value`.
+     *
+     * @return array{appid:int,name:string,image:string}|null
+     */
+    private function normalizeCurrentGameCache(mixed $cached): ?array
+    {
+        if (! is_array($cached)) {
+            return null;
         }
 
-        return is_array($cached)
-            ? $cached
-            : null;
+        $value = array_key_exists('value', $cached) ? $cached['value'] : $cached;
+        if (! is_array($value) || ! isset($value['appid'], $value['name'], $value['image'])) {
+            return null;
+        }
+
+        return [
+            'appid' => (int) $value['appid'],
+            'name' => (string) $value['name'],
+            'image' => (string) $value['image'],
+        ];
     }
 
     /**
@@ -175,7 +191,7 @@ final class SteamClient
             ])->throw()->json('game.availableGameStats.achievements') ?? [];
 
             // Fallback automático se o jogo não tiver PT-BR
-            if (! $schema && $lang === 'brazilian') {
+            if (! $schema) {
                 $player = $this->request()->get(self::BASE.'/ISteamUserStats/GetPlayerAchievements/v1', [
                     'key' => $this->key,
                     'steamid' => $this->steamId,

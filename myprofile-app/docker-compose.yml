@@ -11,8 +11,7 @@ services:
       - bootstrap_cache:/var/www/bootstrap/cache
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini:ro
     ports:
-      - "9000:9000"   # PHP-FPM
-      # - "5137:5137" # REMOVIDO: Vite não deve ser exposto aqui
+      - "9000:9000"
     networks:
       - ets-sistema-network
     depends_on:
@@ -71,7 +70,7 @@ services:
       retries: 30
 
   node:
-    image: node:22
+    image: node:24-alpine
     container_name: myprofile-node
     working_dir: /var/www
     command: >
@@ -81,7 +80,6 @@ services:
       - "5137:5137"   # Vite/HMR no host (como era)
     volumes:
       - ./:/var/www:delegated
-      - vendor_cache:/var/www/vendor
       - node_modules_cache:/var/www/node_modules
     depends_on:
       - php

@@ -170,7 +170,7 @@ final class GitHubClient
         $xpath = new DOMXPath($document);
         $tooltipByDay = [];
         foreach ($xpath->query('//tool-tip[@for]') ?: [] as $tooltip) {
-            $tooltipByDay[$tooltip->attributes?->getNamedItem('for')?->nodeValue ?? ''] = trim($tooltip->textContent);
+            $tooltipByDay[$tooltip->attributes->getNamedItem('for')->nodeValue ?? ''] = trim($tooltip->textContent);
         }
 
         $nodes = $xpath->query("//td[contains(concat(' ', normalize-space(@class), ' '), ' ContributionCalendar-day ')][@data-date][@data-level]");
@@ -180,12 +180,12 @@ final class GitHubClient
 
         $days = [];
         foreach ($nodes as $node) {
-            $date = $node->attributes?->getNamedItem('data-date')?->nodeValue ?? '';
+            $date = $node->attributes->getNamedItem('data-date')->nodeValue ?? '';
             if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
                 continue;
             }
 
-            $id = $node->attributes?->getNamedItem('id')?->nodeValue ?? '';
+            $id = $node->attributes->getNamedItem('id')->nodeValue ?? '';
             $tooltip = $tooltipByDay[$id] ?? '';
             preg_match('/([\d,]+) contributions?/i', $tooltip, $countMatch);
             $count = isset($countMatch[1]) ? (int) str_replace(',', '', $countMatch[1]) : 0;
@@ -194,7 +194,7 @@ final class GitHubClient
             $days[] = [
                 'date' => $date,
                 'count' => $count,
-                'level' => max(0, min(4, (int) ($node->attributes?->getNamedItem('data-level')?->nodeValue ?? 0))),
+                'level' => max(0, min(4, (int) ($node->attributes->getNamedItem('data-level')->nodeValue ?? 0))),
                 'label' => $count === 0
                     ? 'Nenhuma contribuição em '.$day->format('d/m/Y')
                     : $count.' '.($count === 1 ? 'contribuição' : 'contribuições').' em '.$day->format('d/m/Y'),
@@ -303,7 +303,7 @@ final class GitHubClient
                 $lastMonthLabelIndex = $weekIndex;
             }
             $previousMonth = $month ?? $previousMonth;
-            $weeks[] = ['start' => $start, 'year' => $yearLabel, 'month' => $monthLabel, 'days' => array_values($weekDays)];
+            $weeks[] = ['start' => $start, 'year' => $yearLabel, 'month' => $monthLabel, 'days' => $weekDays];
         }
 
         return [

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Duolingo;
 
 use App\Models\DuolingoSnapshot;
+use Illuminate\Support\Collection;
 
 final class DuolingoDashboard
 {
@@ -20,10 +21,16 @@ final class DuolingoDashboard
             ->where('username', $username)
             ->where('snapshot_date', '>=', now()->utc()->subDays(30)->toDateString())
             ->orderBy('snapshot_date')
-            ->get();
-        $latestCollectedAt = $snapshots->max('collected_at');
-        $courses = $snapshots->groupBy('language')->map(function ($history): array {
+            ->get()
+            ->toBase();
+        $latestCollectedAt = $snapshots->max(
+            fn (DuolingoSnapshot $snapshot) => $snapshot->collected_at,
+        );
+        $courses = $snapshots->groupBy('language')->map(function (Collection $history): ?array {
             $latest = $history->last();
+            if (! $latest instanceof DuolingoSnapshot) {
+                return null;
+            }
 
             return [
                 'language' => $latest->language,
@@ -36,7 +43,7 @@ final class DuolingoDashboard
                     'xp' => $snapshot->course_xp,
                 ])->values()->all(),
             ];
-        })->values()->all();
+        })->filter()->values()->all();
 
         return [
             'configured' => true,

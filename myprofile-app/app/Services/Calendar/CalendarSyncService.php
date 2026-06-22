@@ -29,16 +29,12 @@ final class CalendarSyncService
             $publicIds = (array) config('services.google_calendar.public_event_ids', []);
             $projected = [];
 
-            $calendarIds = array_values(array_filter(
-                (array) $connection->calendar_ids,
-                fn ($calendarId): bool => is_string($calendarId) && $calendarId !== '',
-            ));
+            $calendarIds = array_filter(
+                $connection->calendar_ids,
+                fn (string $calendarId): bool => $calendarId !== '',
+            );
 
             foreach ($calendarIds as $calendarId) {
-                if (! is_string($calendarId) || $calendarId === '') {
-                    continue;
-                }
-
                 foreach ($this->client->events($accessToken, $calendarId, $timeMin->toIso8601String(), $timeMax->toIso8601String()) as $event) {
                     $safe = $this->projector->project($event, $calendarId, $publicIds);
                     if ($safe !== null) {

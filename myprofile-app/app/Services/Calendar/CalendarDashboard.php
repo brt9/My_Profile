@@ -68,7 +68,7 @@ final class CalendarDashboard
             'configured' => filled(config('services.google_calendar.client_id'))
                 && filled(config('services.google_calendar.client_secret')),
             'connected' => $connection !== null,
-            'status' => $connection?->status ?? 'not_connected',
+            'status' => $connection->status ?? 'not_connected',
             'last_synced_at' => $connection?->last_synced_at,
             'range_label' => $weekStart->format('d/m').'–'.$weekEnd->subDay()->format('d/m'),
             'days' => $days,

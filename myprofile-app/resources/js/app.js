@@ -1,4 +1,8 @@
+import Alpine from 'alpinejs';
+
 const root = document.documentElement;
+
+window.Alpine = Alpine;
 
 window.loadTelemetryChart = async () => {
     const { default: Chart } = await import('chart.js/auto');
@@ -142,6 +146,8 @@ document.addEventListener('error', (event) => {
     image.closest('[data-game-cover]')?.classList.add('is-error');
     image.remove();
 }, true);
+
+Alpine.start();
 
 const calendarManager = document.querySelector('[data-calendar-manager]');
 const calendarForm = calendarManager?.querySelector('[data-calendar-event-form]');

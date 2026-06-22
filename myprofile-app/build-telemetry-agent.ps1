@@ -3,7 +3,7 @@ Set-Location $PSScriptRoot
 
 $dotnet = Join-Path $PSScriptRoot '.tools\dotnet\dotnet.exe'
 if (-not (Test-Path $dotnet)) {
-    throw 'SDK local não encontrado. Execute a instalação do SDK .NET 8 antes de compilar.'
+    throw 'SDK local não encontrado. Instale o SDK .NET 10 em .tools\dotnet antes de compilar.'
 }
 
 $project = Join-Path $PSScriptRoot 'tools\telemetry-agent\PcTelemetryAgent.csproj'

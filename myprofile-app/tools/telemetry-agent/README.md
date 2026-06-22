@@ -1,6 +1,6 @@
 # PC Telemetry Agent
 
-Agente Windows .NET 8 que lê sensores pelo LibreHardwareMonitor/PawnIO e envia os dados para `POST /api/telemetry/push`.
+Agente Windows .NET 10 LTS que lê sensores pelo LibreHardwareMonitor/PawnIO e envia os dados para `POST /api/telemetry/push`.
 
 ## Métricas exibidas
 
