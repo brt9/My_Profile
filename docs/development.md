@@ -10,7 +10,7 @@
 ## Instalação
 
 ```powershell
-docker compose up -d postgres
+docker compose up -d mysql
 composer setup
 start-portfolio.cmd
 ```
@@ -66,20 +66,20 @@ Nunca copie valores reais para `.env.example`, documentação, logs ou issues.
 
 O executável gerado fica em `dist/telemetry-agent` e não é versionado. Para recompilar, instale o SDK local e execute `build-telemetry-agent.ps1`.
 
-## PostgreSQL e Docker
+## MySQL e Docker
 
-O compose mantém PostgreSQL 16 na porta local `5433`, com health check e volume persistente. A atualização de versão principal exige dump e restore explícitos; o CI valida a aplicação isoladamente no PostgreSQL 18.
+O compose mantém MySQL 8.4 na porta local `3308`, com health check e volume persistente. A porta externa usa `3308` para evitar conflito com outros projetos locais que já usam `3306` ou `3307`.
 
 ```powershell
-docker compose up -d postgres
+docker compose up -d mysql
 php artisan migrate --force
 ```
 
 Backup lógico e restauração:
 
 ```powershell
-docker compose exec -T postgres pg_dump -U myprofile --clean --if-exists myprofile > myprofile-backup.sql
-Get-Content myprofile-backup.sql | docker compose exec -T postgres psql -U myprofile -d myprofile
+docker compose exec -T mysql mysqldump -umyprofile -pmyprofile_local myprofile > myprofile-backup.sql
+Get-Content myprofile-backup.sql | docker compose exec -T mysql mysql -umyprofile -pmyprofile_local myprofile
 ```
 
 Teste rápido de portabilidade em SQLite continua disponível definindo `DB_CONNECTION=sqlite` e `DB_DATABASE=:memory:` somente no processo de teste.

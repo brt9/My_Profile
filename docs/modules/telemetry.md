@@ -8,7 +8,7 @@ Nenhum hostname, usuário, IP público ou identificador de hardware é enviado. 
 
 ```text
 agente 1.3 -> POST /api/telemetry/push -> validação + idempotência
-                                      -> PostgreSQL (snapshot bruto)
+                                      -> MySQL (snapshot bruto)
                                       -> cache (última leitura)
                                       -> integration_health
 ```

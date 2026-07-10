@@ -5,7 +5,7 @@
                 <span class="section-kicker">Ambiente técnico</span>
                 <h2>Hardware monitorado.<br>Dados preservados.</h2>
             </div>
-            <p>Uma demonstração prática de Laravel recebendo métricas autenticadas do Windows, armazenando histórico no PostgreSQL e tratando sensores indisponíveis sem inventar valores.</p>
+            <p>Uma demonstração prática de Laravel recebendo métricas autenticadas do Windows, armazenando histórico no MySQL e tratando sensores indisponíveis sem inventar valores.</p>
         </div>
 
         @php
@@ -22,7 +22,7 @@
         <div class="lab-grid">
             <article class="panel setup-panel">
                 <h3>Ambiente de desenvolvimento</h3>
-                <p>Máquina usada para desenvolver e testar aplicações Laravel com Docker, PostgreSQL, filas, tarefas agendadas e front-end Vite.</p>
+                <p>Máquina usada para desenvolver e testar aplicações Laravel com Docker, MySQL, filas, tarefas agendadas e front-end Vite.</p>
                 <div class="setup-summary">
                     @foreach ($parts as $part)
                         <div class="setup-part">
@@ -41,7 +41,7 @@
             >
                 <div class="telemetry-head">
                     <div>
-                        <span class="card-kicker">Laravel API · PostgreSQL</span>
+                        <span class="card-kicker">Laravel API · MySQL</span>
                         <h3>Saúde da estação em tempo real</h3>
                     </div>
                     <span class="live-status" :class="`is-${status}`" x-text="statusLabel()"></span>

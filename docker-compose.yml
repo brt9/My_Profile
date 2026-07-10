@@ -17,17 +17,16 @@ services:
     networks:
       - ets-sistema-network
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     environment:
       TZ: America/Fortaleza
-      DB_CONNECTION: pgsql
-      DB_HOST: postgres
-      DB_PORT: 5432
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
       DB_DATABASE: myprofile
       DB_USERNAME: myprofile
       DB_PASSWORD: myprofile_local
-      DB_TIMEZONE: UTC
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -50,23 +49,25 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  postgres:
-    image: postgres:16-alpine
-    container_name: myprofile-postgres
+  mysql:
+    image: mysql:8.4
+    container_name: myprofile-mysql
     restart: no
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - myprofile_postgres_data:/var/lib/postgresql/data
+      - myprofile_mysql_data:/var/lib/mysql
     networks:
       - ets-sistema-network
     ports:
-      - "5433:5432"
+      - "3308:3306"
     environment:
-      POSTGRES_DB: myprofile
-      POSTGRES_USER: myprofile
-      POSTGRES_PASSWORD: myprofile_local
+      MYSQL_DATABASE: myprofile
+      MYSQL_USER: myprofile
+      MYSQL_PASSWORD: myprofile_local
+      MYSQL_ROOT_PASSWORD: myprofile_root_local
       TZ: America/Fortaleza
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myprofile -d myprofile"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -umyprofile -pmyprofile_local --silent"]
       interval: 5s
       timeout: 3s
       retries: 30
@@ -95,7 +96,7 @@ networks:
     driver: bridge
 
 volumes:
-  myprofile_postgres_data:
+  myprofile_mysql_data:
     driver: local
   vendor_cache:
     driver: local

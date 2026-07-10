@@ -9,11 +9,10 @@ RUN apt-get update \
         libicu-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
-        libpq-dev \
         libzip-dev \
         unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" exif gd intl pdo_pgsql zip \
+    && docker-php-ext-install -j"$(nproc)" exif gd intl pdo_mysql zip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

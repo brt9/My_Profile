@@ -66,23 +66,23 @@ function Test-TcpPort {
 $dbConnection = Get-EnvValue 'DB_CONNECTION'
 $dbHost = Get-EnvValue 'DB_HOST'
 $dbPort = Get-EnvValue 'DB_PORT'
-$usesLocalComposePostgres = (
-    $dbConnection -eq 'pgsql' -and
+$usesLocalComposeMysql = (
+    $dbConnection -eq 'mysql' -and
     $dbHost -in @('127.0.0.1', 'localhost') -and
-    $dbPort -eq '5433' -and
+    $dbPort -eq '3308' -and
     (Test-Path 'docker-compose.yml')
 )
 
-if ($usesLocalComposePostgres -and -not (Test-TcpPort -HostName $dbHost -Port ([int] $dbPort))) {
-    Write-Host 'Postgres local nao encontrado; iniciando container postgres...' -ForegroundColor Yellow
-    docker compose up -d postgres
+if ($usesLocalComposeMysql -and -not (Test-TcpPort -HostName $dbHost -Port ([int] $dbPort))) {
+    Write-Host 'MySQL local nao encontrado; iniciando container mysql...' -ForegroundColor Yellow
+    docker compose up -d mysql
     if ($LASTEXITCODE -ne 0) {
-        throw 'Nao foi possivel iniciar o Postgres via docker compose.'
+        throw 'Nao foi possivel iniciar o MySQL via docker compose.'
     }
 
     $deadline = (Get-Date).AddSeconds(60)
     do {
-        $health = docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' myprofile-postgres 2>$null
+        $health = docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' myprofile-mysql 2>$null
         if ($health -eq 'healthy' -or (Test-TcpPort -HostName $dbHost -Port ([int] $dbPort))) {
             break
         }
@@ -91,7 +91,7 @@ if ($usesLocalComposePostgres -and -not (Test-TcpPort -HostName $dbHost -Port ([
     } while ((Get-Date) -lt $deadline)
 
     if (-not (Test-TcpPort -HostName $dbHost -Port ([int] $dbPort))) {
-        throw 'Postgres nao ficou disponivel em 127.0.0.1:5433 dentro do tempo esperado.'
+        throw 'MySQL nao ficou disponivel em 127.0.0.1:3308 dentro do tempo esperado.'
     }
 }
 

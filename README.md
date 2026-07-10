@@ -12,7 +12,7 @@ Portfólio em Laravel 13 que combina uma vitrine profissional com um laboratóri
 | GitHub | disponível | perfil, repositórios e atividade pública com cache |
 | Clima | disponível | Open-Meteo, fallback Natal/RN e geolocalização somente por consentimento |
 | Steam | opcional | biblioteca, jogos recentes e conquistas; depende de credenciais privadas |
-| Telemetria | disponível | agente .NET 10/1.3 com inicialização automática, CPU/GPU/RAM/disco/uptime, PostgreSQL, histórico e retenção |
+| Telemetria | disponível | agente .NET 10/1.3 com inicialização automática, CPU/GPU/RAM/disco/uptime, MySQL, histórico e retenção |
 | Google Agenda | leitura e escrita opcionais | conexão automática no login administrativo, CRUD local, OAuth, allowlist, snapshot e agenda semanal |
 | Login Google | disponível | OpenID, e-mail verificado, state e vínculo seguro de conta |
 | Duolingo | disponível | perfil `Pedro_Felipe_Brt`, snapshots diários, histórico e circuit breaker |
@@ -30,12 +30,12 @@ Blade + Tailwind 4 + Alpine 3
        /  |  \
   clients cache API autenticada <--- agente .NET Windows
              |
-        PostgreSQL + histórico
+        MySQL + histórico
    /  |  \
 GitHub Steam Open-Meteo Google Duolingo
 ```
 
-O projeto permanece um monólito modular Laravel. PostgreSQL 16 persiste snapshots e agregados de telemetria; Chart.js é carregado sob demanda para os gráficos. O banco permanece nessa versão até uma migração explícita do volume, enquanto o CI também valida PostgreSQL 18. Veja [arquitetura](docs/architecture.md) e [ADRs](docs/adr/).
+O projeto permanece um monólito modular Laravel. MySQL 8.4 persiste snapshots e agregados de telemetria; Chart.js é carregado sob demanda para os gráficos. Veja [arquitetura](docs/architecture.md) e [ADRs](docs/adr/).
 
 ## Segurança e privacidade
 

@@ -11,7 +11,7 @@ flowchart LR
     V[Visitante] --> B[Blade + Tailwind + Alpine]
     B --> L[Laravel]
     A[Agente .NET 10 / 1.3] -->|Bearer token| T[API de telemetria]
-    T --> P[(PostgreSQL)]
+    T --> P[(MySQL)]
     T --> C[(Cache)]
     Q[Scheduler] --> P
     L --> C
@@ -40,4 +40,4 @@ Chamadas externas não ficam no caminho crítico da home: a página lê snapshot
 - `config/portfolio.php`: conteúdo público editável;
 - `tools/telemetry-agent`: coletor Windows independente.
 
-PostgreSQL é o banco principal. O ambiente local preserva PostgreSQL 16 até uma migração explícita do volume; a CI usa PostgreSQL 18. SQLite continua suportado apenas para testes rápidos de portabilidade.
+MySQL é o banco principal. O ambiente local usa MySQL 8.4 na porta `3308`, com volume Docker persistente. SQLite continua suportado apenas para testes rápidos de portabilidade.

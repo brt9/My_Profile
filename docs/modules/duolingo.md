@@ -10,7 +10,7 @@ A integração consulta um endpoint público não oficial no backend. Ela requer
 - circuit breaker por 30 minutos após três falhas;
 - sincronização a cada 6 horas;
 - `upsert` garante no máximo um snapshot por usuário, idioma e dia;
-- a home lê exclusivamente PostgreSQL e preserva o último snapshot como defasado;
+- a home lê exclusivamente MySQL e preserva o último snapshot como defasado;
 - gráfico aparece somente depois de dois snapshots, com tabela textual equivalente.
 
 ## Configuração
