@@ -1,0 +1,105 @@
+name: myprofile-app
+
+services:
+  php:
+    container_name: myprofile-php
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    restart: no
+    volumes:
+      - ./:/var/www:delegated
+      - vendor_cache:/var/www/vendor
+      - bootstrap_cache:/var/www/bootstrap/cache
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini:ro
+    ports:
+      - "9000:9000"
+    networks:
+      - ets-sistema-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      TZ: America/Fortaleza
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: myprofile
+      DB_USERNAME: myprofile
+      DB_PASSWORD: myprofile_local
+      DB_TIMEZONE: UTC
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  nginx:
+    container_name: myprofile-nginx
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    restart: no
+    ports:
+      - "8080:80"
+      # - "443:443"
+    volumes:
+      - ./:/var/www:delegated,ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - ets-sistema-network
+    depends_on:
+      - php
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: myprofile-postgres
+    restart: no
+    volumes:
+      - myprofile_postgres_data:/var/lib/postgresql/data
+    networks:
+      - ets-sistema-network
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: myprofile
+      POSTGRES_USER: myprofile
+      POSTGRES_PASSWORD: myprofile_local
+      TZ: America/Fortaleza
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myprofile -d myprofile"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  node:
+    image: node:24-alpine
+    container_name: myprofile-node
+    working_dir: /var/www
+    command: >
+      sh -lc "if [ -f package-lock.json ]; then npm ci; else npm i; fi;
+              npm run dev -- --host 0.0.0.0 --port 5137"
+    ports:
+      - "5137:5137"   # Vite/HMR no host (como era)
+    volumes:
+      - ./:/var/www:delegated
+      - node_modules_cache:/var/www/node_modules
+    depends_on:
+      - php
+    networks:
+      - ets-sistema-network
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+
+networks:
+  ets-sistema-network:
+    driver: bridge
+
+volumes:
+  myprofile_postgres_data:
+    driver: local
+  vendor_cache:
+    driver: local
+  bootstrap_cache:
+    driver: local
+  node_modules_cache:
+    driver: local
