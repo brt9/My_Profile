@@ -37,7 +37,7 @@ const applyTheme = (theme) => {
     themeButton?.setAttribute('aria-label', theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro');
 };
 
-applyTheme(browserStorage.get('portfolio-theme') ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+applyTheme(browserStorage.get('portfolio-theme') ?? 'dark');
 
 themeButton?.addEventListener('click', () => {
     const nextTheme = root.classList.contains('dark') ? 'light' : 'dark';

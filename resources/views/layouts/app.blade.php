@@ -26,7 +26,7 @@
             } catch {
                 // Storage can be unavailable in restricted browser contexts.
             }
-            const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const dark = saved ? saved === 'dark' : true;
             document.documentElement.classList.toggle('dark', dark);
             document.documentElement.dataset.theme = dark ? 'dark' : 'light';
 

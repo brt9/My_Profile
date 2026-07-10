@@ -23,11 +23,11 @@
             } catch {
                 // Storage can be unavailable in restricted browser contexts.
             }
-            const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.classList.toggle('dark', dark);
-                document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+            const dark = saved ? saved === 'dark' : true;
+            document.documentElement.classList.toggle('dark', dark);
+            document.documentElement.dataset.theme = dark ? 'dark' : 'light';
 
-            })();
+        })();
         </script>
         @routes
         @viteReactRefresh

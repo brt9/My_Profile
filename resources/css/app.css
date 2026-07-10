@@ -272,8 +272,29 @@ img {
 .hero-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-    align-items: center;
-    gap: clamp(44px, 8vw, 100px);
+    grid-template-areas:
+        "eyebrow visual"
+        "title visual"
+        "body visual";
+    align-items: start;
+    column-gap: clamp(44px, 8vw, 100px);
+    row-gap: 0;
+}
+
+.hero-heading {
+    display: contents;
+}
+
+.hero-heading .eyebrow {
+    grid-area: eyebrow;
+}
+
+.hero-heading h1 {
+    grid-area: title;
+}
+
+.hero-body {
+    grid-area: body;
 }
 
 .eyebrow,
@@ -450,6 +471,8 @@ img {
 .hero-visual {
     position: relative;
     display: grid;
+    grid-area: visual;
+    align-self: center;
     aspect-ratio: 1;
     place-items: center;
 }
@@ -3129,6 +3152,14 @@ body.modal-open {
     .about-grid,
     .lab-grid {
         grid-template-columns: 1fr;
+    }
+
+    .hero-grid {
+        grid-template-areas:
+            "eyebrow"
+            "title"
+            "visual"
+            "body";
     }
 
     .hero-visual {

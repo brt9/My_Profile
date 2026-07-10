@@ -18,6 +18,12 @@ $envText = [IO.File]::ReadAllText($envPath, $utf8)
 $processToken = [Environment]::GetEnvironmentVariable('TELEMETRY_TOKEN')
 $fileMatch = [Regex]::Match($envText, '(?m)^TELEMETRY_TOKEN=(.*)$')
 $fileToken = if ($fileMatch.Success) { $fileMatch.Groups[1].Value.Trim() } else { '' }
+$appUrlMatch = [Regex]::Match($envText, '(?m)^APP_URL=(.*)$')
+$appUrl = if ($appUrlMatch.Success) { $appUrlMatch.Groups[1].Value.Trim().Trim('"').Trim("'").TrimEnd('/') } else { '' }
+
+if ([string]::IsNullOrWhiteSpace($appUrl)) {
+    throw 'APP_URL nao encontrado no .env.'
+}
 
 if (-not [string]::IsNullOrWhiteSpace($processToken)) {
     $token = $processToken
@@ -52,7 +58,7 @@ if ([string]::IsNullOrWhiteSpace($agentId)) {
 }
 
 $configuration = [ordered]@{
-    endpoint = 'http://127.0.0.1:8085/api/telemetry/push'
+    endpoint = "$appUrl/api/telemetry/push"
     token = $token
     agent_id = $agentId
     interval_seconds = 10

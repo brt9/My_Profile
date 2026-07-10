@@ -4,9 +4,25 @@
     <header id="inicio" class="hero">
         <div class="container-shell">
             <div class="hero-grid">
-                <div class="hero-copy">
+                <div class="hero-heading">
                     <span class="eyebrow">{{ $portfolio['role'] }}</span>
                     <h1>Pedro Felipe,<br><span class="gradient-text">código que resolve.</span></h1>
+
+                    <div class="hero-visual" aria-label="Identidade visual de Pedro Felipe">
+                        <div class="hero-orbit" aria-hidden="true"></div>
+                        <div class="avatar-card">
+                            @if (!empty($portfolio['photo']))
+                                <img src="{{ asset($portfolio['photo']) }}" alt="Foto de {{ $portfolio['name'] }}" class="avatar-image" width="512" height="512" fetchpriority="high">
+                            @else
+                                <span class="avatar-monogram">PF</span>
+                            @endif
+                        </div>
+                        <span class="floating-label top">&lt;full-stack /&gt;</span>
+                        <span class="floating-label bottom">laravel · php · js</span>
+                    </div>
+                </div>
+
+                <div class="hero-body">
                     <p class="hero-lead">{{ $portfolio['headline'] }}</p>
 
                     <div class="badge-list" aria-label="Tecnologias principais">
@@ -20,19 +36,6 @@
                         <a href="#projetos" class="button button-primary">Explorar projetos <span aria-hidden="true">↓</span></a>
                         <a href="#experiencia" class="button button-secondary">Ver trajetória</a>
                     </div>
-                </div>
-
-                <div class="hero-visual" aria-label="Identidade visual de Pedro Felipe">
-                    <div class="hero-orbit" aria-hidden="true"></div>
-                    <div class="avatar-card">
-                        @if (!empty($portfolio['photo']))
-                            <img src="{{ asset($portfolio['photo']) }}" alt="Foto de {{ $portfolio['name'] }}" class="avatar-image" width="512" height="512" fetchpriority="high">
-                        @else
-                            <span class="avatar-monogram">PF</span>
-                        @endif
-                    </div>
-                    <span class="floating-label top">&lt;full-stack /&gt;</span>
-                    <span class="floating-label bottom">laravel · php · js</span>
                 </div>
             </div>
 
