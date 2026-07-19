@@ -47,11 +47,31 @@
                 <span>pedrofelipe<span>.dev</span></span>
             </a>
 
-            <div class="desktop-nav">
-                <a href="/#sobre">Sobre</a>
-                <a href="/#projetos">Projetos</a>
-                <a href="/#experiencia">Experiência</a>
-                <a href="/#agenda">Agenda</a>
+            <div class="desktop-nav" data-section-navigation>
+                <a href="/#sobre" data-nav-section="sobre">Sobre</a>
+                <a href="/#projetos" data-nav-section="projetos">Projetos</a>
+                <a href="/#experiencia" data-nav-section="experiencia">Experiência</a>
+                <details class="nav-dropdown" data-nav-group="laboratorio">
+                    <summary @class(['is-active' => request()->routeIs('calendar.show', 'steam.show', 'weather.show')])>Laboratório</summary>
+                    <div class="nav-dropdown-panel">
+                        <a href="/#laboratorio" data-nav-section="laboratorio">
+                            <strong>Visão geral</strong>
+                            <span>Projetos que demonstram minhas habilidades</span>
+                        </a>
+                        <a href="{{ route('calendar.show') }}" @class(['is-active' => request()->routeIs('calendar.show')]) @if(request()->routeIs('calendar.show')) aria-current="page" @endif>
+                            <strong>Agenda integrada</strong>
+                            <span>OAuth, filas e Google Calendar API</span>
+                        </a>
+                        <a href="{{ route('steam.show') }}" @class(['is-active' => request()->routeIs('steam.show')]) @if(request()->routeIs('steam.show')) aria-current="page" @endif>
+                            <strong>Steam API</strong>
+                            <span>Cache, dados públicos e resiliência</span>
+                        </a>
+                        <a href="{{ route('weather.show') }}" @class(['is-active' => request()->routeIs('weather.show')]) @if(request()->routeIs('weather.show')) aria-current="page" @endif>
+                            <strong>Clima em tempo real</strong>
+                            <span>Geolocalização, cache e Open-Meteo</span>
+                        </a>
+                    </div>
+                </details>
             </div>
 
             <div class="nav-actions">
@@ -66,11 +86,17 @@
             </div>
         </div>
 
-        <div id="mobile-menu" class="mobile-menu container-shell" data-mobile-menu hidden>
-            <a href="/#sobre">Sobre</a>
-            <a href="/#projetos">Projetos</a>
-            <a href="/#experiencia">Experiência</a>
-            <a href="/#agenda">Agenda</a>
+        <div id="mobile-menu" class="mobile-menu container-shell" data-mobile-menu data-section-navigation hidden>
+            <a href="/#sobre" data-nav-section="sobre">Sobre</a>
+            <a href="/#projetos" data-nav-section="projetos">Projetos</a>
+            <a href="/#experiencia" data-nav-section="experiencia">Experiência</a>
+            <div class="mobile-nav-group" data-nav-group="laboratorio">
+                <span>Laboratório</span>
+                <a href="/#laboratorio" data-nav-section="laboratorio">Visão geral</a>
+                <a href="{{ route('calendar.show') }}" @class(['is-active' => request()->routeIs('calendar.show')]) @if(request()->routeIs('calendar.show')) aria-current="page" @endif>Agenda integrada</a>
+                <a href="{{ route('steam.show') }}" @class(['is-active' => request()->routeIs('steam.show')]) @if(request()->routeIs('steam.show')) aria-current="page" @endif>Steam API</a>
+                <a href="{{ route('weather.show') }}" @class(['is-active' => request()->routeIs('weather.show')]) @if(request()->routeIs('weather.show')) aria-current="page" @endif>Clima em tempo real</a>
+            </div>
         </div>
     </nav>
 

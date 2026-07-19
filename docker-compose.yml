@@ -3,6 +3,7 @@ name: myprofile-app
 services:
   php:
     container_name: myprofile-php
+    image: myprofile-app-php
     build:
       context: .
       dockerfile: ./docker/php/Dockerfile
@@ -48,6 +49,58 @@ services:
       - php
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  queue:
+    container_name: myprofile-queue
+    image: myprofile-app-php
+    restart: unless-stopped
+    command: php artisan queue:work --sleep=1 --tries=3 --timeout=60
+    volumes:
+      - ./:/var/www:delegated
+      - vendor_cache:/var/www/vendor
+      - bootstrap_cache:/var/www/bootstrap/cache
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini:ro
+    networks:
+      - ets-sistema-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      php:
+        condition: service_started
+    environment:
+      TZ: America/Fortaleza
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: myprofile
+      DB_USERNAME: myprofile
+      DB_PASSWORD: myprofile_local
+
+  scheduler:
+    container_name: myprofile-scheduler
+    image: myprofile-app-php
+    restart: unless-stopped
+    command: php artisan schedule:work
+    volumes:
+      - ./:/var/www:delegated
+      - vendor_cache:/var/www/vendor
+      - bootstrap_cache:/var/www/bootstrap/cache
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini:ro
+    networks:
+      - ets-sistema-network
+    depends_on:
+      mysql:
+        condition: service_healthy
+      php:
+        condition: service_started
+    environment:
+      TZ: America/Fortaleza
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: myprofile
+      DB_USERNAME: myprofile
+      DB_PASSWORD: myprofile_local
 
   mysql:
     image: mysql:8.4

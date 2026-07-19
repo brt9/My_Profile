@@ -1,4 +1,4 @@
-<section id="sobre" class="section section-alt">
+<section id="sobre" class="section section-alt" data-nav-owner="sobre">
     <div class="container-shell">
         <div class="section-header">
             <div>

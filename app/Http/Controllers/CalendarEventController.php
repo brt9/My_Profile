@@ -35,7 +35,7 @@ final class CalendarEventController extends Controller
                 ? 'Compromisso salvo. A sincronização com o Google foi iniciada.'
                 : 'Compromisso salvo na agenda.';
 
-            return redirect('/#agenda')->with('calendar_status', $message);
+            return redirect()->route('calendar.show')->with('calendar_status', $message);
         }
 
         return response()->json(['data' => $this->resource($event)], 201);

@@ -9,7 +9,7 @@ Agente Windows .NET 10 LTS que lê sensores pelo LibreHardwareMonitor/PawnIO e e
 - uso de memória e do disco principal;
 - uptime e instante UTC da coleta.
 
-O agente não envia hostname, usuário, IP ou identificadores de hardware. O `agent_id` é aleatório.
+O agente não envia hostname, usuário, IP ou identificadores de hardware. O `agent_id` é aleatório. A configuração aceita `endpoints` para espelhar a mesma coleta em ambientes local e remoto.
 
 ## Instalação
 

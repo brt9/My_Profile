@@ -1,4 +1,4 @@
-<section id="lab" class="section section-alt">
+<section id="lab" class="section section-alt" data-nav-owner="laboratorio">
     <div class="container-shell">
         <div class="section-header">
             <div>

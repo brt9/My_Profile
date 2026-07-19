@@ -12,7 +12,7 @@ namespace PcTelemetryAgent;
 
 internal static class Program
 {
-    internal const string Version = "1.2.1";
+    internal const string Version = "1.3.1";
 
     public static async Task<int> Main(string[] args)
     {
@@ -43,12 +43,25 @@ internal static class Program
             return 2;
         }
 
+        var endpoints = new List<Uri>();
+        var configuredEndpoints = new[] { config?.Endpoint }
+            .Concat(config?.Endpoints ?? []);
+
+        foreach (var configuredEndpoint in configuredEndpoints)
+        {
+            if (Uri.TryCreate(configuredEndpoint, UriKind.Absolute, out var endpoint)
+                && !endpoints.Contains(endpoint))
+            {
+                endpoints.Add(endpoint);
+            }
+        }
+
         if (config is null
-            || !Uri.TryCreate(config.Endpoint, UriKind.Absolute, out var endpoint)
+            || endpoints.Count == 0
             || string.IsNullOrWhiteSpace(config.Token)
             || string.IsNullOrWhiteSpace(config.AgentId))
         {
-            Console.Error.WriteLine("Informe endpoint e token válidos em telemetry-agent.json.");
+            Console.Error.WriteLine("Informe ao menos um endpoint e um token válidos em telemetry-agent.json.");
             return 2;
         }
 
@@ -116,7 +129,7 @@ internal static class Program
         var interval = TimeSpan.FromSeconds(Math.Clamp(config.IntervalSeconds, 5, 300));
 
         Console.WriteLine($"PC Telemetry Agent {Version}");
-        Console.WriteLine($"Destino: {endpoint}");
+        Console.WriteLine($"Destinos: {string.Join(", ", endpoints)}");
         Console.WriteLine("Pressione Ctrl+C para encerrar.");
 
         do
@@ -124,9 +137,23 @@ internal static class Program
             try
             {
                 var payload = collector.Collect();
-                using var response = await client.PostAsJsonAsync(endpoint, payload, JsonOptions.Default, cancellation.Token);
-                var status = response.IsSuccessStatusCode ? "enviado" : $"HTTP {(int)response.StatusCode}";
-                Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {status} | CPU {Display(payload.CpuTemp, "°C")} | GPU {Display(payload.GpuTemp, "°C")}");
+                foreach (var endpoint in endpoints)
+                {
+                    try
+                    {
+                        using var response = await client.PostAsJsonAsync(endpoint, payload, JsonOptions.Default, cancellation.Token);
+                        var status = response.IsSuccessStatusCode ? "enviado" : $"HTTP {(int)response.StatusCode}";
+                        Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {status} para {endpoint.Host} | CPU {Display(payload.CpuTemp, "°C")} | GPU {Display(payload.GpuTemp, "°C")}");
+                    }
+                    catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+                    {
+                        throw;
+                    }
+                    catch (Exception exception)
+                    {
+                        Console.Error.WriteLine($"[{DateTime.Now:HH:mm:ss}] falha em {endpoint.Host}: {exception.Message}");
+                    }
+                }
             }
             catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
             {
@@ -282,7 +309,8 @@ internal sealed class UpdateVisitor : IVisitor
 }
 
 internal sealed record AgentConfig(
-    [property: JsonPropertyName("endpoint")] string Endpoint,
+    [property: JsonPropertyName("endpoint")] string? Endpoint,
+    [property: JsonPropertyName("endpoints")] string[]? Endpoints,
     [property: JsonPropertyName("token")] string Token,
     [property: JsonPropertyName("agent_id")] string AgentId,
     [property: JsonPropertyName("interval_seconds")] int IntervalSeconds = 10);

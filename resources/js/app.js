@@ -58,6 +58,49 @@ menuButton?.addEventListener('click', () => {
 
 mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
 
+const sectionNavLinks = [...document.querySelectorAll('[data-nav-section]')];
+const trackedSections = [...document.querySelectorAll('[data-nav-owner]')];
+
+const setActiveSection = (sectionId) => {
+    sectionNavLinks.forEach((link) => {
+        const active = link.dataset.navSection === sectionId;
+        link.classList.toggle('is-active', active);
+        if (active) link.setAttribute('aria-current', 'location');
+        else if (link.getAttribute('aria-current') === 'location') link.removeAttribute('aria-current');
+    });
+
+    document.querySelectorAll('[data-nav-group]').forEach((group) => {
+        const active = group.dataset.navGroup === sectionId || Boolean(group.querySelector('a.is-active'));
+        group.classList.toggle('is-active', active);
+        group.querySelector(':scope > summary')?.classList.toggle('is-active', active);
+    });
+};
+
+if (trackedSections.length > 0) {
+    let sectionUpdateQueued = false;
+    const updateActiveSection = () => {
+        sectionUpdateQueued = false;
+        const navOffset = document.querySelector('.site-nav')?.getBoundingClientRect().height ?? 72;
+        const marker = navOffset + 28;
+        const activeSection = trackedSections.find((section) => {
+            const bounds = section.getBoundingClientRect();
+            return bounds.top <= marker && bounds.bottom > marker;
+        });
+        setActiveSection(activeSection?.dataset.navOwner ?? null);
+    };
+
+    const queueSectionUpdate = () => {
+        if (sectionUpdateQueued) return;
+        sectionUpdateQueued = true;
+        window.requestAnimationFrame(updateActiveSection);
+    };
+
+    window.addEventListener('scroll', queueSectionUpdate, { passive: true });
+    window.addEventListener('resize', queueSectionUpdate);
+    window.addEventListener('hashchange', queueSectionUpdate);
+    queueSectionUpdate();
+}
+
 document.querySelectorAll('[data-current-year]').forEach((node) => {
     node.textContent = String(new Date().getFullYear());
 });

@@ -58,6 +58,15 @@ test('home presents the professional narrative without removed sections', functi
         ->assertDontSee('id="contato"', false)
         ->assertSee('https://github.com/brt9', false)
         ->assertSee('https://www.linkedin.com/in/pedrofelipebrt9', false);
+
+    $this->get('/')
+        ->assertSee('Integrações em páginas próprias.')
+        ->assertSee(route('calendar.show'), false)
+        ->assertSee(route('steam.show'), false)
+        ->assertSee(route('weather.show'), false)
+        ->assertDontSee('calendar-shell', false)
+        ->assertDontSee('steam-card', false)
+        ->assertDontSee('weather-card', false);
 });
 
 test('home sections follow the defined visual order', function () {
@@ -68,10 +77,8 @@ test('home sections follow the defined visual order', function () {
         "@include('sections.experience')",
         'id="github"',
         "@include('sections.pc')",
-        "@include('sections.calendar')",
         "@include('sections.duolingo')",
-        'id="steam"',
-        'id="clima"',
+        'id="laboratorio"',
     ];
 
     $positions = array_map(fn (string $needle): int|false => strpos($template, $needle), $needles);

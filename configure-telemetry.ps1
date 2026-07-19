@@ -20,9 +20,24 @@ $fileMatch = [Regex]::Match($envText, '(?m)^TELEMETRY_TOKEN=(.*)$')
 $fileToken = if ($fileMatch.Success) { $fileMatch.Groups[1].Value.Trim() } else { '' }
 $appUrlMatch = [Regex]::Match($envText, '(?m)^APP_URL=(.*)$')
 $appUrl = if ($appUrlMatch.Success) { $appUrlMatch.Groups[1].Value.Trim().Trim('"').Trim("'").TrimEnd('/') } else { '' }
+$endpointsMatch = [Regex]::Match($envText, '(?m)^TELEMETRY_ENDPOINTS=(.*)$')
+$configuredEndpoints = if ($endpointsMatch.Success) {
+    $endpointsMatch.Groups[1].Value.Trim().Trim('"').Trim("'").Split(',') |
+        ForEach-Object { $_.Trim() } |
+        Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+} else {
+    @()
+}
 
 if ([string]::IsNullOrWhiteSpace($appUrl)) {
     throw 'APP_URL nao encontrado no .env.'
+}
+
+$localEndpoint = "$appUrl/api/telemetry/push"
+$endpoints = if (@($configuredEndpoints).Count -gt 0) {
+    @($configuredEndpoints) | Select-Object -Unique
+} else {
+    @($localEndpoint)
 }
 
 if (-not [string]::IsNullOrWhiteSpace($processToken)) {
@@ -58,7 +73,8 @@ if ([string]::IsNullOrWhiteSpace($agentId)) {
 }
 
 $configuration = [ordered]@{
-    endpoint = "$appUrl/api/telemetry/push"
+    endpoint = $endpoints[0]
+    endpoints = @($endpoints)
     token = $token
     agent_id = $agentId
     interval_seconds = 10

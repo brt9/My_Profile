@@ -1,5 +1,9 @@
 {
   "endpoint": "http://127.0.0.1:8085/api/telemetry/push",
+  "endpoints": [
+    "http://127.0.0.1:8085/api/telemetry/push",
+    "https://example.com/api/telemetry/push"
+  ],
   "token": "COLE_O_MESMO_TOKEN_DO_ENV",
   "agent_id": "IDENTIFICADOR_ALEATORIO_GERADO_NA_CONFIGURACAO",
   "interval_seconds": 10

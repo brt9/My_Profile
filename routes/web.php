@@ -1,15 +1,21 @@
 <?php
 
 use App\Http\Controllers\CalendarEventController;
+use App\Http\Controllers\CalendarPageController;
 use App\Http\Controllers\GoogleCalendarOAuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SteamPageController;
+use App\Http\Controllers\WeatherPageController;
 use App\Models\GoogleCalendarConnection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', HomeController::class);
+Route::get('/', HomeController::class)->name('home');
+Route::get('/agenda', CalendarPageController::class)->name('calendar.show');
+Route::get('/laboratorio/steam-api', SteamPageController::class)->name('steam.show');
+Route::get('/laboratorio/clima', WeatherPageController::class)->name('weather.show');
 
 Route::get('/dashboard', function (Request $request) {
     $adminEmail = mb_strtolower(trim((string) config('portfolio.admin_email')));

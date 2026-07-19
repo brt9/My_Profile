@@ -32,7 +32,7 @@ final class GoogleCalendarOAuthController extends Controller
         abort_unless($expectedState !== '' && $state !== '' && hash_equals($expectedState, $state), 419);
 
         if ($request->filled('error')) {
-            return redirect('/#agenda')->with('calendar_status', 'A autorização do Google foi cancelada.');
+            return redirect()->route('calendar.show')->with('calendar_status', 'A autorização do Google foi cancelada.');
         }
 
         $code = $request->string('code')->toString();
@@ -56,7 +56,7 @@ final class GoogleCalendarOAuthController extends Controller
 
         SyncGoogleCalendar::dispatch($connection->getKey());
 
-        return redirect('/#agenda')->with('calendar_status', 'Google Agenda conectado. A primeira sincronização foi iniciada.');
+        return redirect()->route('calendar.show')->with('calendar_status', 'Google Agenda conectado. A primeira sincronização foi iniciada.');
     }
 
     public function revoke(Request $request, GoogleCalendarClient $client): RedirectResponse
@@ -86,6 +86,6 @@ final class GoogleCalendarOAuthController extends Controller
             $connection->delete();
         });
 
-        return redirect('/#agenda')->with('calendar_status', 'Acesso ao Google revogado. Os compromissos criados localmente foram preservados.');
+        return redirect()->route('calendar.show')->with('calendar_status', 'Acesso ao Google revogado. Os compromissos criados localmente foram preservados.');
     }
 }

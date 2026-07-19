@@ -53,7 +53,7 @@ test('calendar form works without javascript and redirects with confirmation', f
         'starts_at' => '2026-06-23T14:00',
         'ends_at' => '2026-06-23T15:00',
         'all_day' => false,
-    ])->assertRedirect('/#agenda')
+    ])->assertRedirect(route('calendar.show'))
         ->assertSessionHas('calendar_status', 'Compromisso salvo na agenda.');
 
     $this->assertDatabaseHas('calendar_events', [
@@ -117,9 +117,9 @@ test('calendar form is visible only to the authenticated portfolio administrator
     config()->set('portfolio.admin_email', $admin->email);
     config()->set('portfolio.integrations.calendar', true);
 
-    $this->get('/')->assertOk()->assertDontSee('data-calendar-manager', false);
-    $this->actingAs($other)->get('/')->assertOk()->assertDontSee('data-calendar-manager', false);
-    $this->actingAs($admin)->get('/')->assertOk()->assertSee('data-calendar-manager', false);
+    $this->get(route('calendar.show'))->assertOk()->assertDontSee('data-calendar-manager', false);
+    $this->actingAs($other)->get(route('calendar.show'))->assertOk()->assertDontSee('data-calendar-manager', false);
+    $this->actingAs($admin)->get(route('calendar.show'))->assertOk()->assertSee('data-calendar-manager', false);
 });
 
 test('calendar dashboard keeps same-day appointments as separate gantt rows', function () {
@@ -183,7 +183,7 @@ test('single timed appointment uses its proportional gantt position and duration
         ->and($event['offset'])->toBe(17.014)
         ->and($event['width'])->toBe(16.736);
 
-    $this->get('/')
+    $this->get(route('calendar.show'))
         ->assertOk()
         ->assertSee('1 compromisso neste dia')
         ->assertSee('data-calendar-event-dialog', false)

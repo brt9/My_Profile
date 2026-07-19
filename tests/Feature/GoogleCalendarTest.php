@@ -172,7 +172,7 @@ test('oauth callback encrypts refresh token and queues first synchronization', f
     $this->actingAs($admin)
         ->withSession(['google_calendar_oauth_state' => 'expected-state'])
         ->get(route('calendar.callback', ['state' => 'expected-state', 'code' => 'oauth-code']))
-        ->assertRedirect('/#agenda');
+        ->assertRedirect(route('calendar.show'));
 
     $connection = GoogleCalendarConnection::query()->sole();
     expect($connection->refresh_token)->toBe('long-lived-refresh')
@@ -227,7 +227,10 @@ test('calendar sync persists only safe projection and retains data when token is
 test('calendar feature flag removes its interface', function () {
     config()->set('portfolio.integrations.calendar', false);
 
-    $this->get('/')->assertOk()->assertDontSee('Google Agenda');
+    $this->get(route('calendar.show'))
+        ->assertOk()
+        ->assertSee('Demonstração temporariamente desativada.')
+        ->assertDontSee('calendar-shell', false);
 });
 
 test('administrator can revoke calendar access and remove local projection', function () {
@@ -251,7 +254,7 @@ test('administrator can revoke calendar access and remove local projection', fun
     ]);
     Http::fake(['oauth2.googleapis.com/revoke' => Http::response([], 200)]);
 
-    $this->actingAs($admin)->delete(route('calendar.revoke'))->assertRedirect('/#agenda');
+    $this->actingAs($admin)->delete(route('calendar.revoke'))->assertRedirect(route('calendar.show'));
 
     expect(GoogleCalendarConnection::query()->count())->toBe(0)
         ->and(CalendarPublicEvent::query()->count())->toBe(0);
@@ -318,7 +321,7 @@ test('calendar interface offers weekly gantt and monthly calendar without catego
         ]);
     }
 
-    $this->get('/')
+    $this->get(route('calendar.show'))
         ->assertOk()
         ->assertSee('Próximos 7 dias')
         ->assertSee('09:00–10:00')
