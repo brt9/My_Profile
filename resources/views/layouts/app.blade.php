@@ -150,7 +150,7 @@
             @endif
 
             <div class="footer-meta">
-                <p>© <span data-current-year>{{ date('Y') }}</span> {{ $profile['name'] }}. Feito com Laravel.</p>
+                <p>© <span data-current-year>{{ date('Y') }}</span> {{ $profile['name'] }}.</p>
             </div>
         </div>
     </footer>

@@ -6,7 +6,7 @@
             <div class="hero-grid">
                 <div class="hero-heading">
                     <span class="eyebrow">{{ $portfolio['role'] }}</span>
-                    <h1>Pedro Felipe,<br><span class="gradient-text">código que resolve.</span></h1>
+                    <h1>Pedro Felipe,<br><span class="gradient-text">da operação<br>para o código.</span></h1>
 
                     <div class="hero-visual" aria-label="Identidade visual de Pedro Felipe">
                         <div class="hero-orbit" aria-hidden="true"></div>
@@ -26,8 +26,8 @@
                     <p class="hero-lead">{{ $portfolio['headline'] }}</p>
 
                     <div class="hero-actions">
-                        <a href="#experiencia" class="button button-primary">Ver trajetória <span aria-hidden="true">↓</span></a>
-                        <a href="#projetos" class="button button-secondary">Explorar projetos</a>
+                        <a href="#experiencia" class="button button-primary">Ver onde trabalhei <span aria-hidden="true">↓</span></a>
+                        <a href="#projetos" class="button button-secondary">Conhecer os projetos</a>
                     </div>
                 </div>
             </div>
@@ -51,9 +51,9 @@
             <div class="section-header">
                 <div>
                     <span class="section-kicker">GitHub</span>
-                    <h2>Código público e evolução.</h2>
+                    <h2>O que mantenho no GitHub.</h2>
                 </div>
-                <p>Projetos, tecnologias e histórico anual de contribuições reunidos logo após a trajetória profissional.</p>
+                <p>Perfil, linguagem mais usada e calendário anual de contribuições consultados pela API pública do GitHub.</p>
             </div>
             <div class="integration-grid integration-grid-single">
                 @include('sections.github')
