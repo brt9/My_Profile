@@ -33,12 +33,14 @@ Com `APP_DEBUG=true`, contas locais entram sem verificação e nenhuma notifica�
 | `PORTFOLIO_EMAIL` | não | sim/pessoal | ativa contato por e-mail |
 | `PORTFOLIO_GITHUB` | não | não | URL pública do GitHub |
 | `PORTFOLIO_LINKEDIN` | não | não | URL pública no formato `/in/...` |
+| `PORTFOLIO_WHATSAPP` | não | não | link público do WhatsApp no formato `https://wa.me/...` |
 | `PORTFOLIO_ADMIN_EMAIL` | sim para administrar | pessoal | único usuário autorizado a administrar integrações |
 | `GITHUB_USERNAME` | sim para o card | não | usuário público consultado |
 | `GITHUB_TOKEN` | não | sim | aumenta o rate limit da API |
 | `STEAM_API_KEY` | sim para Steam | sim | autentica a Steam Web API |
 | `STEAM_ID` | sim para Steam | não | identifica o perfil público |
 | `TELEMETRY_TOKEN` | sim para agente | sim | autentica a ingestão |
+| `TELEMETRY_READ_URL` | não | não | permite ao ambiente local ler a telemetria pública da produção sem receber ingestão |
 | `TELEMETRY_RAW_RETENTION_DAYS` | não | não | retenção de snapshots brutos |
 | `TELEMETRY_AGGREGATE_RETENTION_DAYS` | não | não | retenção de agregados horários |
 | `PORTFOLIO_WEATHER_ENABLED` | não | não | feature flag do clima |

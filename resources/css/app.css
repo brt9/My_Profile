@@ -186,15 +186,11 @@ img {
 }
 
 .brand-mark {
-    display: grid;
+    display: block;
+    flex: 0 0 auto;
     width: 34px;
     height: 34px;
-    place-items: center;
-    border-radius: 11px;
-    background: linear-gradient(135deg, var(--accent), var(--warm));
-    color: white;
-    font: 800 0.72rem/1 ui-monospace, monospace;
-    box-shadow: 0 9px 26px var(--accent-soft);
+    color: var(--text);
 }
 
 .desktop-nav {
@@ -2598,8 +2594,7 @@ body.modal-open {
 }
 
 .github-activity-head,
-.github-activity-foot,
-.github-repositories-heading {
+.github-activity-foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -2616,8 +2611,7 @@ body.modal-open {
 }
 
 .github-activity-head > div > span,
-.github-activity-foot,
-.github-repositories-heading span {
+.github-activity-foot {
     color: var(--muted);
     font-size: 0.72rem;
 }
@@ -2805,55 +2799,6 @@ body.modal-open {
     margin: 10px 0 0;
     color: var(--warm);
     font-size: 0.72rem;
-}
-
-.github-repositories-heading {
-    align-items: baseline;
-    margin-top: 20px;
-}
-
-.github-repositories-heading strong {
-    font-size: 0.82rem;
-}
-
-.github-repositories {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    margin-top: 18px;
-}
-
-.github-repository {
-    display: flex;
-    min-width: 0;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 16px;
-    transition: border-color 160ms ease, transform 160ms ease;
-}
-
-.github-repository:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent);
-}
-
-.github-repository p {
-    margin: 4px 0 0;
-    color: var(--muted);
-    font-size: 0.8rem;
-}
-
-.repo-meta {
-    display: flex;
-    flex: 0 0 auto;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 7px;
-    color: var(--muted);
-    font-size: 0.7rem;
 }
 
 .card-head {
@@ -3725,7 +3670,6 @@ body.modal-open {
     .project-grid,
     .integration-grid,
     .profile-detail-grid,
-    .github-repositories,
     .competency-grid,
     .duolingo-grid {
         grid-template-columns: 1fr;

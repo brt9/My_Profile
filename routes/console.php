@@ -17,7 +17,7 @@ Schedule::command('calendar:sync')
     ->withoutOverlapping();
 
 Schedule::command('duolingo:sync')
-    ->everySixHours()
+    ->hourly()
     ->withoutOverlapping();
 
 Schedule::command('weather:capture-natal')

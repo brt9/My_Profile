@@ -36,7 +36,7 @@
                     <div>
                         <span class="card-kicker">Perfil público conectado</span>
                         <h3>{{ '@'.$duolingo['username'] }}</h3>
-                        <p>{{ $duolingo['stale'] ? 'Último snapshot preservado' : 'Sincronização ativa a cada 6 horas' }}</p>
+                        <p>{{ $duolingo['stale'] ? 'Último snapshot preservado' : 'Sincronização ativa a cada hora' }}</p>
                     </div>
                 </div>
 
@@ -138,7 +138,6 @@
             </div>
             </div>
 
-            <p class="integration-disclaimer"><span aria-hidden="true">ⓘ</span> Fonte pública não oficial. Nenhuma senha, sessão ou payload bruto é armazenado.</p>
         @endif
     </div>
 </section>

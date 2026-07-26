@@ -116,25 +116,6 @@
         @endif
         </div>
 
-        <div class="github-repositories-heading">
-            <strong>Projetos em destaque</strong>
-            <span>Atualizados recentemente</span>
-        </div>
-        <div class="github-repositories">
-            @foreach ($github['repositories'] as $repository)
-                <a href="{{ $repository['url'] }}" target="_blank" rel="noopener noreferrer" class="github-repository">
-                    <div>
-                        <strong>{{ $repository['name'] }}</strong>
-                        <p>{{ $repository['description'] ?: 'Repositório público no GitHub.' }}</p>
-                    </div>
-                    <div class="repo-meta">
-                        @if ($repository['language'])<span>{{ $repository['language'] }}</span>@endif
-                        <span>★ {{ $repository['stars'] }}</span>
-                        <span>⑂ {{ $repository['forks'] }}</span>
-                    </div>
-                </a>
-            @endforeach
-        </div>
     @else
         <p class="integration-note">A atividade do GitHub está temporariamente indisponível. O perfil continua acessível pelo link acima.</p>
     @endif

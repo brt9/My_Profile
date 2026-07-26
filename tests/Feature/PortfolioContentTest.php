@@ -5,10 +5,11 @@ test('professional content is structured around evidence and results', function 
 
     expect($portfolio['social']['github'])->toBe('https://github.com/brt9')
         ->and($portfolio['social']['linkedin'])->toBe('https://www.linkedin.com/in/pedrofelipebrt9')
+        ->and($portfolio['social']['whatsapp'])->toBe('https://wa.me/558498102246')
         ->and($portfolio['competencies'])->toHaveCount(6)
         ->and($portfolio['current_roles'])->toHaveCount(2)
         ->and($portfolio['current_roles'][1]['role'])->toBe('Desenvolvedor Full Stack Freelancer')
-        ->and($portfolio['projects'])->toHaveCount(3)
+        ->and($portfolio['projects'])->toHaveCount(2)
         ->and($portfolio['experience'])->toHaveCount(3)
         ->and($portfolio['language_note'])->toBe('Vivência internacional por 1 ano e 11 meses.')
         ->and($portfolio)->not->toHaveKey('automations');
@@ -32,7 +33,9 @@ test('professional content is structured around evidence and results', function 
             ->and($project['result'])->not->toBeEmpty();
     }
 
-    expect($portfolio['projects'][0]['url'])->toBe('https://www.bardoti.xyz');
+    expect($portfolio['projects'][0]['url'])->toBe('https://www.bardoti.xyz')
+        ->and($portfolio['projects'][1]['number'])->toBe('02')
+        ->and($portfolio['projects'][1]['url'])->toBe('https://etsconstrucoes.com/');
 });
 
 test('home presents the professional narrative without removed sections', function () {
@@ -50,6 +53,9 @@ test('home presents the professional narrative without removed sections', functi
         ->assertSee('technology-logo', false)
         ->assertSee('https://www.bardoti.xyz', false)
         ->assertSee('Abrir o site BardoTI', false)
+        ->assertSee('https://etsconstrucoes.com/', false)
+        ->assertSee('Abrir o site Plataforma de RH e ponto', false)
+        ->assertDontSee('Portfólio resiliente')
         ->assertSee('Vivência internacional por 1 ano e 11 meses.')
         ->assertDontSee('Teixeira Construções / ETS')
         ->assertDontSee('Sistemas de gestão, telemetria e integrações resilientes')
@@ -57,10 +63,13 @@ test('home presents the professional narrative without removed sections', functi
         ->assertDontSee('id="automacoes"', false)
         ->assertDontSee('id="contato"', false)
         ->assertSee('https://github.com/brt9', false)
-        ->assertSee('https://www.linkedin.com/in/pedrofelipebrt9', false);
+        ->assertSee('https://www.linkedin.com/in/pedrofelipebrt9', false)
+        ->assertSee('https://wa.me/558498102246', false);
 
     $this->get('/')
-        ->assertSee('Integrações em páginas próprias.')
+        ->assertDontSee('Estudos de caso')
+        ->assertDontSee('Integrações em páginas próprias.')
+        ->assertDontSee('case-study-grid', false)
         ->assertSee(route('calendar.show'), false)
         ->assertSee(route('steam.show'), false)
         ->assertSee(route('weather.show'), false)
@@ -73,12 +82,11 @@ test('home sections follow the defined visual order', function () {
     $template = file_get_contents(resource_path('views/home.blade.php'));
     $needles = [
         "@include('sections.about')",
-        "@include('sections.projects')",
         "@include('sections.experience')",
         'id="github"',
+        "@include('sections.projects')",
         "@include('sections.pc')",
         "@include('sections.duolingo')",
-        'id="laboratorio"',
     ];
 
     $positions = array_map(fn (string $needle): int|false => strpos($template, $needle), $needles);

@@ -9,6 +9,7 @@
         <meta name="application-name" content="Pedro Felipe">
         <meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)">
         <meta name="theme-color" content="#111116" media="(prefers-color-scheme: dark)">
+        <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">

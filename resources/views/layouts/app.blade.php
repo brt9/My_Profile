@@ -12,6 +12,7 @@
     <meta name="application-name" content="Pedro Felipe">
     <meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#111116" media="(prefers-color-scheme: dark)">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
@@ -43,21 +44,21 @@
     <nav class="site-nav" aria-label="Navegação principal">
         <div class="container-shell nav-inner">
             <a href="/#inicio" class="brand" aria-label="Início">
-                <span class="brand-mark" aria-hidden="true">PF</span>
+                <svg class="brand-mark" viewBox="0 0 34 34" width="34" height="34" aria-hidden="true" focusable="false">
+                    <rect x="4.5" y="5.5" width="25" height="23" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M5.5 11.5h23" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M13 16l-3.5 3 3.5 3M21 16l3.5 3-3.5 3M19 14l-4 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
                 <span>pedrofelipe<span>.dev</span></span>
             </a>
 
             <div class="desktop-nav" data-section-navigation>
                 <a href="/#sobre" data-nav-section="sobre">Sobre</a>
-                <a href="/#projetos" data-nav-section="projetos">Projetos</a>
                 <a href="/#experiencia" data-nav-section="experiencia">Experiência</a>
+                <a href="/#projetos" data-nav-section="projetos">Projetos</a>
                 <details class="nav-dropdown" data-nav-group="laboratorio">
                     <summary @class(['is-active' => request()->routeIs('calendar.show', 'steam.show', 'weather.show')])>Laboratório</summary>
                     <div class="nav-dropdown-panel">
-                        <a href="/#laboratorio" data-nav-section="laboratorio">
-                            <strong>Visão geral</strong>
-                            <span>Projetos que demonstram minhas habilidades</span>
-                        </a>
                         <a href="{{ route('calendar.show') }}" @class(['is-active' => request()->routeIs('calendar.show')]) @if(request()->routeIs('calendar.show')) aria-current="page" @endif>
                             <strong>Agenda integrada</strong>
                             <span>OAuth, filas e Google Calendar API</span>
@@ -88,11 +89,10 @@
 
         <div id="mobile-menu" class="mobile-menu container-shell" data-mobile-menu data-section-navigation hidden>
             <a href="/#sobre" data-nav-section="sobre">Sobre</a>
-            <a href="/#projetos" data-nav-section="projetos">Projetos</a>
             <a href="/#experiencia" data-nav-section="experiencia">Experiência</a>
+            <a href="/#projetos" data-nav-section="projetos">Projetos</a>
             <div class="mobile-nav-group" data-nav-group="laboratorio">
                 <span>Laboratório</span>
-                <a href="/#laboratorio" data-nav-section="laboratorio">Visão geral</a>
                 <a href="{{ route('calendar.show') }}" @class(['is-active' => request()->routeIs('calendar.show')]) @if(request()->routeIs('calendar.show')) aria-current="page" @endif>Agenda integrada</a>
                 <a href="{{ route('steam.show') }}" @class(['is-active' => request()->routeIs('steam.show')]) @if(request()->routeIs('steam.show')) aria-current="page" @endif>Steam API</a>
                 <a href="{{ route('weather.show') }}" @class(['is-active' => request()->routeIs('weather.show')]) @if(request()->routeIs('weather.show')) aria-current="page" @endif>Clima em tempo real</a>
@@ -111,13 +111,16 @@
                 <span>{{ $profile['role'] }} · {{ $profile['location'] }}</span>
             </div>
 
-            @if ($profile['social']['github'] || $profile['social']['linkedin'] || $profile['email'])
+            @if ($profile['social']['github'] || $profile['social']['linkedin'] || ($profile['social']['whatsapp'] ?? null) || $profile['email'])
                 <nav class="footer-links" aria-label="Contatos profissionais">
                     @if ($profile['social']['github'])
                         <a href="{{ $profile['social']['github'] }}" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
                     @endif
                     @if ($profile['social']['linkedin'])
                         <a href="{{ $profile['social']['linkedin'] }}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+                    @endif
+                    @if ($profile['social']['whatsapp'] ?? null)
+                        <a href="{{ $profile['social']['whatsapp'] }}" target="_blank" rel="noopener noreferrer">WhatsApp ↗</a>
                     @endif
                     @if ($profile['email'])
                         <a href="mailto:{{ $profile['email'] }}">E-mail</a>

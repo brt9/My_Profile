@@ -8,9 +8,11 @@ use App\Services\Telemetry\TelemetryHistory;
 use App\Services\Telemetry\TelemetryIngestor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
+use Throwable;
 
 final class TelemetryController extends Controller
 {
@@ -59,6 +61,10 @@ final class TelemetryController extends Controller
 
     public function show(TelemetryIngestor $ingestor): JsonResponse
     {
+        if ($remote = $this->remoteTelemetry('latest')) {
+            return $remote;
+        }
+
         $payload = $ingestor->latestPayload();
 
         if ($payload === []) {
@@ -101,6 +107,10 @@ final class TelemetryController extends Controller
             'resolution' => ['sometimes', 'string', 'max:4'],
         ]);
 
+        if ($remote = $this->remoteTelemetry('history', $validated)) {
+            return $remote;
+        }
+
         try {
             return response()->json($history->get(
                 $validated['metric'],
@@ -109,6 +119,31 @@ final class TelemetryController extends Controller
             ));
         } catch (InvalidArgumentException $exception) {
             throw ValidationException::withMessages(['metric' => $exception->getMessage()]);
+        }
+    }
+
+    /** @param array<string, mixed> $query */
+    private function remoteTelemetry(string $path, array $query = []): ?JsonResponse
+    {
+        $baseUrl = rtrim((string) config('telemetry.read_url'), '/');
+        if ($baseUrl === '') {
+            return null;
+        }
+
+        try {
+            $response = Http::acceptJson()
+                ->timeout(5)
+                ->retry(1, 100)
+                ->get($baseUrl.'/'.$path, $query);
+            $payload = $response->json();
+
+            if (! $response->successful() || ! is_array($payload)) {
+                return null;
+            }
+
+            return response()->json($payload);
+        } catch (Throwable) {
+            return null;
         }
     }
 }

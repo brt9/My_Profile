@@ -73,7 +73,7 @@ test('duolingo home uses snapshots without calling provider', function () {
         ->assertSee('321')
         ->assertSee('brand-mark-duolingo', false)
         ->assertSee('duolingo-dashboard', false)
-        ->assertSee('Fonte pública não oficial');
+        ->assertDontSee('Fonte pública não oficial');
     Http::assertNothingSent();
 });
 

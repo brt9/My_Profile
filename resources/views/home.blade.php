@@ -51,7 +51,6 @@
     </header>
 
     @include('sections.about')
-    @include('sections.projects')
     @include('sections.experience')
 
     <section id="github" class="section" data-nav-owner="experiencia">
@@ -69,59 +68,12 @@
         </div>
     </section>
 
+    @include('sections.projects')
+
     @include('sections.pc')
 
     @if ($duolingo)
         @include('sections.duolingo')
     @endif
 
-    <section id="laboratorio" class="section" data-nav-owner="laboratorio">
-        <div class="container-shell">
-            <div class="section-header">
-                <div>
-                    <span class="section-kicker">Estudos de caso</span>
-                    <h2>Integrações em páginas próprias.</h2>
-                </div>
-                <p>Projetos técnicos documentados com contexto, arquitetura, decisões de segurança e demonstrações em funcionamento.</p>
-            </div>
-
-            <div class="case-study-grid">
-                <a href="{{ route('calendar.show') }}" class="case-study-card">
-                    <span class="case-study-index">01 · Google Calendar API</span>
-                    <h3>Agenda, OAuth e sincronização resiliente</h3>
-                    <p>Uma agenda pública com projeção segura de eventos, CRUD local e sincronização assíncrona com o Google.</p>
-                    <ul class="case-study-tags" aria-label="Tecnologias da agenda">
-                        <li>OAuth 2.0</li>
-                        <li>Laravel Queue</li>
-                        <li>MySQL</li>
-                    </ul>
-                    <span class="case-study-link">Ler estudo de caso <span aria-hidden="true">→</span></span>
-                </a>
-
-                <a href="{{ route('steam.show') }}" class="case-study-card">
-                    <span class="case-study-index">02 · Steam Web API</span>
-                    <h3>Dados públicos convertidos em produto</h3>
-                    <p>Biblioteca, atividade recente e conquistas normalizadas com cache, tolerância a falhas e interface responsiva.</p>
-                    <ul class="case-study-tags" aria-label="Tecnologias da integração Steam">
-                        <li>REST API</li>
-                        <li>Cache</li>
-                        <li>Resiliência</li>
-                    </ul>
-                    <span class="case-study-link">Explorar laboratório <span aria-hidden="true">→</span></span>
-                </a>
-
-                <a href="{{ route('weather.show') }}" class="case-study-card">
-                    <span class="case-study-index">03 · Open-Meteo API</span>
-                    <h3>Clima, geolocalização e dados persistidos</h3>
-                    <p>Condições meteorológicas de Natal e da cidade do visitante com consentimento, cache e fallback para falhas externas.</p>
-                    <ul class="case-study-tags" aria-label="Tecnologias da integração de clima">
-                        <li>Open-Meteo</li>
-                        <li>Geolocalização</li>
-                        <li>Cache</li>
-                    </ul>
-                    <span class="case-study-link">Ver clima em tempo real <span aria-hidden="true">→</span></span>
-                </a>
-            </div>
-        </div>
-    </section>
 @endsection

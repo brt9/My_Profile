@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 beforeEach(function (): void {
     config()->set('telemetry.token', 'test-token');
+    config()->set('telemetry.read_url', '');
     config()->set('telemetry.max_payload_bytes', 16384);
     Cache::forget('telemetry:latest');
     Carbon::setTestNow('2026-06-20T15:00:00Z');
@@ -128,6 +129,35 @@ test('telemetry latest returns unavailable when no snapshot exists', function ()
             'meta' => ['stale' => true, 'machine_status' => 'offline'],
             'error' => null,
         ]);
+});
+
+test('telemetry latest and history can read through the production api', function (): void {
+    config()->set('telemetry.read_url', 'https://portfolio.example/api/telemetry');
+    \Illuminate\Support\Facades\Http::fake([
+        'https://portfolio.example/api/telemetry/latest' => \Illuminate\Support\Facades\Http::response([
+            'status' => 'available',
+            'data' => ['cpu_load' => 17.9, 'cpu_temp' => 53],
+            'meta' => ['machine_status' => 'online'],
+            'error' => null,
+        ]),
+        'https://portfolio.example/api/telemetry/history*' => \Illuminate\Support\Facades\Http::response([
+            'status' => 'available',
+            'data' => ['points' => [['at' => '2026-06-20T14:55:00Z', 'value' => 17.9]]],
+            'meta' => ['metric' => 'cpu_load', 'range' => '1h', 'unit' => '%'],
+            'error' => null,
+        ]),
+    ]);
+
+    $this->getJson('/api/telemetry/latest')
+        ->assertOk()
+        ->assertJsonPath('data.cpu_temp', 53)
+        ->assertJsonPath('meta.machine_status', 'online');
+
+    $this->getJson('/api/telemetry/history?metric=cpu_load&range=1h')
+        ->assertOk()
+        ->assertJsonPath('data.points.0.value', 17.9);
+
+    \Illuminate\Support\Facades\Http::assertSentCount(2);
 });
 
 test('telemetry latest derives stale and offline states from sample age', function (): void {

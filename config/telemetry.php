@@ -2,6 +2,7 @@
 
 return [
     'token' => env('TELEMETRY_TOKEN', ''),
+    'read_url' => env('TELEMETRY_READ_URL', ''),
     'ttl' => (int) env('TELEMETRY_TTL', 180),
     'stale_after' => (int) env('TELEMETRY_STALE_AFTER', 30),
     'offline_after' => (int) env('TELEMETRY_OFFLINE_AFTER', 180),

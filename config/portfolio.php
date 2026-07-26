@@ -25,6 +25,7 @@ return [
     'social' => [
         'github' => env('PORTFOLIO_GITHUB') ?: 'https://github.com/brt9',
         'linkedin' => env('PORTFOLIO_LINKEDIN') ?: 'https://www.linkedin.com/in/pedrofelipebrt9',
+        'whatsapp' => env('PORTFOLIO_WHATSAPP') ?: 'https://wa.me/558498102246',
     ],
     'headline' => 'Transformo processos operacionais em sistemas, integrações e automações que as equipes realmente conseguem usar.',
     'about' => 'Sou desenvolvedor Full Stack e Analista de Implantação, com experiência em Laravel, PHP, JavaScript, PostgreSQL e MySQL. Atuo da análise de regras de negócio à implantação, homologação e suporte, criando aplicações web, APIs, painéis e automações com foco em confiabilidade, rastreabilidade e decisões orientadas por dados.',
@@ -119,21 +120,13 @@ return [
         ],
         [
             'number' => '02',
-            'title' => 'Portfólio resiliente',
-            'context' => 'Uma vitrine profissional não deve desaparecer quando APIs externas ficam indisponíveis.',
-            'action' => 'Separei clientes, normalização, banco, cache e estados de falha para agenda, clima, Steam, Duolingo e GitHub.',
-            'result' => 'A página preserva os últimos dados válidos e informa com clareza quando cada captura ocorreu.',
-            'stack' => ['Laravel', 'Blade', 'PostgreSQL', 'APIs'],
-            'status' => 'Ao vivo',
-        ],
-        [
-            'number' => '03',
             'title' => 'Plataforma de RH e ponto',
             'context' => 'A empresa precisava centralizar jornadas, documentos e acessos de colaboradores.',
             'action' => 'Implementei cálculo de ponto, contracheques em PDF, permissões, testes, implantação e documentação.',
             'result' => 'Fluxo administrativo centralizado, com publicação automatizada e equipe treinada.',
             'stack' => ['Laravel', 'MySQL', 'Blade', 'Bootstrap', 'Nginx'],
             'status' => 'Entregue',
+            'url' => 'https://etsconstrucoes.com/',
         ],
     ],
     'integrations' => [
