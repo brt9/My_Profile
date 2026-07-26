@@ -35,15 +35,17 @@
 
         <div class="profile-detail-grid">
             <article class="panel profile-detail-card">
-                <span class="section-kicker">Formação</span>
-                @foreach ($professional['education'] as $education)
-                    <h3>{{ $education['course'] }}</h3>
-                    <p>{{ $education['institution'] }}<br>{{ $education['period'] }}</p>
-                    @if (!empty($education['diploma_url']))
-                        <a class="diploma-link" href="{{ $education['diploma_url'] }}" target="_blank" rel="noopener noreferrer">
+                <div class="card-head">
+                    <span class="section-kicker">Formação</span>
+                    @if (!empty($professional['education'][0]['diploma_url']))
+                        <a class="button button-secondary diploma-link" href="{{ $professional['education'][0]['diploma_url'] }}" target="_blank" rel="noopener noreferrer">
                             Ver diploma <span aria-hidden="true">↗</span>
                         </a>
                     @endif
+                </div>
+                @foreach ($professional['education'] as $education)
+                    <h3>{{ $education['course'] }}</h3>
+                    <p>{{ $education['institution'] }}<br>{{ $education['period'] }}</p>
                 @endforeach
             </article>
             <article class="panel profile-detail-card">

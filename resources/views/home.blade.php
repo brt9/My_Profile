@@ -25,13 +25,6 @@
                 <div class="hero-body">
                     <p class="hero-lead">{{ $portfolio['headline'] }}</p>
 
-                    <div class="badge-list" aria-label="Tecnologias principais">
-                        <span class="badge">🐘 PHP & Laravel</span>
-                        <span class="badge">⚡ JavaScript</span>
-                        <span class="badge">🧩 APIs & integrações</span>
-                        <span class="badge">📍 {{ $portfolio['location'] }}</span>
-                    </div>
-
                     <div class="hero-actions">
                         <a href="#projetos" class="button button-primary">Explorar projetos <span aria-hidden="true">↓</span></a>
                         <a href="#experiencia" class="button button-secondary">Ver trajetória</a>
