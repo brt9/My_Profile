@@ -39,6 +39,11 @@
                 @foreach ($professional['education'] as $education)
                     <h3>{{ $education['course'] }}</h3>
                     <p>{{ $education['institution'] }}<br>{{ $education['period'] }}</p>
+                    @if (!empty($education['diploma_url']))
+                        <a class="diploma-link" href="{{ $education['diploma_url'] }}" target="_blank" rel="noopener noreferrer">
+                            Ver diploma <span aria-hidden="true">↗</span>
+                        </a>
+                    @endif
                 @endforeach
             </article>
             <article class="panel profile-detail-card">

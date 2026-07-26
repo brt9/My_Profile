@@ -35,7 +35,8 @@ test('professional content is structured around evidence and results', function 
 
     expect($portfolio['projects'][0]['url'])->toBe('https://www.bardoti.xyz')
         ->and($portfolio['projects'][1]['number'])->toBe('02')
-        ->and($portfolio['projects'][1]['url'])->toBe('https://etsconstrucoes.com/');
+        ->and($portfolio['projects'][1]['url'])->toBe('https://etsconstrucoes.com/')
+        ->and($portfolio['education'][0]['diploma_url'])->toContain('media.licdn.com');
 });
 
 test('home presents the professional narrative without removed sections', function () {
@@ -56,6 +57,8 @@ test('home presents the professional narrative without removed sections', functi
         ->assertSee('https://etsconstrucoes.com/', false)
         ->assertSee('Abrir o site Plataforma de RH e ponto', false)
         ->assertDontSee('Portfólio resiliente')
+        ->assertSee('Ver diploma')
+        ->assertSee('media.licdn.com', false)
         ->assertSee('Vivência internacional por 1 ano e 11 meses.')
         ->assertDontSee('Teixeira Construções / ETS')
         ->assertDontSee('Sistemas de gestão, telemetria e integrações resilientes')

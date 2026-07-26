@@ -100,6 +100,7 @@ return [
             'course' => 'Bacharelado em Sistemas de Informação',
             'institution' => 'Universidade Potiguar — UnP',
             'period' => '06/2019 — 06/2023',
+            'diploma_url' => 'https://media.licdn.com/dms/image/v2/D4D2DAQEUUVYdzxnZ8Q/profile-treasury-document-images_1280/profile-treasury-document-images_1280/1/1713376125221?e=1785974400&v=beta&t=J01-SmLZBh7__6c2AxckYKlMMSjasxmDDkN1pcCCqFY',
         ],
     ],
     'languages' => [
