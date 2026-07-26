@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import { registerGlobeBackground } from './globe-background';
 import { registerPwa } from './pwa';
 
 const root = document.documentElement;
@@ -21,6 +22,7 @@ const browserStorage = {
 
 window.Alpine = Alpine;
 registerPwa();
+registerGlobeBackground();
 
 window.loadTelemetryChart = async () => {
     const { default: Chart } = await import('chart.js/auto');

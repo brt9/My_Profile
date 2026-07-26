@@ -38,6 +38,7 @@
 </head>
 
 <body>
+    <canvas class="site-globe-background" data-globe-background aria-hidden="true"></canvas>
     @include('partials.sandbox-warning')
     <a href="#conteudo" class="skip-link">Pular para o conteúdo</a>
 
@@ -57,7 +58,13 @@
                 <a href="/#experiencia" data-nav-section="experiencia">Experiência</a>
                 <a href="/#projetos" data-nav-section="projetos">Projetos</a>
                 <details class="nav-dropdown" data-nav-group="laboratorio">
-                    <summary @class(['is-active' => request()->routeIs('calendar.show', 'steam.show', 'weather.show')])>Laboratório</summary>
+                    <summary
+                        @class(['is-active' => request()->routeIs('calendar.show', 'steam.show', 'weather.show')])
+                        onclick="setTimeout(() => { window.location.href = '/#lab'; }, 0)"
+                    >
+                        Laboratório
+                        <span class="nav-dropdown-chevron" aria-hidden="true">⌄</span>
+                    </summary>
                     <div class="nav-dropdown-panel">
                         <a href="{{ route('calendar.show') }}" @class(['is-active' => request()->routeIs('calendar.show')]) @if(request()->routeIs('calendar.show')) aria-current="page" @endif>
                             <strong>Agenda integrada</strong>
@@ -92,7 +99,7 @@
             <a href="/#experiencia" data-nav-section="experiencia">Experiência</a>
             <a href="/#projetos" data-nav-section="projetos">Projetos</a>
             <div class="mobile-nav-group" data-nav-group="laboratorio">
-                <span>Laboratório</span>
+                <a href="/#lab" class="mobile-nav-group-link" data-nav-section="laboratorio">Laboratório</a>
                 <a href="{{ route('calendar.show') }}" @class(['is-active' => request()->routeIs('calendar.show')]) @if(request()->routeIs('calendar.show')) aria-current="page" @endif>Agenda integrada</a>
                 <a href="{{ route('steam.show') }}" @class(['is-active' => request()->routeIs('steam.show')]) @if(request()->routeIs('steam.show')) aria-current="page" @endif>Steam API</a>
                 <a href="{{ route('weather.show') }}" @class(['is-active' => request()->routeIs('weather.show')]) @if(request()->routeIs('weather.show')) aria-current="page" @endif>Clima em tempo real</a>

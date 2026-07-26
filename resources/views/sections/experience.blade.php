@@ -38,7 +38,7 @@
                 <div class="card-head">
                     <span class="section-kicker">Formação</span>
                     @if (!empty($professional['education'][0]['diploma_url']))
-                        <a class="button button-secondary diploma-link" href="{{ $professional['education'][0]['diploma_url'] }}" target="_blank" rel="noopener noreferrer">
+                        <a class="button button-secondary diploma-link" style="color: var(--accent)" href="{{ $professional['education'][0]['diploma_url'] }}" target="_blank" rel="noopener noreferrer">
                             Ver diploma <span aria-hidden="true">↗</span>
                         </a>
                     @endif

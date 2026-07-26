@@ -60,6 +60,7 @@ html {
 }
 
 body {
+    position: relative;
     margin: 0;
     min-width: 320px;
     overflow-x: hidden;
@@ -71,6 +72,22 @@ body {
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     line-height: 1.6;
     transition: background-color 180ms ease, color 180ms ease;
+}
+
+.site-globe-background {
+    position: fixed;
+    z-index: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+main,
+.site-footer {
+    position: relative;
+    z-index: 1;
 }
 
 a {
@@ -253,6 +270,18 @@ img {
     transition: color 160ms ease;
 }
 
+.nav-dropdown-chevron {
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 0.9em;
+    line-height: 1;
+    transition: transform 160ms ease;
+}
+
+.nav-dropdown[open] .nav-dropdown-chevron {
+    transform: rotate(180deg);
+}
+
 .nav-dropdown summary::-webkit-details-marker {
     display: none;
 }
@@ -386,7 +415,8 @@ img {
     background: var(--surface);
 }
 
-.mobile-nav-group > span {
+.mobile-nav-group > span,
+.mobile-nav-group > .mobile-nav-group-link {
     display: block;
     margin-bottom: 5px;
     color: var(--text);
@@ -397,12 +427,18 @@ img {
     text-transform: uppercase;
 }
 
+.mobile-nav-group > .mobile-nav-group-link {
+    padding: 0;
+    border-left: 0;
+}
+
 .mobile-nav-group a {
     padding: 8px 0 8px 12px;
     border-left: 1px solid var(--border);
 }
 
-.mobile-nav-group.is-active > span {
+.mobile-nav-group.is-active > span,
+.mobile-nav-group.is-active > .mobile-nav-group-link {
     color: var(--accent);
 }
 
@@ -466,10 +502,16 @@ img {
 .hero h1 {
     max-width: 800px;
     margin: 18px 0 0;
-    font-size: clamp(3rem, 7vw, 6.6rem);
+    font-size: clamp(3rem, 6.5vw, 6.1rem);
     font-weight: 850;
     letter-spacing: -0.075em;
     line-height: 0.96;
+}
+
+@media (max-width: 760px) {
+    .site-globe-background {
+        opacity: 0.32;
+    }
 }
 
 .gradient-text {
@@ -607,8 +649,12 @@ img {
 .hero-visual {
     position: relative;
     display: grid;
+    width: 100%;
+    max-width: 460px;
+    min-width: 0;
     grid-area: visual;
     align-self: center;
+    justify-self: center;
     aspect-ratio: 1;
     place-items: center;
 }
@@ -3489,7 +3535,8 @@ body.modal-open {
     }
 
     .hero-visual {
-        width: min(440px, 84vw);
+        width: min(440px, calc(100vw - 40px));
+        max-width: 100%;
         margin-top: 18px;
         margin-inline: auto;
     }

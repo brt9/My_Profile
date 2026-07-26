@@ -26,8 +26,8 @@
                     <p class="hero-lead">{{ $portfolio['headline'] }}</p>
 
                     <div class="hero-actions">
-                        <a href="#projetos" class="button button-primary">Explorar projetos <span aria-hidden="true">↓</span></a>
-                        <a href="#experiencia" class="button button-secondary">Ver trajetória</a>
+                        <a href="#experiencia" class="button button-primary">Ver trajetória <span aria-hidden="true">↓</span></a>
+                        <a href="#projetos" class="button button-secondary">Explorar projetos</a>
                     </div>
                 </div>
             </div>

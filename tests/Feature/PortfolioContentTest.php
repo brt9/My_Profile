@@ -65,6 +65,7 @@ test('home presents the professional narrative without removed sections', functi
         ->assertDontSee('evidence-link', false)
         ->assertDontSee('id="automacoes"', false)
         ->assertDontSee('id="contato"', false)
+        ->assertSee('/#lab', false)
         ->assertSee('https://github.com/brt9', false)
         ->assertSee('https://www.linkedin.com/in/pedrofelipebrt9', false)
         ->assertSee('https://wa.me/558498102246', false);
