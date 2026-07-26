@@ -185,7 +185,7 @@ img {
     color: var(--accent);
 }
 
-.brand-mark {
+.site-brand-icon {
     display: block;
     flex: 0 0 auto;
     width: 34px;
@@ -754,6 +754,14 @@ img {
     background: color-mix(in srgb, var(--surface-soft) 60%, transparent);
 }
 
+.github-section {
+    padding-bottom: clamp(32px, 4vw, 48px);
+}
+
+.projects-section {
+    padding-top: clamp(48px, 5vw, 64px);
+}
+
 .section-header {
     display: flex;
     align-items: end;
@@ -936,7 +944,7 @@ img {
 
 .project-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
 }
 
@@ -3507,10 +3515,6 @@ body.modal-open {
         justify-self: start;
     }
 
-    .project-card:last-child {
-        grid-column: 1 / -1;
-        min-height: 440px;
-    }
 }
 
 @media (max-width: 680px) {

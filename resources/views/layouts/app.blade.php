@@ -44,7 +44,7 @@
     <nav class="site-nav" aria-label="Navegação principal">
         <div class="container-shell nav-inner">
             <a href="/#inicio" class="brand" aria-label="Início">
-                <svg class="brand-mark" viewBox="0 0 34 34" width="34" height="34" aria-hidden="true" focusable="false">
+                <svg class="site-brand-icon" viewBox="0 0 34 34" width="34" height="34" aria-hidden="true" focusable="false">
                     <rect x="4.5" y="5.5" width="25" height="23" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/>
                     <path d="M5.5 11.5h23" fill="none" stroke="currentColor" stroke-width="2"/>
                     <path d="M13 16l-3.5 3 3.5 3M21 16l3.5 3-3.5 3M19 14l-4 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

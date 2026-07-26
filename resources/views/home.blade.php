@@ -53,7 +53,7 @@
     @include('sections.about')
     @include('sections.experience')
 
-    <section id="github" class="section" data-nav-owner="experiencia">
+    <section id="github" class="section github-section" data-nav-owner="experiencia">
         <div class="container-shell">
             <div class="section-header">
                 <div>
