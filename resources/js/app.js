@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs';
 import { registerGlobeBackground } from './globe-background';
 import { registerPwa } from './pwa';
+import { registerSiteIntro } from './site-intro';
 
 const root = document.documentElement;
 const browserStorage = {
@@ -21,8 +22,17 @@ const browserStorage = {
 };
 
 window.Alpine = Alpine;
+const siteIntroActive = registerSiteIntro();
 registerPwa();
-registerGlobeBackground();
+
+const siteBackground = registerGlobeBackground({ autoStart: !siteIntroActive });
+
+if (siteIntroActive) {
+    siteBackground.ready.then(() => {
+        window.dispatchEvent(new CustomEvent('site-background:ready'));
+    });
+    window.addEventListener('site-intro:complete', siteBackground.start, { once: true });
+}
 
 window.loadTelemetryChart = async () => {
     const { default: Chart } = await import('chart.js/auto');

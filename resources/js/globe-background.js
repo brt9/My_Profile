@@ -16,19 +16,49 @@ const cssColor = (name, fallback) => (
     getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback
 );
 
-const createLandDots = (land) => {
-    const dots = [];
-
-    for (let latitude = -84; latitude <= 84; latitude += 3) {
-        for (let longitude = -180; longitude < 180; longitude += 3) {
-            if (geoContains(land, [longitude, latitude])) {
-                dots.push([longitude, latitude]);
-            }
-        }
+const scheduleIdleWork = (callback) => {
+    if ('requestIdleCallback' in window) {
+        return window.requestIdleCallback(callback, { timeout: 900 });
     }
 
-    return dots;
+    return window.setTimeout(() => callback({
+        didTimeout: true,
+        timeRemaining: () => 8,
+    }), 0);
 };
+
+const createLandDots = (land, onSchedule) => new Promise((resolve) => {
+    const dots = [];
+    let latitude = -84;
+
+    const processRows = (deadline) => {
+        let processedRows = 0;
+
+        while (
+            latitude <= 84
+            && processedRows < 4
+            && (deadline.didTimeout || deadline.timeRemaining() > 2)
+        ) {
+            for (let longitude = -180; longitude < 180; longitude += 3) {
+                if (geoContains(land, [longitude, latitude])) {
+                    dots.push([longitude, latitude]);
+                }
+            }
+
+            latitude += 3;
+            processedRows += 1;
+        }
+
+        if (latitude <= 84) {
+            onSchedule(scheduleIdleWork(processRows));
+            return;
+        }
+
+        resolve(dots);
+    };
+
+    onSchedule(scheduleIdleWork(processRows));
+});
 
 const randomMatrixCharacter = () => (
     MATRIX_CHARACTERS[Math.floor(Math.random() * MATRIX_CHARACTERS.length)]
@@ -61,11 +91,16 @@ const createMatrixStrands = (width, height) => {
     return strands;
 };
 
-export const registerGlobeBackground = () => {
+export const registerGlobeBackground = ({ autoStart = true } = {}) => {
     const canvas = document.querySelector('[data-globe-background]');
     const context = canvas?.getContext('2d');
 
-    if (!canvas || !context) return;
+    if (!canvas || !context) {
+        return {
+            ready: Promise.resolve(),
+            start: () => {},
+        };
+    }
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const projection = geoOrthographic().clipAngle(90);
@@ -79,6 +114,10 @@ export const registerGlobeBackground = () => {
     let idleHandle = null;
     let matrixStrands = [];
     let lastMatrixFrame = performance.now();
+    let resolveReady;
+    const ready = new Promise((resolve) => {
+        resolveReady = resolve;
+    });
 
     const resize = () => {
         const width = window.innerWidth;
@@ -226,18 +265,17 @@ export const registerGlobeBackground = () => {
 
     resize();
     render();
-    startRotation();
+    if (autoStart) startRotation();
 
-    const prepareLandDots = () => {
-        landDots = createLandDots(land);
+    const prepareLandDots = async () => {
+        landDots = await createLandDots(land, (handle) => {
+            idleHandle = handle;
+        });
         render();
+        resolveReady();
     };
 
-    if ('requestIdleCallback' in window) {
-        idleHandle = window.requestIdleCallback(prepareLandDots, { timeout: 1200 });
-    } else {
-        idleHandle = window.setTimeout(prepareLandDots, 0);
-    }
+    prepareLandDots();
 
     window.addEventListener('resize', queueResize, { passive: true });
     reducedMotion.addEventListener('change', startRotation);
@@ -250,4 +288,9 @@ export const registerGlobeBackground = () => {
         window.removeEventListener('resize', queueResize);
         reducedMotion.removeEventListener('change', startRotation);
     }, { once: true });
+
+    return {
+        ready,
+        start: startRotation,
+    };
 };

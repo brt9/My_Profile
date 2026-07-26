@@ -38,6 +38,20 @@
 </head>
 
 <body>
+    @if (request()->routeIs('home'))
+        <div class="site-intro" data-site-intro aria-hidden="true">
+            <canvas class="site-intro-canvas" data-site-intro-canvas></canvas>
+            <div class="site-intro-content">
+                <span class="site-intro-kicker">PORTFÓLIO DIGITAL</span>
+                <strong class="site-intro-title" data-site-intro-title>pedrofelipe.dev</strong>
+                <div class="site-intro-progress" aria-hidden="true">
+                    <i data-site-intro-progress></i>
+                </div>
+                <span class="site-intro-status" data-site-intro-status>INICIALIZANDO</span>
+                <span class="site-intro-skip">Clique ou pressione Esc para pular</span>
+            </div>
+        </div>
+    @endif
     <canvas class="site-globe-background" data-globe-background aria-hidden="true"></canvas>
     @include('partials.sandbox-warning')
     <a href="#conteudo" class="skip-link">Pular para o conteúdo</a>
