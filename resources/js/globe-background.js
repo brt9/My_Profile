@@ -18,12 +18,12 @@ const cssColor = (name, fallback) => (
 
 const scheduleIdleWork = (callback) => {
     if ('requestIdleCallback' in window) {
-        return window.requestIdleCallback(callback, { timeout: 900 });
+        return window.requestIdleCallback(callback, { timeout: 90 });
     }
 
     return window.setTimeout(() => callback({
         didTimeout: true,
-        timeRemaining: () => 8,
+        timeRemaining: () => 12,
     }), 0);
 };
 
@@ -36,7 +36,7 @@ const createLandDots = (land, onSchedule) => new Promise((resolve) => {
 
         while (
             latitude <= 84
-            && processedRows < 4
+            && processedRows < 8
             && (deadline.didTimeout || deadline.timeRemaining() > 2)
         ) {
             for (let longitude = -180; longitude < 180; longitude += 3) {
@@ -272,7 +272,9 @@ export const registerGlobeBackground = ({ autoStart = true } = {}) => {
             idleHandle = handle;
         });
         render();
-        resolveReady();
+        window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(resolveReady);
+        });
     };
 
     prepareLandDots();

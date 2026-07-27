@@ -1,23 +1,6 @@
-const INTRO_STORAGE_KEY = 'portfolio-intro-seen';
 const INTRO_TITLE = 'pedrofelipe.dev';
 const SCRAMBLE_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/{}[]#$%&*';
 const RAIN_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+-=[]{}|;:,.<>?/\\';
-
-const storageHasIntro = () => {
-    try {
-        return window.sessionStorage.getItem(INTRO_STORAGE_KEY) === 'true';
-    } catch {
-        return false;
-    }
-};
-
-const rememberIntro = () => {
-    try {
-        window.sessionStorage.setItem(INTRO_STORAGE_KEY, 'true');
-    } catch {
-        // The intro remains functional when session storage is restricted.
-    }
-};
 
 const randomCharacter = (characters) => (
     characters[Math.floor(Math.random() * characters.length)]
@@ -32,11 +15,6 @@ export const registerSiteIntro = () => {
     const context = canvas?.getContext('2d');
 
     if (!intro || !canvas || !title || !context) return false;
-
-    if (storageHasIntro()) {
-        intro.remove();
-        return false;
-    }
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const root = document.documentElement;
@@ -108,7 +86,6 @@ export const registerSiteIntro = () => {
         finished = true;
         if (completionTimer) window.clearTimeout(completionTimer);
         if (readinessTimeout) window.clearTimeout(readinessTimeout);
-        rememberIntro();
         intro.classList.add('is-exiting');
         body.classList.remove('intro-active');
         root.classList.remove('intro-active');
@@ -229,7 +206,7 @@ export const registerSiteIntro = () => {
     readinessTimeout = window.setTimeout(() => {
         backgroundReady = true;
         finishWhenReady();
-    }, 2800);
+    }, 8000);
     startScramble();
 
     intro.addEventListener('click', finish, { once: true });

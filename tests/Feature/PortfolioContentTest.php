@@ -100,3 +100,15 @@ test('home sections follow the defined visual order', function () {
     expect($positions)->not->toContain(false)
         ->and($positions)->toBe(collect($positions)->sort()->values()->all());
 });
+
+test('intro waits for the mobile background first paint on every page opening', function () {
+    $intro = file_get_contents(resource_path('js/site-intro.js'));
+    $background = file_get_contents(resource_path('js/globe-background.js'));
+
+    expect($intro)
+        ->not->toContain('sessionStorage')
+        ->and($intro)->toContain('}, 8000);')
+        ->and($background)->toContain('timeout: 90')
+        ->and($background)->toContain('processedRows < 8')
+        ->and($background)->toContain('window.requestAnimationFrame(resolveReady)');
+});
