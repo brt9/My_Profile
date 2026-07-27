@@ -32,14 +32,6 @@
                 </div>
             </div>
 
-            <div class="stats-grid" aria-label="Resumo profissional">
-                @foreach ($portfolio['stats'] as $stat)
-                    <div class="stat">
-                        <strong>{{ $stat['value'] }}</strong>
-                        <span>{{ $stat['label'] }}</span>
-                    </div>
-                @endforeach
-            </div>
         </div>
     </header>
 

@@ -31,12 +31,6 @@ return [
     'about' => 'Sou desenvolvedor Full Stack e Analista de Implantação, com experiência em Laravel, PHP, JavaScript, PostgreSQL e MySQL. Atuo da análise de regras de negócio à implantação, homologação e suporte, criando aplicações web, APIs, painéis e automações com foco em confiabilidade, rastreabilidade e decisões orientadas por dados.',
     'profile_source' => 'linkedin_pdf',
     'profile_updated_at' => '2026-06-21',
-    'stats' => [
-        ['value' => '10+ anos', 'label' => 'Experiência operacional'],
-        ['value' => 'Laravel', 'label' => 'Stack principal'],
-        ['value' => '3', 'label' => 'Experiências em destaque'],
-        ['value' => 'Natal/RN', 'label' => 'Brasil'],
-    ],
     'competencies' => [
         [
             'title' => 'Backend',
@@ -108,6 +102,68 @@ return [
         ['name' => 'Inglês', 'level' => 'Profissional'],
     ],
     'language_note' => 'Vivência internacional por 1 ano e 11 meses.',
+    'hardware' => [
+        [
+            'label' => 'Processador',
+            'value' => 'Intel Core i5-14600K',
+            'image' => 'images/setup/processor.webp',
+        ],
+        [
+            'label' => 'Placa-mãe',
+            'value' => 'ASUS ROG Strix B760-F Wi-Fi',
+            'image' => 'images/setup/motherboard.jpg',
+        ],
+        [
+            'label' => 'Placa de vídeo',
+            'value' => 'ASUS Dual RTX 4060 Ti 8GB',
+            'image' => 'images/setup/gpu.jpg',
+        ],
+        [
+            'label' => 'Memória',
+            'value' => 'Corsair Dominator 64GB DDR5-6200',
+            'image' => 'images/setup/memory.jpg',
+        ],
+        [
+            'label' => 'Armazenamento',
+            'value' => 'Kingston NV2 1TB NVMe',
+            'image' => 'images/setup/ssd.jpg',
+        ],
+        [
+            'label' => 'Refrigeração',
+            'value' => 'Corsair iCUE LINK H100i LCD',
+            'image' => 'images/setup/water-cooler.jpg',
+        ],
+        [
+            'label' => 'Fonte',
+            'value' => 'Corsair RM850e 850W',
+            'image' => 'images/setup/power-supply.jpg',
+        ],
+        [
+            'label' => 'Gabinete',
+            'value' => 'Corsair iCUE 4000X RGB',
+            'image' => 'images/setup/case.jpg',
+        ],
+        [
+            'label' => 'Teclado',
+            'value' => 'Logitech G915 X Lightspeed',
+            'image' => 'images/setup/keyboard.jpg',
+        ],
+        [
+            'label' => 'Mouse',
+            'value' => 'Logitech G Pro X Superlight 2',
+            'image' => 'images/setup/mouse.jpg',
+        ],
+        [
+            'label' => 'Headset',
+            'value' => 'HyperX Cloud III Wireless',
+            'image' => 'images/setup/headset.jpg',
+        ],
+        [
+            'label' => 'Microfone',
+            'value' => 'HyperX QuadCast S',
+            'image' => 'images/setup/microphone.jpg',
+        ],
+    ],
     'projects' => [
         [
             'number' => '01',
@@ -118,6 +174,7 @@ return [
             'stack' => ['Laravel', 'PHP', 'JavaScript', 'MySQL', 'PWA'],
             'status' => 'Em uso',
             'url' => 'https://www.bardoti.xyz',
+            'image' => 'images/projects/bardoti-warehouse.jpg',
         ],
         [
             'number' => '02',
@@ -128,6 +185,7 @@ return [
             'stack' => ['Laravel', 'MySQL', 'Blade', 'Bootstrap', 'Nginx'],
             'status' => 'Entregue',
             'url' => 'https://etsconstrucoes.com/',
+            'image' => 'images/projects/time-tracking.jpg',
         ],
     ],
     'integrations' => [

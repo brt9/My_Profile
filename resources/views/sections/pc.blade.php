@@ -8,26 +8,27 @@
             <p>Uma demonstração prática de Laravel recebendo métricas autenticadas do Windows, armazenando histórico no MySQL e tratando sensores indisponíveis sem inventar valores.</p>
         </div>
 
-        @php
-            $parts = [
-                ['label' => 'Processador', 'value' => 'Intel Core i5-14600K'],
-                ['label' => 'Placa de vídeo', 'value' => 'RTX 4060 Ti 8GB'],
-                ['label' => 'Memória', 'value' => '64GB DDR5-6200'],
-                ['label' => 'Armazenamento', 'value' => 'NVMe Kingston 1TB'],
-                ['label' => 'Refrigeração', 'value' => 'Corsair H100i LCD'],
-                ['label' => 'Sistema', 'value' => 'Windows + Docker'],
-            ];
-        @endphp
-
         <div class="lab-grid">
             <article class="panel setup-panel">
                 <h3>Ambiente de desenvolvimento</h3>
                 <p>Máquina usada para desenvolver e testar aplicações Laravel com Docker, MySQL, filas, tarefas agendadas e front-end Vite.</p>
                 <div class="setup-summary">
-                    @foreach ($parts as $part)
+                    @foreach ($portfolio['hardware'] as $part)
                         <div class="setup-part">
-                            <small>{{ $part['label'] }}</small>
-                            <strong>{{ $part['value'] }}</strong>
+                            <span class="setup-part-media">
+                                <img
+                                    src="{{ asset($part['image']) }}"
+                                    alt="Foto de {{ $part['value'] }}"
+                                    width="200"
+                                    height="200"
+                                    loading="lazy"
+                                    decoding="async"
+                                >
+                            </span>
+                            <span class="setup-part-copy">
+                                <small>{{ $part['label'] }}</small>
+                                <strong>{{ $part['value'] }}</strong>
+                            </span>
                         </div>
                     @endforeach
                 </div>
@@ -43,8 +44,21 @@
                     <div>
                         <span class="card-kicker">Laravel API · MySQL</span>
                         <h3>Saúde da estação em tempo real</h3>
+                        <p class="telemetry-copy">Leituras de CPU, GPU, memória e disco armazenadas para consulta do histórico.</p>
                     </div>
-                    <span class="live-status" :class="`is-${status}`" x-text="statusLabel()"></span>
+                    <div class="telemetry-head-actions">
+                        <button
+                            type="button"
+                            class="telemetry-uptime"
+                            :disabled="!supported(uptimeMetric.key)"
+                            :aria-label="supported(uptimeMetric.key) ? 'Abrir histórico do tempo ligado' : 'Tempo ligado indisponível'"
+                            @click="openHistory(uptimeMetric)"
+                        >
+                            <small>Tempo ligado</small>
+                            <strong x-text="metricValue(uptimeMetric)">—</strong>
+                        </button>
+                        <span class="live-status" :class="`is-${status}`" x-text="statusLabel()"></span>
+                    </div>
                 </div>
 
                 <div class="metric-grid telemetry-metric-grid">
@@ -63,7 +77,7 @@
                     </template>
                 </div>
 
-                <p class="integration-note" aria-live="polite" x-text="message"></p>
+                <p class="integration-note telemetry-updated-at" aria-live="polite" x-text="message"></p>
 
                 <div
                     class="telemetry-modal-backdrop"
@@ -150,6 +164,7 @@
                 chart: null,
                 previousFocus: null,
                 ranges: ['1h', '6h', '12h', '24h'],
+                uptimeMetric: { key: 'uptime_seconds', label: 'Tempo ligado', suffix: 's', digits: 0 },
                 metrics: [
                     { key: 'cpu_load', label: 'Uso da CPU', suffix: '%', digits: 1 },
                     { key: 'cpu_temp', label: 'Temperatura da CPU', suffix: '°C', digits: 1 },
@@ -157,7 +172,6 @@
                     { key: 'gpu_temp', label: 'Temperatura da GPU', suffix: '°C', digits: 1 },
                     { key: 'memory_usage', label: 'Memória', suffix: '%', digits: 1 },
                     { key: 'disk_usage', label: 'Disco principal', suffix: '%', digits: 1 },
-                    { key: 'uptime_seconds', label: 'Tempo ligado', suffix: 's', digits: 0 },
                 ],
                 history: {
                     open: false,

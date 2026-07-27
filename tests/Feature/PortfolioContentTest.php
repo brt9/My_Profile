@@ -9,6 +9,7 @@ test('professional content is structured around evidence and results', function 
         ->and($portfolio['competencies'])->toHaveCount(6)
         ->and($portfolio['current_roles'])->toHaveCount(2)
         ->and($portfolio['current_roles'][1]['role'])->toBe('Desenvolvedor Full Stack Freelancer')
+        ->and($portfolio['hardware'])->toHaveCount(12)
         ->and($portfolio['projects'])->toHaveCount(2)
         ->and($portfolio['experience'])->toHaveCount(3)
         ->and($portfolio['language_note'])->toBe('Vivência internacional por 1 ano e 11 meses.')
@@ -24,6 +25,12 @@ test('professional content is structured around evidence and results', function 
 
     expect($portfolio['competencies'][0]['items'])->toHaveCount(7)
         ->and($portfolio['competencies'][1]['items'])->toHaveCount(7);
+
+    foreach ($portfolio['hardware'] as $part) {
+        expect($part)
+            ->toHaveKeys(['label', 'value', 'image'])
+            ->and(public_path($part['image']))->toBeFile();
+    }
 
     foreach ($portfolio['projects'] as $project) {
         expect($project)
@@ -52,6 +59,11 @@ test('home presents the professional narrative without removed sections', functi
         ->assertSee('O que faz')
         ->assertSee('technology-badge', false)
         ->assertSee('technology-logo', false)
+        ->assertSee('Foto de Intel Core i5-14600K', false)
+        ->assertSee('Foto de Logitech G915 X Lightspeed', false)
+        ->assertSee('Foto de Logitech G Pro X Superlight 2', false)
+        ->assertSee('Foto de HyperX QuadCast S', false)
+        ->assertDontSee('Ver produto', false)
         ->assertSee('https://www.bardoti.xyz', false)
         ->assertSee('Abrir o site BardoTI', false)
         ->assertSee('https://etsconstrucoes.com/', false)
