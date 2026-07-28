@@ -59,3 +59,26 @@ test('primary navigation links to the dedicated integration pages', function () 
         ->assertDontSee('>Agenda</a>', false)
         ->assertDontSee('/#agenda', false);
 });
+
+test('mobile navigation keeps fixed geometry while sections change', function () {
+    $styles = file_get_contents(resource_path('css/app.css'));
+    $scripts = file_get_contents(resource_path('js/app.js'));
+
+    expect($styles)
+        ->toContain('grid-template-columns: repeat(4, minmax(0, 1fr));')
+        ->and($styles)->toContain('height: 70px;')
+        ->and($styles)->toContain('height: 54px;')
+        ->and($styles)->toContain('overflow-x: clip;')
+        ->and($styles)->toContain('width: min(calc(100% - 20px), 520px);')
+        ->and($styles)->toContain('width: min(310px, calc(400% - 28px));')
+        ->and($styles)->toContain('contain: size layout;')
+        ->and($styles)->toContain('transform: translate3d(-50%, 0, 0);')
+        ->and($styles)->toContain('top: calc(100dvh - 80px - env(safe-area-inset-bottom, 0px));')
+        ->and($styles)->not->toContain('--mobile-viewport-bottom-offset')
+        ->and($scripts)->not->toContain('visualViewport')
+        ->and($scripts)->toContain('lockedNavigationSection')
+        ->and($scripts)->toContain('laboratorySection.scrollIntoView')
+        ->and($scripts)->toContain("window.history.replaceState(null, '', '#lab')")
+        ->and($scripts)->toContain("window.addEventListener('scrollend', unlockNavigationSection")
+        ->and($scripts)->toContain("mobileLabMenu?.removeAttribute('open')");
+});

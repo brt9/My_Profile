@@ -74,7 +74,8 @@
                 <details class="nav-dropdown" data-nav-group="laboratorio">
                     <summary
                         @class(['is-active' => request()->routeIs('calendar.show', 'steam.show', 'weather.show')])
-                        onclick="setTimeout(() => { window.location.href = '/#lab'; }, 0)"
+                        data-lab-trigger
+                        data-lab-url="/#lab"
                     >
                         Laboratório
                         <span class="nav-dropdown-chevron" aria-hidden="true"></span>
@@ -137,7 +138,8 @@
                 <summary
                     @class(['mobile-bottom-item', 'is-active' => request()->routeIs('calendar.show', 'steam.show', 'weather.show')])
                     data-nav-section="laboratorio"
-                    onclick="setTimeout(() => { window.location.href = '/#lab'; }, 0)"
+                    data-lab-trigger
+                    data-lab-url="/#lab"
                 >
                     <svg class="mobile-bottom-icon" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M9 3.5h6M10 3.5v5L5.4 17a2.3 2.3 0 0 0 2 3.5h9.2a2.3 2.3 0 0 0 2-3.5L14 8.5v-5"></path>
@@ -148,7 +150,7 @@
                 <div class="mobile-lab-panel">
                     <strong>Laboratório</strong>
                     <span>Integrações e páginas próprias</span>
-                    <a href="/#lab">Hardware monitorado</a>
+                    <a href="/#lab" data-lab-trigger data-lab-url="/#lab">Hardware monitorado</a>
                     <a href="{{ route('calendar.show') }}" @class(['is-active' => request()->routeIs('calendar.show')]) @if(request()->routeIs('calendar.show')) aria-current="page" @endif>Agenda integrada</a>
                     <a href="{{ route('steam.show') }}" @class(['is-active' => request()->routeIs('steam.show')]) @if(request()->routeIs('steam.show')) aria-current="page" @endif>Steam API</a>
                     <a href="{{ route('weather.show') }}" @class(['is-active' => request()->routeIs('weather.show')]) @if(request()->routeIs('weather.show')) aria-current="page" @endif>Clima em tempo real</a>

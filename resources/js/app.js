@@ -43,34 +43,6 @@ const themeButton = document.querySelector('[data-theme-toggle]');
 const mobileLabMenu = document.querySelector('[data-mobile-lab-menu]');
 const mobileBottomNav = document.querySelector('.mobile-bottom-nav');
 
-let mobileViewportUpdateQueued = false;
-const updateMobileViewportOffset = () => {
-    mobileViewportUpdateQueued = false;
-    if (!mobileBottomNav) return;
-
-    const viewport = window.visualViewport;
-    const hiddenViewportHeight = viewport
-        ? Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
-        : 0;
-
-    mobileBottomNav.style.setProperty(
-        '--mobile-viewport-bottom-offset',
-        `${Math.round(hiddenViewportHeight)}px`,
-    );
-};
-
-const queueMobileViewportUpdate = () => {
-    if (mobileViewportUpdateQueued) return;
-    mobileViewportUpdateQueued = true;
-    window.requestAnimationFrame(updateMobileViewportOffset);
-};
-
-window.visualViewport?.addEventListener('resize', queueMobileViewportUpdate);
-window.visualViewport?.addEventListener('scroll', queueMobileViewportUpdate, { passive: true });
-window.addEventListener('resize', queueMobileViewportUpdate);
-window.addEventListener('orientationchange', queueMobileViewportUpdate);
-queueMobileViewportUpdate();
-
 const applyTheme = (theme) => {
     root.classList.toggle('dark', theme === 'dark');
     root.dataset.theme = theme;
@@ -97,6 +69,9 @@ document.addEventListener('keydown', (event) => {
 
 const sectionNavLinks = [...document.querySelectorAll('[data-nav-section]')];
 const trackedSections = [...document.querySelectorAll('[data-nav-owner]')];
+const laboratoryTriggers = [...document.querySelectorAll('[data-lab-trigger]')];
+let lockedNavigationSection = null;
+let navigationUnlockTimer = null;
 
 const setActiveSection = (sectionId) => {
     sectionNavLinks.forEach((link) => {
@@ -113,10 +88,69 @@ const setActiveSection = (sectionId) => {
     });
 };
 
+const unlockNavigationSection = () => {
+    if (!lockedNavigationSection) return;
+    lockedNavigationSection = null;
+    window.clearTimeout(navigationUnlockTimer);
+    navigationUnlockTimer = null;
+    window.dispatchEvent(new Event('scroll'));
+};
+
+const lockNavigationSection = (sectionId) => {
+    lockedNavigationSection = sectionId;
+    window.clearTimeout(navigationUnlockTimer);
+    navigationUnlockTimer = window.setTimeout(unlockNavigationSection, 1800);
+};
+
+laboratoryTriggers.forEach((trigger) => {
+    trigger.addEventListener('click', (event) => {
+        const laboratorySection = document.querySelector('#lab');
+
+        if (!laboratorySection) {
+            window.location.assign(trigger.dataset.labUrl ?? '/#lab');
+            return;
+        }
+
+        if (trigger instanceof HTMLAnchorElement) {
+            event.preventDefault();
+        }
+
+        lockNavigationSection('laboratorio');
+        setActiveSection('laboratorio');
+        laboratorySection.scrollIntoView({
+            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+            block: 'start',
+        });
+        window.history.replaceState(null, '', '#lab');
+    });
+});
+
+sectionNavLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+        lockNavigationSection(link.dataset.navSection);
+        setActiveSection(link.dataset.navSection);
+
+        if (!mobileLabMenu?.contains(link)) {
+            mobileLabMenu?.removeAttribute('open');
+        }
+    });
+});
+
+mobileBottomNav?.querySelectorAll(':scope > a').forEach((link) => {
+    link.addEventListener('click', () => mobileLabMenu?.removeAttribute('open'), { capture: true });
+});
+
+window.addEventListener('scrollend', unlockNavigationSection, { passive: true });
+
 if (trackedSections.length > 0) {
     let sectionUpdateQueued = false;
     const updateActiveSection = () => {
         sectionUpdateQueued = false;
+        if (lockedNavigationSection) {
+            setActiveSection(lockedNavigationSection);
+            return;
+        }
+
         const navOffset = document.querySelector('.site-nav')?.getBoundingClientRect().height ?? 72;
         const marker = navOffset + 28;
         const activeSection = trackedSections.find((section) => {
