@@ -40,8 +40,36 @@ window.loadTelemetryChart = async () => {
     return Chart;
 };
 const themeButton = document.querySelector('[data-theme-toggle]');
-const menuButton = document.querySelector('[data-menu-toggle]');
-const mobileMenu = document.querySelector('[data-mobile-menu]');
+const mobileLabMenu = document.querySelector('[data-mobile-lab-menu]');
+const mobileBottomNav = document.querySelector('.mobile-bottom-nav');
+
+let mobileViewportUpdateQueued = false;
+const updateMobileViewportOffset = () => {
+    mobileViewportUpdateQueued = false;
+    if (!mobileBottomNav) return;
+
+    const viewport = window.visualViewport;
+    const hiddenViewportHeight = viewport
+        ? Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
+        : 0;
+
+    mobileBottomNav.style.setProperty(
+        '--mobile-viewport-bottom-offset',
+        `${Math.round(hiddenViewportHeight)}px`,
+    );
+};
+
+const queueMobileViewportUpdate = () => {
+    if (mobileViewportUpdateQueued) return;
+    mobileViewportUpdateQueued = true;
+    window.requestAnimationFrame(updateMobileViewportOffset);
+};
+
+window.visualViewport?.addEventListener('resize', queueMobileViewportUpdate);
+window.visualViewport?.addEventListener('scroll', queueMobileViewportUpdate, { passive: true });
+window.addEventListener('resize', queueMobileViewportUpdate);
+window.addEventListener('orientationchange', queueMobileViewportUpdate);
+queueMobileViewportUpdate();
 
 const applyTheme = (theme) => {
     root.classList.toggle('dark', theme === 'dark');
@@ -57,18 +85,15 @@ themeButton?.addEventListener('click', () => {
     applyTheme(nextTheme);
 });
 
-const closeMenu = () => {
-    mobileMenu?.setAttribute('hidden', '');
-    menuButton?.setAttribute('aria-expanded', 'false');
-};
-
-menuButton?.addEventListener('click', () => {
-    const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
-    menuButton.setAttribute('aria-expanded', String(!isOpen));
-    mobileMenu?.toggleAttribute('hidden', isOpen);
+document.addEventListener('click', (event) => {
+    if (mobileLabMenu?.open && !mobileLabMenu.contains(event.target)) {
+        mobileLabMenu.removeAttribute('open');
+    }
 });
 
-mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') mobileLabMenu?.removeAttribute('open');
+});
 
 const sectionNavLinks = [...document.querySelectorAll('[data-nav-section]')];
 const trackedSections = [...document.querySelectorAll('[data-nav-owner]')];

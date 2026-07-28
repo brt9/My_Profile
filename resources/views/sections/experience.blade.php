@@ -9,7 +9,6 @@
         </div>
 
         @if (($professional['source'] ?? 'portfolio') === 'linkedin_pdf')
-            <p class="content-source">Conteúdo profissional revisado a partir do perfil PDF do LinkedIn em {{ $professional['updated_at']?->format('d/m/Y') }}.</p>
         @endif
 
         <div class="panel">

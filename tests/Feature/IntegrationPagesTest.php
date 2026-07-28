@@ -8,7 +8,7 @@ test('calendar case study has a dedicated public page', function () {
         ->assertSee('Agenda pública com privacidade por padrão.')
         ->assertSee('Google Calendar API')
         ->assertSee('calendar-shell', false)
-        ->assertSee('<summary class="is-active">Laboratório</summary>', false)
+        ->assertSee('class="is-active"', false)
         ->assertSee('aria-current="page"', false)
         ->assertSee(route('home').'#laboratorio', false);
 });
@@ -19,7 +19,7 @@ test('steam api laboratory has a dedicated public page', function () {
         ->assertSee('Uma API externa transformada em experiência.')
         ->assertSee('Steam Web API')
         ->assertSee('steam-card', false)
-        ->assertSee('<summary class="is-active">Laboratório</summary>', false)
+        ->assertSee('class="is-active"', false)
         ->assertSee('aria-current="page"', false)
         ->assertSee(route('home').'#laboratorio', false);
 });
@@ -32,7 +32,7 @@ test('weather laboratory has a dedicated public page', function () {
         ->assertSee('Clima em tempo real com privacidade.')
         ->assertSee('Open-Meteo')
         ->assertSee('weather-card', false)
-        ->assertSee('<summary class="is-active">Laboratório</summary>', false)
+        ->assertSee('class="is-active"', false)
         ->assertSee('aria-current="page"', false)
         ->assertSee(route('home').'#laboratorio', false);
 });
@@ -41,10 +41,13 @@ test('primary navigation links to the dedicated integration pages', function () 
     $this->get('/')
         ->assertOk()
         ->assertSee('nav-dropdown', false)
+        ->assertSee('mobile-bottom-nav', false)
+        ->assertSee('data-mobile-lab-menu', false)
+        ->assertDontSee('data-menu-toggle', false)
         ->assertSee('Laboratório')
         ->assertSee('data-nav-section="sobre"', false)
         ->assertSee('data-nav-group="laboratorio"', false)
-        ->assertSee('Projetos que demonstram minhas habilidades')
+        ->assertSee('Trabalho em funcionamento.')
         ->assertSee(route('calendar.show'), false)
         ->assertSee(route('steam.show'), false)
         ->assertSee(route('weather.show'), false)

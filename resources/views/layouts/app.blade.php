@@ -77,7 +77,7 @@
                         onclick="setTimeout(() => { window.location.href = '/#lab'; }, 0)"
                     >
                         Laboratório
-                        <span class="nav-dropdown-chevron" aria-hidden="true">⌄</span>
+                        <span class="nav-dropdown-chevron" aria-hidden="true"></span>
                     </summary>
                     <div class="nav-dropdown-panel">
                         <a href="{{ route('calendar.show') }}" @class(['is-active' => request()->routeIs('calendar.show')]) @if(request()->routeIs('calendar.show')) aria-current="page" @endif>
@@ -101,25 +101,60 @@
                     <span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span>
                     <span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span>
                 </button>
-                <button type="button" class="icon-button menu-toggle" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu">
-                    <span class="sr-only">Abrir menu</span>
-                    <span aria-hidden="true">☰</span>
-                </button>
-            </div>
-        </div>
-
-        <div id="mobile-menu" class="mobile-menu container-shell" data-mobile-menu data-section-navigation hidden>
-            <a href="/#sobre" data-nav-section="sobre">Sobre</a>
-            <a href="/#experiencia" data-nav-section="experiencia">Experiência</a>
-            <a href="/#projetos" data-nav-section="projetos">Projetos</a>
-            <div class="mobile-nav-group" data-nav-group="laboratorio">
-                <a href="/#lab" class="mobile-nav-group-link" data-nav-section="laboratorio">Laboratório</a>
-                <a href="{{ route('calendar.show') }}" @class(['is-active' => request()->routeIs('calendar.show')]) @if(request()->routeIs('calendar.show')) aria-current="page" @endif>Agenda integrada</a>
-                <a href="{{ route('steam.show') }}" @class(['is-active' => request()->routeIs('steam.show')]) @if(request()->routeIs('steam.show')) aria-current="page" @endif>Steam API</a>
-                <a href="{{ route('weather.show') }}" @class(['is-active' => request()->routeIs('weather.show')]) @if(request()->routeIs('weather.show')) aria-current="page" @endif>Clima em tempo real</a>
             </div>
         </div>
     </nav>
+
+    <div class="mobile-bottom-nav" data-section-navigation role="navigation" aria-label="Navegação móvel">
+            <a href="/#sobre" class="mobile-bottom-item" data-nav-section="sobre">
+                <svg class="mobile-bottom-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="8" r="3.5"></circle>
+                    <path d="M5.5 19c.7-3.4 3-5.2 6.5-5.2s5.8 1.8 6.5 5.2"></path>
+                </svg>
+                <span>Sobre</span>
+            </a>
+            <a href="/#experiencia" class="mobile-bottom-item" data-nav-section="experiencia">
+                <svg class="mobile-bottom-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3.5" y="7" width="17" height="12" rx="2"></rect>
+                    <path d="M8.5 7V5.5h7V7M3.5 12.5h17M10 12.5v1h4v-1"></path>
+                </svg>
+                <span>Experiência</span>
+            </a>
+            <a href="/#projetos" class="mobile-bottom-item" data-nav-section="projetos">
+                <svg class="mobile-bottom-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="4" y="4" width="6" height="6" rx="1"></rect>
+                    <rect x="14" y="4" width="6" height="6" rx="1"></rect>
+                    <rect x="4" y="14" width="6" height="6" rx="1"></rect>
+                    <rect x="14" y="14" width="6" height="6" rx="1"></rect>
+                </svg>
+                <span>Projetos</span>
+            </a>
+            <details
+                class="mobile-bottom-lab"
+                data-nav-group="laboratorio"
+                data-mobile-lab-menu
+            >
+                <summary
+                    @class(['mobile-bottom-item', 'is-active' => request()->routeIs('calendar.show', 'steam.show', 'weather.show')])
+                    data-nav-section="laboratorio"
+                    onclick="setTimeout(() => { window.location.href = '/#lab'; }, 0)"
+                >
+                    <svg class="mobile-bottom-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M9 3.5h6M10 3.5v5L5.4 17a2.3 2.3 0 0 0 2 3.5h9.2a2.3 2.3 0 0 0 2-3.5L14 8.5v-5"></path>
+                        <path d="M7.6 15h8.8"></path>
+                    </svg>
+                    <span>Laboratório</span>
+                </summary>
+                <div class="mobile-lab-panel">
+                    <strong>Laboratório</strong>
+                    <span>Integrações e páginas próprias</span>
+                    <a href="/#lab">Hardware monitorado</a>
+                    <a href="{{ route('calendar.show') }}" @class(['is-active' => request()->routeIs('calendar.show')]) @if(request()->routeIs('calendar.show')) aria-current="page" @endif>Agenda integrada</a>
+                    <a href="{{ route('steam.show') }}" @class(['is-active' => request()->routeIs('steam.show')]) @if(request()->routeIs('steam.show')) aria-current="page" @endif>Steam API</a>
+                    <a href="{{ route('weather.show') }}" @class(['is-active' => request()->routeIs('weather.show')]) @if(request()->routeIs('weather.show')) aria-current="page" @endif>Clima em tempo real</a>
+                </div>
+            </details>
+    </div>
 
     <main id="conteudo">
         @yield('content')
