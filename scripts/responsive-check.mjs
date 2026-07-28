@@ -84,7 +84,7 @@ for (const [width, height] of sizes) {
     if (navigation.errorText) throw new Error(`Falha ao abrir ${url}: ${navigation.errorText}`);
     for (let attempt = 0; attempt < 40; attempt += 1) {
         const ready = await command('Runtime.evaluate', {
-            expression: "document.readyState === 'complete' && Boolean(document.querySelector('[data-menu-toggle]'))",
+            expression: "document.readyState === 'complete' && Boolean(document.querySelector('.mobile-bottom-nav'))",
             returnByValue: true,
         });
         if (ready.result.value === true) break;
@@ -93,7 +93,18 @@ for (const [width, height] of sizes) {
 
     const { result } = await command('Runtime.evaluate', {
         expression: `(() => {
-            const menu = document.querySelector('[data-menu-toggle]');
+            const menu = document.querySelector('.mobile-bottom-nav');
+            const menuStyle = menu ? getComputedStyle(menu) : null;
+            const initialScrollY = window.scrollY;
+            const initialMenuRect = menu?.getBoundingClientRect();
+            window.scrollTo(0, Math.min(900, document.documentElement.scrollHeight - window.innerHeight));
+            const scrolledMenuRect = menu?.getBoundingClientRect();
+            const labMenu = document.querySelector('[data-mobile-lab-menu]');
+            const labWasOpen = labMenu?.open ?? false;
+            if (labMenu) labMenu.open = true;
+            const openMenuRect = menu?.getBoundingClientRect();
+            if (labMenu) labMenu.open = labWasOpen;
+            window.scrollTo(0, initialScrollY);
             const footer = document.querySelector('.site-footer');
             const footerLinks = [...document.querySelectorAll('.footer-links a, .footer-meta a')];
             const overflowElements = [...document.querySelectorAll('body *')]
@@ -120,6 +131,23 @@ for (const [width, height] of sizes) {
                 hasHorizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
                 sections: document.querySelectorAll('main section').length,
                 menuButtonVisible: menu ? getComputedStyle(menu).display !== 'none' : null,
+                mobileNavAnchoredToBottom: menuStyle
+                    ? menuStyle.position === 'fixed'
+                        && menuStyle.bottom !== 'auto'
+                    : false,
+                mobileNavStable: initialMenuRect && scrolledMenuRect && openMenuRect
+                    ? Math.abs(initialMenuRect.bottom - scrolledMenuRect.bottom) <= 1
+                        && Math.abs(initialMenuRect.left - scrolledMenuRect.left) <= 1
+                        && Math.abs(initialMenuRect.width - openMenuRect.width) <= 1
+                        && Math.abs(initialMenuRect.bottom - openMenuRect.bottom) <= 1
+                    : false,
+                mobileNavPosition: menuStyle
+                    ? {
+                        position: menuStyle.position,
+                        top: menuStyle.top,
+                        bottom: menuStyle.bottom,
+                    }
+                    : null,
                 footerCentered: footer ? getComputedStyle(footer).textAlign === 'center' : false,
                 footerTouchTargets: footerLinks.every(link => link.getBoundingClientRect().height >= 44),
                 unsafeFooterLinks: footerLinks.filter(link => link.target === '_blank' && !link.rel.includes('noopener')).length,
@@ -134,6 +162,8 @@ for (const [width, height] of sizes) {
     const valid = !report.hasHorizontalOverflow
         && report.sections >= 6
         && report.menuButtonVisible === expectedMenu
+        && (!expectedMenu || report.mobileNavAnchoredToBottom)
+        && (!expectedMenu || report.mobileNavStable)
         && report.footerCentered
         && report.footerTouchTargets
         && report.unsafeFooterLinks === 0;

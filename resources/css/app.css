@@ -3901,10 +3901,9 @@ body.modal-open {
     .mobile-bottom-nav {
         position: fixed;
         z-index: 80;
-        top: calc(100vh - 80px - env(safe-area-inset-bottom, 0px));
-        top: calc(100dvh - 80px - env(safe-area-inset-bottom, 0px));
+        top: auto;
         right: auto;
-        bottom: auto;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
         left: 50%;
         display: grid;
         width: min(calc(100% - 20px), 520px);
@@ -3921,7 +3920,6 @@ body.modal-open {
         backface-visibility: hidden;
         contain: layout style;
         transform: translate3d(-50%, 0, 0);
-        will-change: transform;
         -webkit-tap-highlight-color: transparent;
     }
 
