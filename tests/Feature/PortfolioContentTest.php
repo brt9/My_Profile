@@ -9,7 +9,7 @@ test('professional content is structured around evidence and results', function 
         ->and($portfolio['competencies'])->toHaveCount(6)
         ->and($portfolio['current_roles'])->toHaveCount(2)
         ->and($portfolio['current_roles'][1]['role'])->toBe('Desenvolvedor Full Stack Freelancer')
-        ->and($portfolio['hardware'])->toHaveCount(12)
+        ->and($portfolio['hardware'])->toHaveCount(14)
         ->and($portfolio['projects'])->toHaveCount(2)
         ->and($portfolio['experience'])->toHaveCount(3)
         ->and($portfolio['language_note'])->toBe('Vivência internacional por 1 ano e 11 meses.')
@@ -24,7 +24,8 @@ test('professional content is structured around evidence and results', function 
     }
 
     expect($portfolio['competencies'][0]['items'])->toHaveCount(7)
-        ->and($portfolio['competencies'][1]['items'])->toHaveCount(7);
+        ->and($portfolio['competencies'][1]['items'])->toHaveCount(7)
+        ->and($portfolio['hardware'][3]['value'])->toBe('Corsair Dominator 4×16GB · 64GB DDR5-6200');
 
     foreach ($portfolio['hardware'] as $part) {
         expect($part)
@@ -62,6 +63,9 @@ test('home presents the professional narrative without removed sections', functi
         ->assertSee('Foto de Intel Core i5-14600K', false)
         ->assertSee('Foto de Logitech G915 X Lightspeed', false)
         ->assertSee('Foto de Logitech G Pro X Superlight 2', false)
+        ->assertSee('Monitores · 2 unidades', false)
+        ->assertSee('Foto de Dell P2419H 24″', false)
+        ->assertSee('Foto de Logitech Brio 500', false)
         ->assertSee('Foto de HyperX QuadCast S', false)
         ->assertDontSee('Ver produto', false)
         ->assertSee('https://www.bardoti.xyz', false)

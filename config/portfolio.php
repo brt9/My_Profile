@@ -120,7 +120,7 @@ return [
         ],
         [
             'label' => 'Memória',
-            'value' => 'Corsair Dominator 64GB DDR5-6200',
+            'value' => 'Corsair Dominator 4×16GB · 64GB DDR5-6200',
             'image' => 'images/setup/memory.jpg',
         ],
         [
@@ -142,6 +142,16 @@ return [
             'label' => 'Gabinete',
             'value' => 'Corsair iCUE 4000X RGB',
             'image' => 'images/setup/case.jpg',
+        ],
+        [
+            'label' => 'Monitores · 2 unidades',
+            'value' => 'Dell P2419H 24″',
+            'image' => 'images/setup/monitor.jpg',
+        ],
+        [
+            'label' => 'Webcam',
+            'value' => 'Logitech Brio 500',
+            'image' => 'images/setup/webcam.jpg',
         ],
         [
             'label' => 'Teclado',

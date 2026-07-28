@@ -47,21 +47,22 @@
                         <p class="telemetry-copy">Leituras de CPU, GPU, memória e disco armazenadas para consulta do histórico.</p>
                     </div>
                     <div class="telemetry-head-actions">
-                        <button
-                            type="button"
-                            class="telemetry-uptime"
-                            :disabled="!supported(uptimeMetric.key)"
-                            :aria-label="supported(uptimeMetric.key) ? 'Abrir histórico do tempo ligado' : 'Tempo ligado indisponível'"
-                            @click="openHistory(uptimeMetric)"
-                        >
-                            <small>Tempo ligado</small>
-                            <strong x-text="metricValue(uptimeMetric)">—</strong>
-                        </button>
                         <span class="live-status" :class="`is-${status}`" x-text="statusLabel()"></span>
                     </div>
                 </div>
 
                 <div class="metric-grid telemetry-metric-grid">
+                    <button
+                        type="button"
+                        class="metric metric-button telemetry-uptime"
+                        :disabled="!supported(uptimeMetric.key)"
+                        :aria-label="supported(uptimeMetric.key) ? 'Abrir histórico do tempo ligado' : 'Tempo ligado indisponível'"
+                        @click="openHistory(uptimeMetric)"
+                    >
+                        <small>Tempo ligado</small>
+                        <strong x-text="metricValue(uptimeMetric)" :class="metricClass(uptimeMetric.key)">—</strong>
+                        <span class="metric-action" x-show="supported(uptimeMetric.key) && status !== 'loading'">Abrir histórico ↗</span>
+                    </button>
                     <template x-for="metric in metrics" :key="metric.key">
                         <button
                             type="button"
