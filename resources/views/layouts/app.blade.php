@@ -204,16 +204,16 @@
         aria-describedby="cookie-consent-description"
     >
         <div class="cookie-consent-copy">
-            <span class="cookie-consent-kicker">Sua privacidade</span>
-            <h2 id="cookie-consent-title">Você controla sua localização.</h2>
+            <span class="cookie-consent-kicker">Preferências de privacidade</span>
+            <h2 id="cookie-consent-title">Escolha como deseja navegar.</h2>
             <p id="cookie-consent-description">
-                Este site usa cookies essenciais para funcionar. Com sua autorização, também usa a localização do navegador para incluir sua região aproximada no mapa de visitantes. O mapa não armazena coordenadas exatas nem associa seu IP ao registro.
+                Usamos cookies essenciais para o funcionamento do site. Com sua permissão, recursos opcionais também podem usar sua localização aproximada para gerar estatísticas anônimas de acesso. Nenhuma coordenada exata é armazenada.
             </p>
             <p class="cookie-consent-status" data-cookie-consent-status aria-live="polite"></p>
         </div>
         <div class="cookie-consent-actions">
-            <button type="button" class="button button-secondary" data-cookie-essential>Somente necessários</button>
-            <button type="button" class="button button-primary" data-cookie-location>Compartilhar minha região</button>
+            <button type="button" class="button button-secondary" data-cookie-essential>Aceitar apenas os necessários</button>
+            <button type="button" class="button button-primary" data-cookie-location>Aceitar todos os cookies</button>
             <button type="button" class="cookie-consent-close" data-cookie-consent-close hidden aria-label="Fechar preferências">Fechar</button>
         </div>
     </aside>

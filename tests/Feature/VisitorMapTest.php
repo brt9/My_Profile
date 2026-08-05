@@ -6,8 +6,10 @@ test('home presents privacy choices and the anonymous visitor map', function () 
     $this->get('/')
         ->assertOk()
         ->assertSee('data-cookie-consent', false)
-        ->assertSee('Somente necessários')
-        ->assertSee('Compartilhar minha região')
+        ->assertSee('Preferências de privacidade')
+        ->assertSee('Escolha como deseja navegar.')
+        ->assertSee('Aceitar apenas os necessários')
+        ->assertSee('Aceitar todos os cookies')
         ->assertSee('data-visitor-map', false)
         ->assertSee('De onde este portfólio é acessado.');
 });
