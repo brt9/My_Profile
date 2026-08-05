@@ -461,12 +461,19 @@ body.intro-active {
         bottom: 86px;
         left: 12px;
         grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) auto;
         gap: 18px;
         width: calc(100% - 24px);
         max-height: calc(100vh - 104px);
-        overflow-y: auto;
+        max-height: calc(100dvh - 104px);
+        overflow: hidden;
         padding: 20px;
         border-radius: 20px;
+    }
+
+    .cookie-consent-copy {
+        min-height: 0;
+        overflow-y: auto;
     }
 
     .cookie-consent-actions {

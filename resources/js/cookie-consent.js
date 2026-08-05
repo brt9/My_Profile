@@ -67,27 +67,27 @@ export const registerCookieConsent = () => {
     const chooseEssential = async () => {
         const previouslyShared = readCookie(CONSENT_COOKIE) === LOCATION_CONSENT;
         writeConsent(ESSENTIAL_CONSENT);
-        essentialButton.disabled = true;
-        if (previouslyShared) await removeVisitor();
-        essentialButton.disabled = false;
         if (mapStatus) mapStatus.textContent = 'Sua região não está incluída. Você pode alterar essa escolha quando quiser.';
         hide();
+        if (previouslyShared) await removeVisitor();
     };
 
     const shareLocation = () => {
         if (!navigator.geolocation) {
             writeConsent(ESSENTIAL_CONSENT);
-            setStatus('Seu navegador não oferece geolocalização. Somente os cookies necessários serão usados.');
+            if (mapStatus) mapStatus.textContent = 'Preferências salvas. Somente os cookies necessários serão usados.';
+            hide();
             return;
         }
 
+        writeConsent(LOCATION_CONSENT);
         locationButton.disabled = true;
         essentialButton.disabled = true;
         setStatus('Aguardando a permissão de localização do navegador…');
+        hide();
 
         navigator.geolocation.getCurrentPosition(async ({ coords }) => {
             try {
-                writeConsent(LOCATION_CONSENT);
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     credentials: 'same-origin',
