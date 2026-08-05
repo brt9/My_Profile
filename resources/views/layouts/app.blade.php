@@ -188,11 +188,36 @@
 
             <div class="footer-meta">
                 <p>© <span data-current-year>{{ date('Y') }}</span> {{ $profile['name'] }}.</p>
+                <button type="button" class="footer-privacy-button" data-cookie-settings-open>Privacidade e cookies</button>
             </div>
         </div>
     </footer>
 
     @yield('modals')
+
+    <aside
+        class="cookie-consent"
+        data-cookie-consent
+        data-visitor-map-endpoint="{{ route('visitors.map.index') }}"
+        hidden
+        aria-labelledby="cookie-consent-title"
+        aria-describedby="cookie-consent-description"
+    >
+        <div class="cookie-consent-copy">
+            <span class="cookie-consent-kicker">Sua privacidade</span>
+            <h2 id="cookie-consent-title">Você controla sua localização.</h2>
+            <p id="cookie-consent-description">
+                Este site usa cookies essenciais para funcionar. Com sua autorização, também usa a localização do navegador para incluir sua região aproximada no mapa de visitantes. O mapa não armazena coordenadas exatas nem associa seu IP ao registro.
+            </p>
+            <p class="cookie-consent-status" data-cookie-consent-status aria-live="polite"></p>
+        </div>
+        <div class="cookie-consent-actions">
+            <button type="button" class="button button-secondary" data-cookie-essential>Somente necessários</button>
+            <button type="button" class="button button-primary" data-cookie-location>Compartilhar minha região</button>
+            <button type="button" class="cookie-consent-close" data-cookie-consent-close hidden aria-label="Fechar preferências">Fechar</button>
+        </div>
+    </aside>
+
     @stack('scripts')
 </body>
 

@@ -1,7 +1,9 @@
 import Alpine from 'alpinejs';
+import { registerCookieConsent } from './cookie-consent';
 import { registerGlobeBackground } from './globe-background';
 import { registerPwa } from './pwa';
 import { registerSiteIntro } from './site-intro';
+import { registerVisitorMap } from './visitor-map';
 
 const root = document.documentElement;
 const browserStorage = {
@@ -24,6 +26,8 @@ const browserStorage = {
 window.Alpine = Alpine;
 const siteIntroActive = registerSiteIntro();
 registerPwa();
+registerVisitorMap();
+registerCookieConsent();
 
 const siteBackground = registerGlobeBackground({ autoStart: !siteIntroActive });
 

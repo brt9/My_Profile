@@ -57,6 +57,8 @@
 
     @include('sections.pc')
 
+    @include('sections.visitor-map')
+
     @if ($duolingo)
         @include('sections.duolingo')
     @endif
