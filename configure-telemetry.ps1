@@ -9,8 +9,8 @@ if (-not (Test-Path $envPath)) {
     throw '.env não encontrado. Execute a configuração do Laravel primeiro.'
 }
 
-if (-not (Test-Path (Join-Path $agentDirectory 'PC-Telemetry-Agent.exe'))) {
-    throw 'PC-Telemetry-Agent.exe não encontrado. Compile o agente primeiro.'
+if (-not (Test-Path (Join-Path $agentDirectory 'PC-Telemetry-Agent.dll'))) {
+    throw 'PC-Telemetry-Agent.dll não encontrado. Compile o agente primeiro.'
 }
 
 $utf8 = New-Object System.Text.UTF8Encoding($false)
@@ -34,11 +34,13 @@ if ([string]::IsNullOrWhiteSpace($appUrl)) {
 }
 
 $localEndpoint = "$appUrl/api/telemetry/push"
-$endpoints = if (@($configuredEndpoints).Count -gt 0) {
-    @($configuredEndpoints) | Select-Object -Unique
-} else {
-    @($localEndpoint)
-}
+$endpoints = @(
+    if (@($configuredEndpoints).Count -gt 0) {
+        @($configuredEndpoints) | Select-Object -Unique
+    } else {
+        $localEndpoint
+    }
+)
 
 if (-not [string]::IsNullOrWhiteSpace($processToken)) {
     $token = $processToken
@@ -84,4 +86,4 @@ $configuration | ConvertTo-Json | Set-Content $agentConfig -Encoding utf8
 php artisan config:clear | Out-Null
 
 Write-Host 'Telemetria configurada com token privado.' -ForegroundColor Green
-Write-Host "Execute: $agentDirectory\PC-Telemetry-Agent.exe"
+Write-Host 'Execute: start-telemetry-agent.cmd'

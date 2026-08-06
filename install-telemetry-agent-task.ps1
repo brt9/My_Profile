@@ -3,11 +3,16 @@ Set-Location $PSScriptRoot
 
 $taskName = 'MyProfile PC Telemetry'
 $agentDirectory = Join-Path $PSScriptRoot 'dist\telemetry-agent'
-$agent = Join-Path $agentDirectory 'PC-Telemetry-Agent.exe'
+$dotnet = Join-Path $PSScriptRoot '.tools\dotnet\dotnet.exe'
+$agent = Join-Path $agentDirectory 'PC-Telemetry-Agent.dll'
 $configuration = Join-Path $agentDirectory 'telemetry-agent.json'
 
+if (-not (Test-Path -LiteralPath $dotnet)) {
+    throw "Host .NET não encontrado: $dotnet"
+}
+
 if (-not (Test-Path -LiteralPath $agent)) {
-    throw "Executavel nao encontrado: $agent"
+    throw "Agente nao encontrado: $agent"
 }
 
 if (-not (Test-Path -LiteralPath $configuration)) {
@@ -15,10 +20,8 @@ if (-not (Test-Path -LiteralPath $configuration)) {
 }
 
 $user = [Security.Principal.WindowsIdentity]::GetCurrent().Name
-$powershell = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
-$escapedAgent = $agent.Replace("'", "''")
-$arguments = "-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -Command `"& '$escapedAgent'`""
-$action = New-ScheduledTaskAction -Execute $powershell -Argument $arguments -WorkingDirectory $agentDirectory
+$arguments = "`"$agent`" --config `"$configuration`""
+$action = New-ScheduledTaskAction -Execute $dotnet -Argument $arguments -WorkingDirectory $agentDirectory
 $trigger = New-ScheduledTaskTrigger -AtLogOn -User $user
 $principal = New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive -RunLevel Highest
 $settings = New-ScheduledTaskSettingsSet `
@@ -38,7 +41,9 @@ Register-ScheduledTask `
     -Description 'Envia telemetria local do PC para o MyProfile.' `
     -Force | Out-Null
 
-Get-Process -Name 'PC-Telemetry-Agent' -ErrorAction SilentlyContinue | Stop-Process -Force
+Get-CimInstance Win32_Process -Filter "Name = 'dotnet.exe'" |
+    Where-Object { $_.CommandLine -like '*PC-Telemetry-Agent.dll*' } |
+    ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
 Start-ScheduledTask -TaskName $taskName
 Start-Sleep -Seconds 2
 

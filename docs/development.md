@@ -63,10 +63,10 @@ Nunca copie valores reais para `.env.example`, documentação, logs ou issues.
 1. Execute `configure-telemetry.cmd` para gerar e alinhar o token.
 2. Instale PawnIO quando a Integridade de memória do Windows estiver ativa.
 3. Execute `install-telemetry-agent-task.cmd` uma vez para iniciar no login e reiniciar em caso de falha.
-4. Use `start-telemetry-agent.cmd` somente para execução manual e `PC-Telemetry-Agent.exe --list-sensors` para diagnóstico.
+4. Use `start-telemetry-agent.cmd` somente para execução manual e `.\.tools\dotnet\dotnet.exe .\dist\telemetry-agent\PC-Telemetry-Agent.dll --list-sensors` para diagnóstico em um terminal elevado.
 5. Em produção, mantenha `php artisan schedule:work` supervisionado.
 
-O executável gerado fica em `dist/telemetry-agent` e não é versionado. Para recompilar, instale o SDK local e execute `build-telemetry-agent.ps1`.
+O agente gerado fica em `dist/telemetry-agent` e não é versionado. Para recompilar, instale o SDK local e execute `build-telemetry-agent.ps1`.
 
 ## MySQL e Docker
 

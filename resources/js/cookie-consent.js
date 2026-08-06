@@ -86,11 +86,17 @@ export const registerCookieConsent = () => {
         setStatus('Aguardando a permissão de localização do navegador…');
         hide();
 
-        navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+        const finishRequest = () => {
+            locationButton.disabled = false;
+            essentialButton.disabled = false;
+        };
+
+        const recordLocation = async ({ coords }) => {
             try {
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     credentials: 'same-origin',
+                    keepalive: true,
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
@@ -107,23 +113,44 @@ export const registerCookieConsent = () => {
                 window.dispatchEvent(new CustomEvent('visitor-map:reload'));
                 hide();
             } catch {
-                writeConsent(ESSENTIAL_CONSENT);
-                setStatus('Não foi possível adicionar sua região agora. Nenhuma localização foi armazenada.');
+                const message = 'Sua permissão foi salva, mas não foi possível atualizar o mapa agora. Tente novamente nas preferências.';
+                setStatus(message);
+                if (mapStatus) mapStatus.textContent = message;
             } finally {
-                locationButton.disabled = false;
-                essentialButton.disabled = false;
+                finishRequest();
             }
-        }, (error) => {
-            writeConsent(ESSENTIAL_CONSENT);
+        };
+
+        const handleLocationError = (error) => {
+            if (error.code === 1) writeConsent(ESSENTIAL_CONSENT);
+
             const messages = {
                 1: 'Permissão negada. Sua localização não será compartilhada.',
-                2: 'Localização indisponível. Nenhuma localização foi armazenada.',
-                3: 'O pedido de localização expirou. Nenhuma localização foi armazenada.',
+                2: 'Sua permissão foi salva, mas a localização está indisponível. Tente novamente nas preferências.',
+                3: 'Sua permissão foi salva, mas a localização demorou para responder. Tente novamente nas preferências.',
             };
-            setStatus(messages[error.code] ?? 'Não foi possível obter sua localização.');
-            locationButton.disabled = false;
-            essentialButton.disabled = false;
-        }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
+            const message = messages[error.code] ?? 'Não foi possível obter sua localização.';
+            setStatus(message);
+            if (mapStatus) mapStatus.textContent = message;
+            finishRequest();
+        };
+
+        navigator.geolocation.getCurrentPosition(
+            recordLocation,
+            (error) => {
+                if (error.code === 2 || error.code === 3) {
+                    navigator.geolocation.getCurrentPosition(
+                        recordLocation,
+                        handleLocationError,
+                        { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 },
+                    );
+                    return;
+                }
+
+                handleLocationError(error);
+            },
+            { enableHighAccuracy: false, timeout: 30000, maximumAge: 0 },
+        );
     };
 
     essentialButton.addEventListener('click', chooseEssential);

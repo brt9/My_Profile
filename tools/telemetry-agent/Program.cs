@@ -12,7 +12,7 @@ namespace PcTelemetryAgent;
 
 internal static class Program
 {
-    internal const string Version = "1.3.1";
+    internal const string Version = "1.3.2";
 
     public static async Task<int> Main(string[] args)
     {
@@ -202,6 +202,11 @@ internal static class Program
             Verb = "runas",
             WorkingDirectory = AppContext.BaseDirectory,
         };
+
+        if (Path.GetFileNameWithoutExtension(executable).Equals("dotnet", StringComparison.OrdinalIgnoreCase))
+        {
+            startInfo.ArgumentList.Add(typeof(Program).Assembly.Location);
+        }
 
         foreach (var argument in args)
         {

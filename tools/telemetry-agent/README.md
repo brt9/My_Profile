@@ -18,13 +18,13 @@ O agente não envia hostname, usuário, IP ou identificadores de hardware. O `ag
 3. Execute `build-telemetry-agent.ps1` após alterações no agente.
 4. Execute `install-telemetry-agent-task.cmd` uma vez. A tarefa inicia o agente com privilégios elevados no login e o reinicia se houver falha.
 
-O executável publicado fica em `dist/telemetry-agent/PC-Telemetry-Agent.exe`. Para uma execução manual use `start-telemetry-agent.cmd` e mantenha a janela aberta.
+O agente publicado fica em `dist/telemetry-agent/PC-Telemetry-Agent.dll` e é executado pelo host oficial assinado do .NET. Para uma execução manual use `start-telemetry-agent.cmd` e mantenha a janela aberta.
 
 ## Diagnóstico
 
 ```powershell
-PC-Telemetry-Agent.exe --once
-PC-Telemetry-Agent.exe --list-sensors
+.\.tools\dotnet\dotnet.exe .\dist\telemetry-agent\PC-Telemetry-Agent.dll --once
+.\.tools\dotnet\dotnet.exe .\dist\telemetry-agent\PC-Telemetry-Agent.dll --list-sensors
 Get-ScheduledTask -TaskName "MyProfile PC Telemetry"
 Invoke-RestMethod http://127.0.0.1:8085/api/telemetry/latest
 ```
