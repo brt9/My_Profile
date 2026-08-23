@@ -252,6 +252,68 @@ body.intro-active {
     min-height: 470px;
 }
 
+.visitor-map-legend {
+    position: absolute;
+    z-index: 2;
+    bottom: 18px;
+    left: 18px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 11px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    color: var(--muted);
+    font-size: 0.68rem;
+    line-height: 1;
+    pointer-events: none;
+    backdrop-filter: blur(10px);
+}
+
+.visitor-map-legend-bubble {
+    display: grid;
+    width: 23px;
+    height: 23px;
+    border: 2px solid var(--surface-soft);
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--surface);
+    font-size: 0.64rem;
+    font-weight: 800;
+    place-items: center;
+}
+
+.visitor-map-tooltip {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    max-width: 210px;
+    padding: 9px 12px;
+    border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border));
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--surface) 95%, transparent);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.24);
+    color: var(--text);
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.35;
+    pointer-events: none;
+    text-align: center;
+    transform: translate(-50%, calc(-100% - 14px));
+    width: max-content;
+    backdrop-filter: blur(12px);
+}
+
+.visitor-map-tooltip[hidden] {
+    display: none;
+}
+
+.visitor-map-tooltip[data-placement="below"] {
+    transform: translate(-50%, 14px);
+}
+
 .visitor-map-loading {
     position: absolute;
     inset: 0;
@@ -447,6 +509,13 @@ body.intro-active {
         min-height: 300px;
     }
 
+    .visitor-map-legend {
+        right: 14px;
+        bottom: 14px;
+        left: 14px;
+        justify-content: center;
+    }
+
     .visitor-map-details {
         gap: 22px;
         padding: 24px;
@@ -567,6 +636,41 @@ img {
 
 .skip-link:focus {
     transform: translateY(0);
+}
+
+.whatsapp-float {
+    position: fixed;
+    z-index: 90;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    display: inline-flex;
+    width: 60px;
+    height: 60px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #25d366;
+    box-shadow: 0 12px 30px rgba(37, 211, 102, 0.28);
+    color: #fff;
+    text-decoration: none;
+    transition: background-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.whatsapp-float:hover {
+    background: #1fb95a;
+    color: #fff;
+    box-shadow: 0 15px 34px rgba(37, 211, 102, 0.36);
+    transform: translateY(-2px);
+}
+
+.whatsapp-float:active {
+    transform: translateY(0);
+}
+
+.whatsapp-float svg {
+    display: block;
+    width: 36px;
+    height: 36px;
 }
 
 .site-nav {
@@ -4164,6 +4268,18 @@ body.modal-open {
 
     body {
         padding-bottom: calc(84px + env(safe-area-inset-bottom));
+    }
+
+    .whatsapp-float {
+        right: 0.85rem;
+        bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+        width: 54px;
+        height: 54px;
+    }
+
+    .whatsapp-float svg {
+        width: 32px;
+        height: 32px;
     }
 
     .mobile-bottom-nav {

@@ -97,8 +97,12 @@ for (const [width, height] of sizes) {
             const menuStyle = menu ? getComputedStyle(menu) : null;
             const initialScrollY = window.scrollY;
             const initialMenuRect = menu?.getBoundingClientRect();
+            const whatsapp = document.querySelector('.whatsapp-float');
+            const whatsappStyle = whatsapp ? getComputedStyle(whatsapp) : null;
+            const initialWhatsappRect = whatsapp?.getBoundingClientRect();
             window.scrollTo(0, Math.min(900, document.documentElement.scrollHeight - window.innerHeight));
             const scrolledMenuRect = menu?.getBoundingClientRect();
+            const scrolledWhatsappRect = whatsapp?.getBoundingClientRect();
             const labMenu = document.querySelector('[data-mobile-lab-menu]');
             const labWasOpen = labMenu?.open ?? false;
             if (labMenu) labMenu.open = true;
@@ -148,6 +152,32 @@ for (const [width, height] of sizes) {
                         bottom: menuStyle.bottom,
                     }
                     : null,
+                whatsappVisible: whatsappStyle ? whatsappStyle.display !== 'none' : false,
+                whatsappFixed: whatsappStyle?.position === 'fixed',
+                whatsappStable: initialWhatsappRect && scrolledWhatsappRect
+                    ? Math.abs(initialWhatsappRect.right - scrolledWhatsappRect.right) <= 1
+                        && Math.abs(initialWhatsappRect.bottom - scrolledWhatsappRect.bottom) <= 1
+                    : false,
+                whatsappInViewport: initialWhatsappRect
+                    ? initialWhatsappRect.top >= 0
+                        && initialWhatsappRect.right <= window.innerWidth
+                        && initialWhatsappRect.bottom <= window.innerHeight
+                    : false,
+                whatsappSize: initialWhatsappRect
+                    ? {
+                        width: Math.round(initialWhatsappRect.width),
+                        height: Math.round(initialWhatsappRect.height),
+                    }
+                    : null,
+                whatsappClearsMobileNav: !initialMenuRect || !initialWhatsappRect
+                    ? !initialMenuRect && Boolean(initialWhatsappRect)
+                    : initialWhatsappRect.bottom < initialMenuRect.top,
+                whatsappSafeLink: whatsapp
+                    ? whatsapp.target === '_blank'
+                        && whatsapp.rel.includes('noopener')
+                        && whatsapp.href.startsWith('https://wa.me/')
+                        && Boolean(whatsapp.getAttribute('aria-label'))
+                    : false,
                 footerCentered: footer ? getComputedStyle(footer).textAlign === 'center' : false,
                 footerTouchTargets: footerLinks.every(link => link.getBoundingClientRect().height >= 44),
                 unsafeFooterLinks: footerLinks.filter(link => link.target === '_blank' && !link.rel.includes('noopener')).length,
@@ -159,11 +189,20 @@ for (const [width, height] of sizes) {
 
     const report = result.value;
     const expectedMenu = width <= 900;
+    const expectedWhatsappSize = expectedMenu ? 54 : 60;
     const valid = !report.hasHorizontalOverflow
         && report.sections >= 6
         && report.menuButtonVisible === expectedMenu
         && (!expectedMenu || report.mobileNavAnchoredToBottom)
         && (!expectedMenu || report.mobileNavStable)
+        && report.whatsappVisible
+        && report.whatsappFixed
+        && report.whatsappStable
+        && report.whatsappInViewport
+        && report.whatsappSize?.width === expectedWhatsappSize
+        && report.whatsappSize?.height === expectedWhatsappSize
+        && (!expectedMenu || report.whatsappClearsMobileNav)
+        && report.whatsappSafeLink
         && report.footerCentered
         && report.footerTouchTargets
         && report.unsafeFooterLinks === 0;

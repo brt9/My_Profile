@@ -86,7 +86,11 @@ test('home presents the professional narrative without removed sections', functi
         ->assertSee('/#lab', false)
         ->assertSee('https://github.com/brt9', false)
         ->assertSee('https://www.linkedin.com/in/pedrofelipebrt9', false)
-        ->assertSee('https://wa.me/558498102246', false);
+        ->assertSee('https://wa.me/558498102246', false)
+        ->assertSee('class="whatsapp-float"', false)
+        ->assertSee('aria-label="Falar com Pedro Felipe pelo WhatsApp"', false)
+        ->assertSee('target="_blank"', false)
+        ->assertSee('rel="noopener noreferrer"', false);
 
     $this->get('/')
         ->assertDontSee('Estudos de caso')

@@ -11,6 +11,7 @@ test('home presents privacy choices and the anonymous visitor map', function () 
         ->assertSee('Aceitar apenas os necessários')
         ->assertSee('Aceitar todos os cookies')
         ->assertSee('data-visitor-map', false)
+        ->assertSee('número de visitantes agrupados')
         ->assertSee('De onde este portfólio é acessado.');
 });
 

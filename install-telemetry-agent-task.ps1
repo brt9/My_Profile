@@ -19,11 +19,10 @@ if (-not (Test-Path -LiteralPath $configuration)) {
     throw 'Configuracao nao encontrada. Execute configure-telemetry.cmd primeiro.'
 }
 
-$user = [Security.Principal.WindowsIdentity]::GetCurrent().Name
 $arguments = "`"$agent`" --config `"$configuration`""
 $action = New-ScheduledTaskAction -Execute $dotnet -Argument $arguments -WorkingDirectory $agentDirectory
-$trigger = New-ScheduledTaskTrigger -AtLogOn -User $user
-$principal = New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive -RunLevel Highest
+$trigger = New-ScheduledTaskTrigger -AtStartup
+$principal = New-ScheduledTaskPrincipal -UserId 'SYSTEM' -LogonType ServiceAccount -RunLevel Highest
 $settings = New-ScheduledTaskSettingsSet `
     -AllowStartIfOnBatteries `
     -DontStopIfGoingOnBatteries `

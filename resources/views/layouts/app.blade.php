@@ -193,6 +193,19 @@
         </div>
     </footer>
 
+    @if ($profile['social']['whatsapp'] ?? null)
+        <a
+            class="whatsapp-float"
+            href="{{ $profile['social']['whatsapp'] }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Falar com {{ $profile['name'] }} pelo WhatsApp"
+            title="Falar pelo WhatsApp"
+        >
+            <x-icons.whatsapp />
+        </a>
+    @endif
+
     @yield('modals')
 
     <aside

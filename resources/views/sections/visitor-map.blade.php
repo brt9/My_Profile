@@ -21,6 +21,11 @@
                     role="img"
                     aria-label="Mapa-múndi com as regiões aproximadas dos visitantes"
                 ></canvas>
+                <div class="visitor-map-legend" aria-hidden="true">
+                    <span class="visitor-map-legend-bubble">8</span>
+                    <span>número de visitantes agrupados</span>
+                </div>
+                <div class="visitor-map-tooltip" data-visitor-map-tooltip hidden></div>
                 <div class="visitor-map-loading" data-visitor-map-loading>Carregando o mapa…</div>
             </div>
 
