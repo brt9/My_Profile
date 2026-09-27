@@ -196,6 +196,12 @@
                                     <div>
                                         <strong>{{ $event['title'] }}</strong>
                                         <span>{{ \Carbon\CarbonImmutable::parse($event['starts_at'])->format('d/m H:i') }} · {{ ucfirst($event['category']) }}</span>
+                                        <span>{{ match ($event['sync_status']) {
+                                            'synced' => 'Sincronizado com o Google',
+                                            'pending' => 'Aguardando sincronização com o Google',
+                                            'error' => 'Falha ao enviar ao Google. Edite e salve para tentar novamente.',
+                                            default => 'Salvo apenas nesta agenda',
+                                        } }}</span>
                                     </div>
                                     <div class="calendar-item-actions">
                                         <button class="text-button" type="button" data-calendar-edit>Editar</button>
@@ -210,8 +216,11 @@
                 <div class="admin-integration-actions" aria-label="Administração do Google Agenda">
                     @if (!$calendar['configured'])
                         <span>Google opcional: configure o cliente OAuth no <code>.env</code> para ativar a sincronização.</span>
-                    @elseif (!$calendar['connected'] || $calendar['status'] === 'reauth_required')
-                        <span>O Google Agenda será conectado automaticamente no próximo login do administrador.</span>
+                    @elseif (!$calendar['connected'] || $calendar['status'] !== 'connected')
+                        <span>Conecte o Google para enviar os compromissos salvos apenas nesta agenda.</span>
+                        <a class="button button-secondary" href="{{ route('calendar.connect') }}">{{ $calendar['connected'] ? 'Reconectar Google Agenda' : 'Conectar Google Agenda' }}</a>
+                    @elseif (!$calendar['write_enabled'])
+                        <span>A conexão com o Google está em modo de leitura. Novos compromissos são salvos apenas nesta agenda.</span>
                     @else
                         <span>Sincronização automática ativa.</span>
                         <form method="POST" action="{{ route('calendar.revoke') }}">@csrf @method('DELETE')<button class="text-button" type="submit">Revogar acesso</button></form>

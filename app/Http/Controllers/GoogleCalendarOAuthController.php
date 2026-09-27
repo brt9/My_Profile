@@ -54,7 +54,7 @@ final class GoogleCalendarOAuthController extends Controller
             ],
         );
 
-        SyncGoogleCalendar::dispatch($connection->getKey());
+        SyncGoogleCalendar::dispatch($connection->getKey())->afterResponse();
 
         return redirect()->route('calendar.show')->with('calendar_status', 'Google Agenda conectado. A primeira sincronização foi iniciada.');
     }

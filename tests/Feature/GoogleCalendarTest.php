@@ -5,6 +5,7 @@ use App\Models\CalendarPublicEvent;
 use App\Models\GoogleCalendarConnection;
 use App\Models\User;
 use App\Services\Calendar\CalendarDashboard;
+use App\Services\Calendar\CalendarEventManager;
 use App\Services\Calendar\CalendarEventProjector;
 use App\Services\Calendar\CalendarSyncService;
 use Carbon\CarbonImmutable;
@@ -338,4 +339,84 @@ test('calendar interface offers weekly gantt and monthly calendar without catego
         ->assertDontSee('calendar-manager', false);
 
     CarbonImmutable::setTestNow();
+});
+
+test('reconnecting recovers local appointments without a queue worker and respects read only mode', function (bool $writeEnabled) {
+    $admin = User::factory()->create(['email' => 'admin@example.com']);
+    $other = User::factory()->create();
+    config()->set('portfolio.admin_email', $admin->email);
+    config()->set('services.google_calendar.write_enabled', $writeEnabled);
+    config()->set('queue.default', 'database');
+    $connection = GoogleCalendarConnection::query()->create([
+        'user_id' => $admin->id,
+        'refresh_token' => 'expired-refresh',
+        'calendar_ids' => ['primary'],
+        'status' => 'reauth_required',
+    ]);
+    $manager = app(CalendarEventManager::class);
+    $data = [
+        'title' => 'Salvo durante a desconex?o',
+        'category' => 'reuniao',
+        'starts_at' => now()->addDay()->format('Y-m-d\TH:i'),
+        'ends_at' => now()->addDay()->addHour()->format('Y-m-d\TH:i'),
+    ];
+    $event = $manager->create($admin, $data);
+    $cancelled = $manager->create($admin, $data);
+    $manager->cancel($cancelled);
+    $otherEvent = $manager->create($other, $data);
+    expect($event->sync_status)->toBe('local_only');
+
+    Http::preventStrayRequests();
+    Http::fake([
+        'oauth2.googleapis.com/token' => Http::response([
+            'access_token' => 'new-access',
+            'refresh_token' => 'new-refresh',
+            'scope' => 'https://www.googleapis.com/auth/calendar.events',
+        ]),
+        'www.googleapis.com/calendar/v3/calendars/primary/events*' => Http::response([
+            'id' => 'recovered-event',
+            'items' => [],
+        ]),
+    ]);
+
+    $this->actingAs($admin)
+        ->withSession(['google_calendar_oauth_state' => 'reconnect-state'])
+        ->get(route('calendar.callback', ['state' => 'reconnect-state', 'code' => 'new-code']))
+        ->assertRedirect(route('calendar.show'));
+
+    expect($event->fresh()->sync_status)->toBe($writeEnabled ? 'synced' : 'local_only')
+        ->and($event->fresh()->provider_event_id)->toBe($writeEnabled ? 'recovered-event' : null)
+        ->and($cancelled->fresh()->sync_status)->toBe('local_only')
+        ->and($otherEvent->fresh()->sync_status)->toBe('local_only')
+        ->and(DB::table('jobs')->count())->toBe(0);
+
+    // A later import must not create a second copy of the recovered event.
+    app(CalendarSyncService::class)->sync($connection->fresh());
+    $writes = Http::recorded(fn ($request): bool => $request->method() === 'POST'
+        && str_contains($request->url(), '/calendars/primary/events'));
+    expect($writes)->toHaveCount($writeEnabled ? 1 : 0);
+})->with([true, false]);
+
+test('only the administrator sees reconnect and individual synchronization status', function () {
+    $admin = User::factory()->create(['email' => 'admin@example.com']);
+    config()->set('portfolio.admin_email', $admin->email);
+    GoogleCalendarConnection::query()->create([
+        'user_id' => $admin->id,
+        'refresh_token' => 'expired-refresh',
+        'calendar_ids' => ['primary'],
+        'status' => 'reauth_required',
+    ]);
+    app(CalendarEventManager::class)->create($admin, [
+        'title' => 'Aguardando conex?o',
+        'category' => 'reuniao',
+        'starts_at' => now()->addDay()->format('Y-m-d\TH:i'),
+        'ends_at' => now()->addDay()->addHour()->format('Y-m-d\TH:i'),
+    ]);
+
+    $this->get(route('calendar.show'))->assertOk()->assertDontSee('Reconectar Google Agenda');
+    $this->actingAs($admin)->get(route('calendar.show'))
+        ->assertOk()
+        ->assertSee('Reconectar Google Agenda')
+        ->assertSee(route('calendar.connect'))
+        ->assertSee('Salvo apenas nesta agenda');
 });

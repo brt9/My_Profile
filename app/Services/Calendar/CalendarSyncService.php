@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Calendar;
 
+use App\Models\CalendarEvent;
 use App\Models\GoogleCalendarConnection;
 use App\Services\Telemetry\IntegrationHealthMonitor;
 use Illuminate\Http\Client\RequestException;
@@ -16,6 +17,7 @@ final class CalendarSyncService
         private readonly GoogleCalendarClient $client,
         private readonly CalendarEventProjector $projector,
         private readonly IntegrationHealthMonitor $health,
+        private readonly CalendarEventManager $eventManager,
     ) {}
 
     public function sync(GoogleCalendarConnection $connection): int
@@ -75,6 +77,18 @@ final class CalendarSyncService
                     'last_error_code' => null,
                 ]);
             });
+
+            // Recover appointments saved locally while Google was disconnected.
+            if (config('services.google_calendar.write_enabled')) {
+                CalendarEvent::query()
+                    ->where('user_id', $connection->user_id)
+                    ->where('source', 'local')
+                    ->where('sync_status', 'local_only')
+                    ->where('status', '!=', 'cancelado')
+                    ->eachById(function (CalendarEvent $event): void {
+                        $this->eventManager->syncExistingToGoogle($event);
+                    });
+            }
 
             $this->health->success('google_calendar', $startedAt);
 
