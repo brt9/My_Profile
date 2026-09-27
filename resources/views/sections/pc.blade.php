@@ -80,71 +80,74 @@
 
                 <p class="integration-note telemetry-updated-at" aria-live="polite" x-text="message"></p>
 
-                <div
-                    class="telemetry-modal-backdrop"
-                    x-show="history.open"
-                    x-transition.opacity
-                    @click.self="closeHistory()"
-                    x-cloak
-                >
-                    <section
-                        class="telemetry-modal"
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="telemetry-history-title"
-                        x-ref="historyDialog"
-                        tabindex="-1"
+                {{-- Keep the overlay outside the main content stacking context. --}}
+                <template x-teleport="body">
+                    <div
+                        class="telemetry-modal-backdrop"
+                        x-show="history.open"
+                        x-transition.opacity
+                        @click.self="closeHistory()"
+                        x-cloak
                     >
-                        <div class="telemetry-modal-head">
-                            <div>
-                                <span class="card-kicker">Histórico sem interpolação</span>
-                                <h3 id="telemetry-history-title" x-text="history.label"></h3>
+                        <section
+                            class="telemetry-modal"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="telemetry-history-title"
+                            x-ref="historyDialog"
+                            tabindex="-1"
+                        >
+                            <div class="telemetry-modal-head">
+                                <div>
+                                    <span class="card-kicker">Histórico sem interpolação</span>
+                                    <h3 id="telemetry-history-title" x-text="history.label"></h3>
+                                </div>
+                                <button type="button" class="icon-button" @click="closeHistory()" aria-label="Fechar histórico">×</button>
                             </div>
-                            <button type="button" class="icon-button" @click="closeHistory()" aria-label="Fechar histórico">×</button>
-                        </div>
 
-                        <div class="history-filters" aria-label="Intervalo do histórico">
-                            <template x-for="range in ranges" :key="range">
-                                <button
-                                    type="button"
-                                    :class="{ 'is-active': history.range === range }"
-                                    :aria-pressed="history.range === range"
-                                    @click="changeRange(range)"
-                                    x-text="range"
-                                ></button>
-                            </template>
-                        </div>
+                            <div class="history-filters" aria-label="Intervalo do histórico">
+                                <template x-for="range in ranges" :key="range">
+                                    <button
+                                        type="button"
+                                        :class="{ 'is-active': history.range === range }"
+                                        :aria-pressed="history.range === range"
+                                        @click="changeRange(range)"
+                                        x-text="range"
+                                    ></button>
+                                </template>
+                            </div>
 
-                        <p class="integration-note" x-show="history.loading">Carregando histórico…</p>
-                        <p class="integration-note" role="alert" x-show="history.error" x-text="history.error"></p>
+                            <p class="integration-note" x-show="history.loading">Carregando histórico…</p>
+                            <p class="integration-note" role="alert" x-show="history.error" x-text="history.error"></p>
 
-                        <div class="history-chart-wrap" x-show="!history.loading && !history.error">
-                            <canvas x-ref="historyChart" role="img" :aria-label="`Gráfico de ${history.label} nas últimas ${history.range}`"></canvas>
-                        </div>
+                            <div class="history-chart-wrap" x-show="!history.loading && !history.error">
+                                <canvas x-ref="historyChart" role="img" :aria-label="`Gráfico de ${history.label} nas últimas ${history.range}`"></canvas>
+                            </div>
 
-                        <dl class="history-summary" x-show="history.summary">
-                            <div><dt>Mínimo</dt><dd x-text="summaryValue('minimum')"></dd></div>
-                            <div><dt>Média</dt><dd x-text="summaryValue('average')"></dd></div>
-                            <div><dt>Máximo</dt><dd x-text="summaryValue('maximum')"></dd></div>
-                            <div><dt>Amostras</dt><dd x-text="history.summary?.samples ?? '—'"></dd></div>
-                        </dl>
+                            <dl class="history-summary" x-show="history.summary">
+                                <div><dt>Mínimo</dt><dd x-text="summaryValue('minimum')"></dd></div>
+                                <div><dt>Média</dt><dd x-text="summaryValue('average')"></dd></div>
+                                <div><dt>Máximo</dt><dd x-text="summaryValue('maximum')"></dd></div>
+                                <div><dt>Amostras</dt><dd x-text="history.summary?.samples ?? '—'"></dd></div>
+                            </dl>
 
-                        <div class="history-table-wrap" x-show="history.points.length">
-                            <table class="history-table">
-                                <caption>Últimos pontos disponíveis; lacunas não são preenchidas.</caption>
-                                <thead><tr><th scope="col">Horário</th><th scope="col">Valor</th></tr></thead>
-                                <tbody>
-                                    <template x-for="point in availableHistoryPoints()" :key="point.at">
-                                        <tr>
-                                            <td x-text="formatDate(point.at)"></td>
-                                            <td x-text="`${point.value}${history.unit}`"></td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                </div>
+                            <div class="history-table-wrap" x-show="history.points.length">
+                                <table class="history-table">
+                                    <caption>Últimos pontos disponíveis; lacunas não são preenchidas.</caption>
+                                    <thead><tr><th scope="col">Horário</th><th scope="col">Valor</th></tr></thead>
+                                    <tbody>
+                                        <template x-for="point in availableHistoryPoints()" :key="point.at">
+                                            <tr>
+                                                <td x-text="formatDate(point.at)"></td>
+                                                <td x-text="`${point.value}${history.unit}`"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+                </template>
             </article>
         </div>
     </div>
